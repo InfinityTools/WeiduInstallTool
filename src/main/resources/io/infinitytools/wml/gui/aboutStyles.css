@@ -1,0 +1,17 @@
+.root {
+  -fx-padding: 12px;
+}
+
+.link {
+  -fx-font-weight: bold;
+}
+
+#titleLabel {
+  -fx-font-weight: bold;
+  -fx-font-size: 18pt;
+}
+
+#versionLabel {
+  -fx-font-weight: bold;
+  -fx-font-size: 12pt;
+}

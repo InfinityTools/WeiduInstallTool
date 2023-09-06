@@ -1,0 +1,11 @@
+/* .root {
+  -fx-padding: 10px;
+} */
+
+.boldLabel {
+  -fx-font-weight: bold;
+}
+
+.subPane {
+  -fx-padding: 10px;
+}

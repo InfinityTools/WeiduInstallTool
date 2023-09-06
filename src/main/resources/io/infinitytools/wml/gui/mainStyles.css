@@ -1,0 +1,25 @@
+/* Custom monospaced font for input and output text areas */
+@font-face {
+  font-style: normal;
+  font-weight: normal;
+  src: url('../fonts/liberation-mono/LiberationMono-Regular.ttf') format('truetype');
+}
+
+#outputArea, #inputField {
+  -fx-font-family: "Liberation Mono", monospace;
+}
+
+#sendButton {
+  -fx-padding: 4 20 4 20;
+  -fx-font-weight: bold;
+}
+
+#quitButton {
+  -fx-padding: 5 20 5 20;
+  -fx-font-weight: bold;
+}
+
+/* Consistent look for labels */
+.boldLabel {
+  -fx-font-weight: bold;
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<SplitPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="io.infinitytools.wml.gui.DetailsWindowController"
+           stylesheets="@detailsStyles.css"
+           orientation="VERTICAL"
+           dividerPositions="0.5">
+  <!-- Top region of the split pane: language selection and components tree -->
+  <VBox alignment="CENTER"
+        spacing="8"
+        styleClass="subPane">
+
+    <!-- Language selection -->
+    <HBox alignment="CENTER_LEFT"
+          spacing="8">
+      <Label text="Language:"
+             styleClass="boldLabel"/>
+      <ChoiceBox fx:id="languageChoiceBox"
+                 minWidth="0"
+                 prefWidth="32"
+                 maxWidth="Infinity"
+                 HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <!-- Components tree -->
+    <TreeView fx:id="componentsTree"
+              showRoot="false"
+              VBox.vgrow="ALWAYS"/>
+  </VBox>
+
+  <!-- Bottom region of the split pane: mod information tree -->
+  <VBox alignment="CENTER_LEFT"
+        spacing="8"
+        styleClass="subPane">
+    <Label fx:id="iniLabel"
+           text="About the mod:"
+           styleClass="boldLabel"/>
+    <TreeView fx:id="iniTree"
+              showRoot="false"
+              VBox.vgrow="ALWAYS"/>
+  </VBox>
+</SplitPane>

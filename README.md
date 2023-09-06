@@ -1,5 +1,15 @@
-# WeiDU Mod Launcher
+# ![alt text](../devel/src/main/resources/io/infinitytools/wml/icons/logo/64x64.png "WeiDU Mod Launcher") WeiDU Mod Launcher
 *A graphical frontend for WeiDU Mods.*
+
+...Introduction...
+
+## Installation
+
+...TODO...
+
+## Building from Source
+
+...TODO...
 
 ## License
 

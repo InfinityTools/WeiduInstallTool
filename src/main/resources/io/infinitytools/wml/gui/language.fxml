@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="io.infinitytools.wml.gui.LanguageWindowController"
+      stylesheets="@languageStyles.css"
+      alignment="CENTER"
+      spacing="8">
+
+  <Label fx:id="promptLabel"
+         styleClass="boldLabel,bigLabel"
+         textAlignment="CENTER"
+         text="Please choose the language in which you wish to play the game."
+         wrapText="true"/>
+  
+  <Label fx:id="infoLabel"
+         textAlignment="CENTER"
+         text="If you later wish to play the game in a different language you will need to edit the file weidu.conf and reinstall your mods."
+         wrapText="true"/>
+
+  <Label fx:id="notesLabel"
+         textAlignment="CENTER"
+         text="Press &quot;Cancel&quot; to let the mod installation itself handle game language selection."
+         wrapText="true"/>
+
+  <!-- Language selection -->
+  <HBox alignment="CENTER"
+        spacing="8">
+    <padding>
+      <Insets top="8"/>
+    </padding>
+    <Label styleClass="boldLabel"
+           text="Language:"/>
+
+    <ComboBox fx:id="languageBox"
+              HBox.hgrow="ALWAYS"/>
+  </HBox>
+
+  <!-- dialog buttons -->
+  <HBox alignment="CENTER"
+        spacing="8">
+    <padding>
+      <Insets top="8"/>
+    </padding>
+    <Button fx:id="okButton"
+            styleClass="boldLabel"
+            defaultButton="true"
+            text="    OK    "/>
+    <Button fx:id="cancelButton"
+            styleClass="boldLabel"
+            cancelButton="true"
+            text="Cancel"/>
+  </HBox>
+
+</VBox>

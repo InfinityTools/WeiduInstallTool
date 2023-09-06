@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="io.infinitytools.wml.gui.AboutWindowController"
+      stylesheets="@aboutStyles.css"
+      alignment="CENTER"
+      spacing="8">
+
+  <!-- main content -->
+  <HBox alignment="TOP_CENTER"
+        spacing="8">
+
+    <!-- logo -->
+    <VBox alignment="TOP_CENTER">
+      <ImageView fx:id="logoImage"
+                 fitWidth="96"
+                 fitHeight="96"
+                 preserveRatio="true">
+        <Image url="@../icons/logo/128x128.png"/>
+      </ImageView>
+      <Pane VBox.vgrow="ALWAYS"/>
+    </VBox>
+
+    <!-- about information -->
+    <VBox>
+
+      <Label fx:id="titleLabel"
+             text="::title::">
+      </Label>
+
+      <Label fx:id="versionLabel"
+             text="::version::">
+      </Label>
+
+      <Pane prefHeight="16"
+            VBox.vgrow="NEVER"/>
+
+      <HBox alignment="CENTER_LEFT"
+            styleClass="link">
+        <Label text="Project:"/>
+        <Hyperlink fx:id="projectLink"
+                   text="::project-link::">
+        </Hyperlink>
+      </HBox>
+
+      <HBox alignment="CENTER_LEFT"
+            styleClass="link">
+        <Label text="WeiDU:"/>
+        <Hyperlink fx:id="weiduLink"
+                   text="::weidu-link::">
+        </Hyperlink>
+      </HBox>
+
+      <Pane prefHeight="8"
+            VBox.vgrow="NEVER"/>
+
+      <Label fx:id="descLabel"
+             text="A graphical frontend for WeiDU."/>
+
+      <Label fx:id="copyLabel"
+             text="Copyright (c) 2023 Argent77"/>
+
+      <Pane prefHeight="8"
+            VBox.vgrow="ALWAYS"/>
+    </VBox>
+  </HBox>
+
+  <!-- dialog button -->
+  <HBox alignment="CENTER"
+        spacing="8">
+    <Button fx:id="okButton"
+            cancelButton="true"
+            defaultButton="true"
+            text="  OK  "/>
+  </HBox>
+</VBox>

@@ -1,0 +1,164 @@
+import org.gradle.internal.os.OperatingSystem
+
+plugins {
+  id 'java'
+  id 'application'
+  id 'org.javamodularity.moduleplugin' version '1.8.12'
+  id 'org.openjfx.javafxplugin' version '0.0.14'
+  id 'org.beryx.jlink' version '2.26.0'
+}
+
+group 'io.infinitytools'
+version '1.0-SNAPSHOT'
+
+repositories {
+  mavenCentral()
+}
+
+//def appTitle
+def appName
+def projectUrl
+
+ext {
+  junitVersion = '5.9.2'
+
+  // App version is stored in a global properties file
+  Properties _props = new Properties()
+  _props.load(file("src/main/resources/globals.properties").newDataInputStream())
+  project.version = _props.getProperty("version")
+//  appTitle = _props.getProperty("title", "WeiDU Mod Launcher")
+  appName = _props.getProperty("name", "WeiDUModLauncher")
+  projectUrl = _props.getProperty("project", "https://github.com/InfinityTools/wml")
+}
+
+java {
+  sourceCompatibility '20'
+  targetCompatibility '20'
+}
+
+// remove when switching to JDK 21
+def ENABLE_PREVIEW = "--enable-preview"
+// Workaround for accessing GitHub API
+def TLS_PROTOCOL = "-Djdk.tls.client.protocols=TLSv1.2"
+
+tasks.withType(JavaCompile).configureEach {
+  options.compilerArgs += ENABLE_PREVIEW
+  options.compilerArgs += "-Xlint:preview"
+  options.encoding = 'UTF-8'
+  options.debugOptions.setDebugLevel("source,lines,vars")
+//  options.debug = true
+}
+
+tasks.withType(Test).configureEach {
+  useJUnitPlatform()
+  jvmArgs += ENABLE_PREVIEW
+  jvmArgs += TLS_PROTOCOL
+}
+
+tasks.withType(JavaExec).configureEach {
+  jvmArgs += ENABLE_PREVIEW
+  jvmArgs += TLS_PROTOCOL
+}
+
+application {
+  mainModule = 'io.infinitytools.wml'
+  mainClass = 'io.infinitytools.wml.WeiduModLauncher'
+}
+
+javafx {
+  version = "${java.sourceCompatibility}.+"
+  modules = ['javafx.controls', 'javafx.fxml']
+}
+
+dependencies {
+  // https://mvnrepository.com/artifact/org.json/json
+  implementation group: 'org.json', name: 'json', version: '20230227'
+  // https://tinylog.org/v2/download/
+  implementation group: 'org.tinylog', name: 'tinylog-api', version: '2.6.2'
+  implementation group: 'org.tinylog', name: 'tinylog-impl', version: '2.6.2'
+
+  testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+
+//test {
+//  useJUnitPlatform()
+//}
+
+jlink {
+  imageZip.fileValue(project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip"))
+  addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
+  addExtraDependencies("javafx")
+
+  launcher {
+    name = "${appName}"
+    noConsole = false
+  }
+
+  jpackage {
+    jvmArgs = [
+            ENABLE_PREVIEW,
+            TLS_PROTOCOL
+    ]
+
+    installerOptions = [
+            "--verbose",
+            "--app-version", "${project.version}",
+            "--copyright", "Copyright © 2023 Argent77",
+            "--description", "A graphical frontend for WeiDU.",
+    ]
+
+    if (OperatingSystem.current().isWindows()) {
+      imageOptions = [
+              "--icon", "${projectDir}/buildres/windows/wml.ico"
+      ]
+      installerType = "exe"
+      installerOptions.addAll([
+              "--icon", "${projectDir}/buildres/windows/wml.ico",
+              "--resource-dir", "${projectDir}/buildres/windows",
+              "--file-associations", "${projectDir}/buildres/windows/open_with.properties",
+              "--win-dir-chooser",
+              "--win-per-user-install",
+              "--win-shortcut",
+              "--win-shortcut-prompt",
+              "--win-menu",
+              "--about-url", "${projectUrl}"
+      ])
+    } else if (OperatingSystem.current().isLinux()) {
+      imageOptions = [
+              "--icon", "${projectDir}/src/main/resources/io/infinitytools/wml/icons/icon/256x256.png",
+      ]
+      installerType = "deb"
+      installerOptions.addAll([
+              "--resource-dir", "${projectDir}/buildres/linux",
+              "--file-associations", "${projectDir}/buildres/linux/open_with.properties",
+              "--linux-rpm-license-type", "Apache-2.0",
+              "--linux-shortcut"
+      ])
+    } else if (OperatingSystem.current().isMacOsX()) {
+      imageOptions = [
+              "--icon", "${projectDir}/buildres/mac/wml.icns",
+              "--resource-dir", "${projectDir}/buildres/mac"
+      ]
+      installerType = "pkg"
+      installerOptions.addAll([
+              "--mac-package-name", "${appName}",
+              "--resource-dir", "${projectDir}/buildres/mac",
+              "--file-associations", "${projectDir}/buildres/mac/open_with.properties"
+      ])
+    }
+  }
+}
+
+jlinkZip {
+  group = 'distribution'
+}
+
+//if (OperatingSystem.current().isMacOsX()) {
+//  tasks.jpackageImage.doLast {
+//    copy {
+//      from("${projectDir}/buildres/mac")
+//      into "${buildDir}/${jlinkZip.group}/${appName}.app/Contents/Resources"
+//    }
+//  }
+//}
