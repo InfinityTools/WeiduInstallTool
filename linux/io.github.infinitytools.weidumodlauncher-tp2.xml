@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+   <mime-type type="application/x-tp2">
+     <comment xml:lang="en">WeiDU TP2 Script</comment>
+     <glob pattern="*.tp2"/>
+     <icon name="io.github.infinitytools.weidumodlauncher-tp2"/>
+     <generic-icon name="io.github.infinitytools.weidumodlauncher-tp2"/>
+   </mime-type>
+</mime-info>
