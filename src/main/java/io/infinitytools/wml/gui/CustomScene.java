@@ -46,7 +46,7 @@ public class CustomScene extends Scene {
       boolean enabled = Configuration.getInstance().getOption(Configuration.Key.DARK_UI_MODE);
       setDarkMode(scene, enabled);
     } catch (Throwable t) {
-      Logger.error("Setting dark mode", t);
+      Logger.error("Could not set dark UI mode", t);
     }
   }
 

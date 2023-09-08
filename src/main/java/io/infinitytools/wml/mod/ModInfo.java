@@ -220,7 +220,7 @@ public class ModInfo {
               StandardOpenOption.WRITE);
           retVal = true;
         } catch (IOException e) {
-          Logger.debug("Error while writing weidu.conf", e);
+          Logger.debug("Error writing weidu.conf", e);
         }
       }
     }

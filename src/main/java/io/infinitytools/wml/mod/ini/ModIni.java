@@ -187,7 +187,7 @@ public class ModIni {
           return new URI(item.strip()).toURL();
         } catch (Exception e) {
           // ignore
-          Logger.debug("Mod Ini: invalid url item", e);
+          Logger.debug("Mod Ini: invalid url entry", e);
         }
       }
       return null;

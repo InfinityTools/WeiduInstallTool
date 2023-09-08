@@ -152,7 +152,7 @@ public enum Icons {
       assert is != null;
       retVal = new Image(is);
     } catch (IOException e) {
-      Logger.error("Icon not accessible", e);
+      Logger.error("Image not accessible", e);
     }
 
     return retVal;

@@ -158,7 +158,7 @@ public class Weidu {
 
         result.get();
       } catch (ExecutionException | IOException | InterruptedException e) {
-        Logger.error("Error while executing WeiDU process", e);
+        Logger.error("Error executing WeiDU process", e);
       }
       String output = sp.getOutput();
       if (output != null) {
@@ -558,7 +558,7 @@ public class Weidu {
     try {
       zipAsset = findWeiduAsset();
     } catch (IOException e) {
-      Logger.debug("findWeiduAsset error", e);
+      Logger.debug("Unrecoverable findWeiduAsset() error", e);
       throw new IOException("Could not determine WeiDU binary URL.", e);
     }
 

@@ -81,7 +81,7 @@ public class Globals {
           retVal = value;
         }
       } catch (IOException e) {
-        Logger.debug("Error fetching properties entry", e);
+        Logger.debug("Error loading \"globals.properties\" entry", e);
       }
     }
 
