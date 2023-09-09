@@ -6,7 +6,7 @@ Name=WeiDU Mod Launcher
 Comment=A graphical frontend for WeiDU Mods
 Categories=Game;Java;
 
-Icon=io.github.infinitytools.weidumodlauncher
-Exec=weidumodlauncher %f
+Icon=io.github.infinitytools.WeiduModLauncher
+Exec=WeiduModLauncher %f
 Terminal=false
 MimeType=application/x-tp2
