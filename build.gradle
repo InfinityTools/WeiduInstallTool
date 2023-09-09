@@ -27,7 +27,7 @@ ext {
   _props.load(file("src/main/resources/globals.properties").newDataInputStream())
   project.version = _props.getProperty("version")
 //  appTitle = _props.getProperty("title", "WeiDU Mod Launcher")
-  appName = _props.getProperty("name", "WeiDUModLauncher")
+  appName = _props.getProperty("name", "WeiduModLauncher")
   projectUrl = _props.getProperty("project", "https://github.com/InfinityTools/wml")
 }
 
