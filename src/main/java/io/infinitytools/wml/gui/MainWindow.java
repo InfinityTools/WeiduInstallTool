@@ -443,7 +443,8 @@ public class MainWindow extends Application {
     if (!getController().detailsButton.isDisabled()) {
       if (newValue) {
         detailsWindow.show();
-        getStage().requestFocus();
+        // Delay required to work around platform-specific window behavior
+        Platform.runLater(() -> getStage().requestFocus());
       } else {
         detailsWindow.hide();
       }
