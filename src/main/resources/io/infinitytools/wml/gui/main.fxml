@@ -9,6 +9,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
@@ -100,7 +101,40 @@
             </Tooltip>
           </tooltip>-->
         </CheckMenuItem>
+
         <SeparatorMenuItem />
+
+        <CustomMenuItem fx:id="outputFontSizeMenuItem">
+          <content>
+            <HBox alignment="CENTER_LEFT"
+                  spacing="8">
+              <padding>
+                <Insets top="2"
+                        right="4"
+                        bottom="2"/>
+              </padding>
+              <Label text="Output Font Size:"
+                     styleClass="boldLabel"/>
+              <Spinner fx:id="outputFontSizeSpinner"
+                       HBox.hgrow="SOMETIMES">
+                <valueFactory>
+                  <!-- Fully qualified class path required to work around fxml build errors -->
+                  <javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory fx:id="outputFontSizeValueFactory"
+                                                                                      min="4.0"
+                                                                                      max="80.0"
+                                                                                      initialValue="12.0"
+                                                                                      amountToStepBy="0.5">
+                  </javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory>
+                </valueFactory>
+              </Spinner>
+              <Label text="pt"
+                     styleClass="boldLabel"/>
+            </HBox>
+          </content>
+        </CustomMenuItem>
+
+        <SeparatorMenuItem />
+
         <!-- Output Buffer Size uses a custom menu item with a complex UI layout -->
         <CustomMenuItem fx:id="bufferSizeMenuItem">
           <content>

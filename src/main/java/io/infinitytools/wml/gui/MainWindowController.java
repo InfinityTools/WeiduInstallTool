@@ -39,9 +39,13 @@ public class MainWindowController {
   public CheckMenuItem warnModOrderCheckItem;
   public CheckMenuItem darkModeUiCheckItem;
   public CustomMenuItem bufferSizeMenuItem;
+  public CustomMenuItem outputFontSizeMenuItem;
+  public Spinner<Double> outputFontSizeSpinner;
+  public SpinnerValueFactory.DoubleSpinnerValueFactory outputFontSizeValueFactory;
   public Slider bufferSizeSlider;
   public Label bufferSizeValueLabel;
 
   public MainWindowController() {
   }
+
 }

@@ -60,6 +60,10 @@ public class Configuration {
      */
     DARK_UI_MODE("Dark UI Mode", Boolean.class, false),
     /**
+     * Specifies font size, in pt, of the output text area.
+     */
+    OUTPUT_FONT_SIZE("Output Font Size", Double.class, null),
+    /**
      * Indicates whether the Details window should be visible on launch.
      */
     SHOW_DETAILS("Show Details Window", Boolean.class, true),
@@ -318,6 +322,8 @@ public class Configuration {
           setOption(key, entry.getBoolValue(key.getDefaultValue()));
         } else if (Integer.class.isAssignableFrom(key.getType())) {
           setOption(key, entry.getNumericValue(key.getDefaultValue()).intValue());
+        } else if (Double.class.isAssignableFrom(key.getType())) {
+          setOption(key, entry.getNumericValue(key.getDefaultValue()).doubleValue());
         } else {
           setOption(key, entry.getValue());
         }

@@ -39,6 +39,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -403,6 +404,15 @@ public class MainWindow extends Application {
     return roundedValue;
   }
 
+  /**
+   * Returns the font size of the output text area, as specified in the output font size option.
+   *
+   * @return Font size, in pt.
+   */
+  public double getOutputAreaFontSize() {
+    return getController().outputArea.getFont().getSize();
+  }
+
   /** Returns the content of the output text area. */
   public String getOutputText() {
     return getController().outputArea.getText();
@@ -610,6 +620,36 @@ public class MainWindow extends Application {
     stage.setTitle(title);
   }
 
+  /** Sets the font size of the output text area to the specified value. */
+  private void setOutputAreaFontSize(double value) {
+    final Font font = getController().outputArea.getFont();
+    if (font.getSize() != value) {
+      getController().outputArea.styleProperty().set(String.format("-fx-font-size: %f;", value));
+    }
+  }
+
+  /**
+   * Applies the specified font size to the font size spinner and optionally updates configuration option.
+   *
+   * @param fontSize Font size to apply to the output text area.
+   * @param updateConfig Whether to update the corresponding {@link Configuration} option.
+   */
+  private void applyOutputFontSize(double fontSize, boolean updateConfig) {
+    // ensure that output font size is rounded to a multiple of 0.5
+    fontSize = Math.floor(fontSize * 2.0) / 2.0;
+
+    if (updateConfig) {
+      Configuration.getInstance().setOption(Configuration.Key.OUTPUT_FONT_SIZE, fontSize);
+    }
+
+    // distinction is necessary to ensure that font size is set
+    if (fontSize != getController().outputFontSizeValueFactory.getValue()) {
+      getController().outputFontSizeValueFactory.setValue(fontSize);
+    } else {
+      setOutputAreaFontSize(getOutputAreaFontSize());
+    }
+  }
+
   /** Updates the output buffer size label to the specified value. */
   private void setOutputBufferSizeLabel(double value) {
     final int roundedValue = getOutputBufferSize(value);
@@ -726,6 +766,7 @@ public class MainWindow extends Application {
         .setOption(Configuration.Key.WARN_MOD_ORDER, isWarnModOrderEnabled()));
     getController().darkModeUiCheckItem.setOnAction(event -> applyDarkModeUi(isDarkModeEnabled()));
     getController().bufferSizeSlider.valueProperty().addListener((ob, ov, nv) -> setOutputBufferSizeLabel(nv.doubleValue()));
+    getController().outputFontSizeValueFactory.valueProperty().addListener((ob, ov, nv) -> setOutputAreaFontSize(nv));
 
     getController().quitButton.setOnAction(this::onCloseApplication);
     getController().detailsButton.selectedProperty().addListener((ob, ov, nv) -> onDetailsButtonSelected(nv));
@@ -790,6 +831,9 @@ public class MainWindow extends Application {
     getController().darkModeUiCheckItem.setSelected(Configuration.getInstance().<Boolean>getOption(Configuration.Key.DARK_UI_MODE));
     getController().bufferSizeSlider.setValue(Configuration.getInstance().<Integer>getOption(Configuration.Key.BUFFER_LIMIT));
 
+    applyOutputFontSize(Configuration.getInstance().getOption(Configuration.Key.OUTPUT_FONT_SIZE,
+        getController().outputArea.getFont().getSize()), true);
+
     applyDarkModeUi(isDarkModeEnabled());
 
     onDetailsButtonSelected(Configuration.getInstance().getOption(Configuration.Key.SHOW_DETAILS));
@@ -838,6 +882,7 @@ public class MainWindow extends Application {
     cfg.setOption(Configuration.Key.QUIT_ON_ENTER, isAutoQuitEnabled());
     cfg.setOption(Configuration.Key.VISUALIZE_RESULT, isVisualizeResultsEnabled());
     cfg.setOption(Configuration.Key.BUFFER_LIMIT, getOutputBufferSize());
+    cfg.setOption(Configuration.Key.OUTPUT_FONT_SIZE, getOutputAreaFontSize());
     if (modInfo != null) {
       cfg.setOption(Configuration.Key.LAST_GAME_PATH, modInfo.getGamePath().toString());
       if (modInfo.getTp2File() != null) {
