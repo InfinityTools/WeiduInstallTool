@@ -113,8 +113,7 @@
                         right="4"
                         bottom="2"/>
               </padding>
-              <Label text="Output Font Size:"
-                     styleClass="boldLabel"/>
+              <Label text="Output Font Size:"/>
               <Spinner fx:id="outputFontSizeSpinner"
                        HBox.hgrow="SOMETIMES">
                 <valueFactory>
@@ -127,8 +126,7 @@
                   </javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory>
                 </valueFactory>
               </Spinner>
-              <Label text="pt"
-                     styleClass="boldLabel"/>
+              <Label text="pt"/>
             </HBox>
           </content>
         </CustomMenuItem>
@@ -139,8 +137,7 @@
         <CustomMenuItem fx:id="bufferSizeMenuItem">
           <content>
             <VBox spacing="4">
-              <Label styleClass="boldLabel"
-                     text="Output Buffer Size:"/>
+              <Label text="Output Buffer Size:"/>
               <HBox alignment="CENTER_LEFT"
                     spacing="8">
                 <Slider fx:id="bufferSizeSlider"

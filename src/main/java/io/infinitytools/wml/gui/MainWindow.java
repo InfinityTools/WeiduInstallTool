@@ -629,7 +629,8 @@ public class MainWindow extends Application {
   private void setOutputAreaFontSize(double value) {
     final Font font = getController().outputArea.getFont();
     if (font.getSize() != value) {
-      getController().outputArea.styleProperty().set(String.format("-fx-font-size: %f;", value));
+      final String style = String.format("-fx-font-size: %f;", value);
+      getController().outputArea.styleProperty().set(style);
     }
   }
 
