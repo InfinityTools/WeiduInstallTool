@@ -9,4 +9,6 @@ module io.infinitytools.wml {
   opens io.infinitytools.wml.gui to javafx.fxml;
   exports io.infinitytools.wml.gui;
   exports io.infinitytools.wml.mod;
+  exports io.infinitytools.wml.mod.info;
+  exports io.infinitytools.wml.mod.ini;
 }
