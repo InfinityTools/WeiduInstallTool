@@ -382,6 +382,11 @@ public class MainWindow extends Application {
     return getOutputBufferSize(getController().bufferSizeSlider.getValue());
   }
 
+  /** Sets the new output buffer size to the specified value. */
+  public void setOutputBufferSize(int newSize) {
+    getController().bufferSizeSlider.setValue(newSize);
+  }
+
   /**
    * Returns the output buffer size based on the specified value.
    * <p>
@@ -425,13 +430,13 @@ public class MainWindow extends Application {
    */
   public void appendOutputText(String text) {
     if (text != null) {
-      setOutputText(getController().outputArea.getText() + text);
+      setOutputText(getOutputText() + text);
     }
   }
 
   /** Sets the specified text to the output text area and scrolls down to the bottom-most line of the content. */
   public void setOutputText(String text) {
-    getController().outputArea.clear();
+    clearOutputText();
     if (text != null) {
       getController().outputArea.appendText(ensureOutputTextLimit(text));
       scrollDownOutput();
@@ -445,7 +450,7 @@ public class MainWindow extends Application {
 
   /** This method should be called whenever the visibility state of the Details window changes. */
   public void updateDetailsButtonSelected() {
-    getController().detailsButton.setSelected(detailsWindow.isShowing());
+    setDetailsWindowVisible(detailsWindow.isShowing());
   }
 
   /** Called by listener of the Details toggle button when the selected state changes. */
@@ -460,7 +465,7 @@ public class MainWindow extends Application {
       }
       updateDetailsButtonSelected();
     } else {
-      getController().detailsButton.setSelected(newValue);
+      setDetailsWindowVisible(newValue);
     }
   }
 
@@ -825,11 +830,11 @@ public class MainWindow extends Application {
       }
     }
 
-    getController().autoQuitCheckItem.setSelected(Configuration.getInstance().<Boolean>getOption(Configuration.Key.QUIT_ON_ENTER));
-    getController().visualizeResultCheckItem.setSelected(Configuration.getInstance().<Boolean>getOption(Configuration.Key.VISUALIZE_RESULT));
-    getController().warnModOrderCheckItem.setSelected(Configuration.getInstance().<Boolean>getOption(Configuration.Key.WARN_MOD_ORDER));
-    getController().darkModeUiCheckItem.setSelected(Configuration.getInstance().<Boolean>getOption(Configuration.Key.DARK_UI_MODE));
-    getController().bufferSizeSlider.setValue(Configuration.getInstance().<Integer>getOption(Configuration.Key.BUFFER_LIMIT));
+    setAutoQuitEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.QUIT_ON_ENTER));
+    setVisualizeResultsEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.VISUALIZE_RESULT));
+    setWarnModOrderEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.WARN_MOD_ORDER));
+    setDarkModeEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.DARK_UI_MODE));
+    setOutputBufferSize(Configuration.getInstance().<Integer>getOption(Configuration.Key.BUFFER_LIMIT));
 
     applyOutputFontSize(Configuration.getInstance().getOption(Configuration.Key.OUTPUT_FONT_SIZE,
         getController().outputArea.getFont().getSize()), true);

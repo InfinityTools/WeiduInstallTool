@@ -313,7 +313,7 @@ public class Configuration {
    * @throws Exception if the configuration file could not be loaded.
    */
   public void load() throws Exception {
-    final IniMap ini = IniMap.parse(configPath, IniMap.Style.getDefault());
+    final IniMap ini = IniMap.parse(getConfigFile(), IniMap.Style.getDefault());
     final IniMapSection section = ini.getDefaultSection();
     for (final Key key : Key.values()) {
       final IniEntry entry = section.getEntry(key.getName());
@@ -352,9 +352,9 @@ public class Configuration {
    * @throws Exception if the configuration could not be written.
    */
   public void save() throws Exception {
-    if (!Files.exists(configPath)) {
+    if (!Files.exists(getConfigFile())) {
       // Create path and file
-      final Path configDir = configPath.getParent();
+      final Path configDir = getConfigFile().getParent();
       if (!Files.exists(configDir)) {
         Files.createDirectories(configDir);
       }
@@ -369,7 +369,7 @@ public class Configuration {
       }
     }
 
-    Files.writeString(configPath, ini.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+    Files.writeString(getConfigFile(), ini.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
         StandardOpenOption.WRITE);
   }
 

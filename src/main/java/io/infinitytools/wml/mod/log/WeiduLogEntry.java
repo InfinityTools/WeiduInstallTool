@@ -61,7 +61,7 @@ public class WeiduLogEntry implements Comparable<WeiduLogEntry> {
    * Returns the base name of the TP2 file without the path, "setup-" prefix and file extension part.
    */
   public String getTp2Name() {
-    return ModInfo.stripModName(tp2File.getFileName().toString(), true);
+    return ModInfo.stripModName(getTp2File().getFileName().toString(), true);
   }
 
   @Override
@@ -74,7 +74,7 @@ public class WeiduLogEntry implements Comparable<WeiduLogEntry> {
 
   @Override
   public String toString() {
-    return String.format("~%s~ #%d #%d", tp2File.toString(), language, component);
+    return String.format("~%s~ #%d #%d", getTp2File().toString(), language, component);
   }
 
   /** Parses the specified line and initializes the {@link WeiduLogEntry}. */

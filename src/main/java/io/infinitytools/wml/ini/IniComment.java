@@ -45,14 +45,12 @@ public class IniComment extends IniBaseNode {
   /**
    * Assigns a new comment. Line breaks are automatically converted to spaces.
    */
-  public IniComment setComment(String newComment) {
+  public void setComment(String newComment) {
     if (newComment == null) {
       newComment = "";
     }
     newComment = newComment.replaceAll("[\r\n]", " ").strip();
     this.comment = newComment;
-
-    return this;
   }
 
   @Override
@@ -86,7 +84,7 @@ public class IniComment extends IniBaseNode {
 
   @Override
   public String toString() {
-    return String.format("%s %s", getCommentStyle(), comment);
+    return String.format("%s %s", getCommentStyle(), getComment());
   }
 
   /**

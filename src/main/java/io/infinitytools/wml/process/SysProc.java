@@ -458,8 +458,8 @@ public class SysProc {
       }
 
       process = pb.start();
-      final InputStreamConsumer consumer = new InputStreamConsumer(process, charset);
-      final OutputStreamProducer producer = new OutputStreamProducer(process, charset);
+      final InputStreamConsumer consumer = new InputStreamConsumer(process, getCharset());
+      final OutputStreamProducer producer = new OutputStreamProducer(process, getCharset());
 
       // process execution has started
       runAsync(() -> fireChangeEvent(SysProcChangeEvent.Type.Started));

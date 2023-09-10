@@ -445,9 +445,8 @@ public class IniMap implements Iterable<IniMapSection> {
   }
 
   /** Assigns a new comment style to the INI map. */
-  public IniMap setStyle(Style newStyle) {
+  public void setStyle(Style newStyle) {
     this.style = (newStyle != null) ? newStyle : Style.getDefault();
-    return this;
   }
 
   /**
