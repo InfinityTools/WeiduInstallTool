@@ -427,19 +427,34 @@ public class MainWindow extends Application {
    * Adds the specified text string to the output text area and scrolls down to the bottom-most line of the content.
    *
    * @param text string to add.
+   * @param autoScrollDown Whether to scroll the text area down to the last line.
    */
-  public void appendOutputText(String text) {
+  public void appendOutputText(String text, boolean autoScrollDown) {
     if (text != null) {
-      setOutputText(getOutputText() + text);
+      setOutputText(getOutputText() + text, autoScrollDown);
     }
   }
 
-  /** Sets the specified text to the output text area and scrolls down to the bottom-most line of the content. */
-  public void setOutputText(String text) {
+  /**
+   * Sets the specified text to the output text area and scrolls down to the bottom-most line of the content.
+   *
+   * @param text string to set.
+   * @param autoScrollDown Whether to scroll the text area down to the last line.
+   */
+  public void setOutputText(String text, boolean autoScrollDown) {
+    int caretPos = getController().outputArea.getCaretPosition();
+    if (autoScrollDown) {
+      getController().outputArea.positionCaret(0);
+    }
+
     clearOutputText();
     if (text != null) {
       getController().outputArea.appendText(ensureOutputTextLimit(text));
-      scrollDownOutput();
+
+      if (autoScrollDown) {
+        caretPos = getController().outputArea.getText().length();
+      }
+      getController().outputArea.positionCaret(caretPos);
     }
   }
 
@@ -489,7 +504,7 @@ public class MainWindow extends Application {
 
   /** Called by process event handler whenever output data is available. */
   private void onProcessOutput(SysProcOutputEvent event) {
-    Platform.runLater(() -> appendOutputText(event.getText()));
+    Platform.runLater(() -> appendOutputText(event.getText(), true));
   }
 
   /** Performs post-initializations when the window is about to become visible. */
@@ -709,12 +724,6 @@ public class MainWindow extends Application {
     return retVal;
   }
 
-  /** Scrolls the output text area down to the bottom-most content. */
-  private void scrollDownOutput() {
-    getController().outputArea.positionCaret(getController().outputArea.getLength());
-    getController().outputArea.setScrollTop(Double.MAX_VALUE);
-  }
-
   /**
    * This method sends the specified text to the current WeiDU process.
    *
@@ -727,7 +736,7 @@ public class MainWindow extends Application {
       process.setInput(inputText);
     }
 
-    appendOutputText(inputText);
+    appendOutputText(inputText, true);
 
     if (cleanup) {
       getController().inputField.setText("");
@@ -855,10 +864,10 @@ public class MainWindow extends Application {
       this.process.addOutputEventHandler(this::onProcessOutput);
 
       if (this.process.getWorkingDirectory() != null) {
-        appendOutputText("Working directory: " + this.process.getWorkingDirectory().toString() + "\n");
+        appendOutputText("Working directory: " + this.process.getWorkingDirectory().toString() + "\n", true);
       }
       // display executed command line in output area
-      appendOutputText(this.process.getCommandLine() + "\n");
+      appendOutputText(this.process.getCommandLine() + "\n", true);
 
       try {
         processResult = this.process.execute();
@@ -981,7 +990,7 @@ public class MainWindow extends Application {
 
     final BorderWidths bw = new BorderWidths(2.0);
     final BorderStroke bs = new BorderStroke(color, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, bw);
-    getController().outputScrollPane.setBorder(new Border(bs));
+    getController().outputArea.setBorder(new Border(bs));
   }
 
   /**
@@ -1060,7 +1069,8 @@ public class MainWindow extends Application {
           if (confirm) {
             executeGuided();
           } else {
-            appendOutputText(String.format("*** Skipped installation of \"%s\" ***\n", getModInfo().getTp2Name()));
+            appendOutputText(String.format("*** Skipped installation of \"%s\" ***\n", getModInfo().getTp2Name()),
+                false);
           }
         }
         default -> executeCustom();
@@ -1076,8 +1086,7 @@ public class MainWindow extends Application {
       setWeiduRunning();
       final String helpDesc = Weidu.getInstance().getHelp();
       if (helpDesc != null) {
-        appendOutputText(helpDesc);
-        controller.outputArea.positionCaret(0);
+        appendOutputText(helpDesc, false);
       } else {
         Utils.showErrorDialog(getStage(), "Error", "No WeiDU help available.", null);
       }

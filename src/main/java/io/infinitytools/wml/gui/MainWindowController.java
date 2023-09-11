@@ -18,7 +18,6 @@ package io.infinitytools.wml.gui;
 import javafx.scene.control.*;
 
 public class MainWindowController {
-  public ScrollPane outputScrollPane;
   public TextArea outputArea;
   public TextField inputField;
   public Button sendButton;

@@ -128,7 +128,8 @@ jlink {
       imageOptions = [
               "--icon", "${projectDir}/src/main/resources/io/infinitytools/wml/icons/icon/256x256.png",
       ]
-      installerType = "deb"
+      // Let jpackage determine output format automatically (for now)
+      // installerType = "deb"
       installerOptions.addAll([
               "--resource-dir", "${projectDir}/buildres/linux",
               "--file-associations", "${projectDir}/buildres/linux/open_with.properties",

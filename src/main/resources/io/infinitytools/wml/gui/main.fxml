@@ -6,7 +6,6 @@
 <?import javafx.scene.control.CustomMenuItem?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Spinner?>
@@ -160,18 +159,14 @@
   </HBox>
 
   <!-- Grid(0, 1): Output text area -->
-  <ScrollPane fx:id="outputScrollPane"
-              fitToWidth="true"
-              fitToHeight="true"
-              GridPane.columnIndex="0"
-              GridPane.rowIndex="1"
-              GridPane.hgrow="ALWAYS"
-              GridPane.vgrow="ALWAYS">
-    <TextArea fx:id="outputArea"
-              prefColumnCount="80"
-              wrapText="true"
-              editable="false"/>
-  </ScrollPane>
+  <TextArea fx:id="outputArea"
+            prefColumnCount="80"
+            wrapText="true"
+            editable="false"
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="1"
+            GridPane.hgrow="ALWAYS"
+            GridPane.vgrow="ALWAYS"/>
 
   <!-- Grid(0, 2): User input (label, input field, button) -->
   <HBox alignment="CENTER_LEFT"
