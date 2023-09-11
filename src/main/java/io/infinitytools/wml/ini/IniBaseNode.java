@@ -32,7 +32,9 @@ public abstract class IniBaseNode implements Comparable<IniBaseNode> {
     this.section = Objects.requireNonNull(section);
   }
 
-  /** Returns the {@link IniMapSection} instance this node is associated with. */
+  /**
+   * Returns the {@link IniMapSection} instance this node is associated with.
+   */
   public IniMapSection getSection() {
     return section;
   }

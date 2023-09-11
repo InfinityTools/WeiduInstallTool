@@ -65,7 +65,9 @@ public class OutputStreamProducer implements Runnable {
     }
   }
 
-  /** Returns the {@link Thread} instance that runs this producer. */
+  /**
+   * Returns the {@link Thread} instance that runs this producer.
+   */
   public Thread getRunner() {
     return runner;
   }

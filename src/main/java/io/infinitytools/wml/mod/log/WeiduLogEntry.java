@@ -42,17 +42,23 @@ public class WeiduLogEntry implements Comparable<WeiduLogEntry> {
     parse(line);
   }
 
-  /** Returns the TP2 file path defined by this log entry. */
+  /**
+   * Returns the TP2 file path defined by this log entry.
+   */
   public Path getTp2File() {
     return tp2File;
   }
 
-  /** Returns the language number defined by this log entry. */
+  /**
+   * Returns the language number defined by this log entry.
+   */
   public int getLanguage() {
     return language;
   }
 
-  /** Returns the component number defined by this log entry. */
+  /**
+   * Returns the component number defined by this log entry.
+   */
   public int getComponent() {
     return component;
   }
@@ -77,7 +83,9 @@ public class WeiduLogEntry implements Comparable<WeiduLogEntry> {
     return String.format("~%s~ #%d #%d", getTp2File().toString(), language, component);
   }
 
-  /** Parses the specified line and initializes the {@link WeiduLogEntry}. */
+  /**
+   * Parses the specified line and initializes the {@link WeiduLogEntry}.
+   */
   private void parse(String line) throws Exception {
     final Pattern p = Pattern.compile("~([^~]*)~\\s+#(\\d+)\\s+#(\\d+)");
     final Matcher m = p.matcher(strip(line));
@@ -98,7 +106,9 @@ public class WeiduLogEntry implements Comparable<WeiduLogEntry> {
     }
   }
 
-  /** Helper method to throw a customized exception message if the string could not be converted to a number. */
+  /**
+   * Helper method to throw a customized exception message if the string could not be converted to a number.
+   */
   private int toNumber(String s, String error) throws Exception {
     try {
       return Integer.parseInt(s);
@@ -107,7 +117,9 @@ public class WeiduLogEntry implements Comparable<WeiduLogEntry> {
     }
   }
 
-  /** Removes comments as well as leading and trailing whitespace from the string. */
+  /**
+   * Removes comments as well as leading and trailing whitespace from the string.
+   */
   private static String strip(String s) {
     if (s != null) {
       return s.replaceFirst("//.*", "").strip();

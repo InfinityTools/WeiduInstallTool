@@ -25,13 +25,19 @@ import java.util.Objects;
  * instance.
  */
 public class ComponentInfo extends ComponentBase {
-  /** List of {@link ComponentGroup} instances this component is associated with. */
+  /**
+   * List of {@link ComponentGroup} instances this component is associated with.
+   */
   private final List<ComponentGroup> groupList = new ArrayList<>();
 
-  /** List of available {@link ComponentLabel} instances for this component. */
+  /**
+   * List of available {@link ComponentLabel} instances for this component.
+   */
   private final List<ComponentLabel> labelList = new ArrayList<>();
 
-  /** List of available {@link ComponentMetaData} instances for this component. */
+  /**
+   * List of available {@link ComponentMetaData} instances for this component.
+   */
   private final List<ComponentMetaData> metaList = new ArrayList<>();
 
   private final int index;
@@ -47,12 +53,16 @@ public class ComponentInfo extends ComponentBase {
     this.forced = forced;
   }
 
-  /** Returns the sequential index, as the component is defined in the tp2 script. */
+  /**
+   * Returns the sequential index, as the component is defined in the tp2 script.
+   */
   public int getIndex() {
     return index;
   }
 
-  /** Returns the numeric identifier of the component, which is unique for the whole mod. */
+  /**
+   * Returns the numeric identifier of the component, which is unique for the whole mod.
+   */
   public int getId() {
     return id;
   }
@@ -67,37 +77,51 @@ public class ComponentInfo extends ComponentBase {
     return name;
   }
 
-  /** Returns whether this is a forced component. */
+  /**
+   * Returns whether this is a forced component.
+   */
   public boolean isForced() {
     return forced;
   }
 
-  /** Returns an unmodifiable list of all associated groups. */
+  /**
+   * Returns an unmodifiable list of all associated groups.
+   */
   public List<ComponentGroup> getGroups() {
     return Collections.unmodifiableList(groupList);
   }
 
-  /** Write access to the group list for internal purposes. */
+  /**
+   * Write access to the group list for internal purposes.
+   */
   List<ComponentGroup> getGroupList() {
     return groupList;
   }
 
-  /** Returns an unmodifiable list of all available labels for this component. */
+  /**
+   * Returns an unmodifiable list of all available labels for this component.
+   */
   public List<ComponentLabel> getLabels() {
     return Collections.unmodifiableList(labelList);
   }
 
-  /** Write access to the label list for internal purposes. */
+  /**
+   * Write access to the label list for internal purposes.
+   */
   List<ComponentLabel> getLabelList() {
     return labelList;
   }
 
-  /** Returns an unmodifiable list of all available metadata information for this component. */
+  /**
+   * Returns an unmodifiable list of all available metadata information for this component.
+   */
   public List<ComponentMetaData> getMetadata() {
     return Collections.unmodifiableList(metaList);
   }
 
-  /** Write access to the metadata list for internal purposes. */
+  /**
+   * Write access to the metadata list for internal purposes.
+   */
   List<ComponentMetaData> getMetadataList() {
     return metaList;
   }

@@ -41,7 +41,9 @@ import java.net.URL;
  * Provides detailed information about mod components and optional mod.ini content.
  */
 public class DetailsWindow extends Stage {
-  /** Path to the FXML definition file for this window. */
+  /**
+   * Path to the FXML definition file for this window.
+   */
   private final static URL FXML_FILE = MainWindow.class.getResource("details.fxml");
 
   private static final String TITLE = "Details";
@@ -59,7 +61,9 @@ public class DetailsWindow extends Stage {
     init();
   }
 
-  /** Called by listener of the language combobox when the item selection changes. */
+  /**
+   * Called by listener of the language combobox when the item selection changes.
+   */
   private void onLanguageItemSelected(int newIndex) {
     try {
       ComponentRoot components = modInfo.getComponentInfo(newIndex);
@@ -75,7 +79,7 @@ public class DetailsWindow extends Stage {
     if (components != null) {
       TreeItem<ComponentBase> rootItem = new TreeItem<>(components);
 
-      for (final ComponentBase child: components.getChildren()) {
+      for (final ComponentBase child : components.getChildren()) {
         if (child instanceof ComponentContainerBase container) {
           final TreeItem<ComponentBase> parentItem = new TreeItem<>(container);
           for (final ComponentBase subChild : container.getChildren()) {
@@ -218,7 +222,9 @@ public class DetailsWindow extends Stage {
     setOnHidden(this::onHidden);
   }
 
-  /** Performs post-initializations when the window is about to become visible. */
+  /**
+   * Performs post-initializations when the window is about to become visible.
+   */
   private void onShowing(WindowEvent event) {
     // one-time initialization
     if (!controller.languageChoiceBox.getItems().isEmpty() &&
@@ -227,29 +233,39 @@ public class DetailsWindow extends Stage {
     }
   }
 
-  /** Performs post-initializations that are only possible when the window is visible. */
+  /**
+   * Performs post-initializations that are only possible when the window is visible.
+   */
   private void onShown(WindowEvent event) {
     restoreSettings();
   }
 
-  /** Performs clean up operations when the window is about to be hidden/closed. */
+  /**
+   * Performs clean up operations when the window is about to be hidden/closed.
+   */
   private void onHiding(WindowEvent event) {
     storeSettings();
   }
 
-  /** Performs clean up operations when the window is hidden/closed. */
+  /**
+   * Performs clean up operations when the window is hidden/closed.
+   */
   private void onHidden(WindowEvent event) {
     MainWindow.getInstance().updateDetailsButtonSelected();
   }
 
-  /** Opens the specified link with the associated application. */
+  /**
+   * Opens the specified link with the associated application.
+   */
   private void onHyperlinkClick(Hyperlink node) {
     if (node != null) {
       MainWindow.getInstance().getHostServices().showDocument(node.getText());
     }
   }
 
-  /** Stores the current window size, position and state. */
+  /**
+   * Stores the current window size, position and state.
+   */
   private void storeSettings() {
     // we need to store window size and position, since hiding the window is equivalent to closing the window
     if (isMaximized()) {
@@ -260,7 +276,9 @@ public class DetailsWindow extends Stage {
     }
   }
 
-  /** Restores or initializes window size, position and state. */
+  /**
+   * Restores or initializes window size, position and state.
+   */
   private void restoreSettings() {
     if (windowRect != null) {
       // restoring last known window size and position
@@ -291,7 +309,9 @@ public class DetailsWindow extends Stage {
     storeSettings();
   }
 
-  /** Expands the specified tree node and all child nodes recursively. */
+  /**
+   * Expands the specified tree node and all child nodes recursively.
+   */
   private static <T> void expandTreeNodes(TreeItem<T> node) {
     if (node != null) {
       node.setExpanded(true);
@@ -301,7 +321,9 @@ public class DetailsWindow extends Stage {
     }
   }
 
-  /** Collapses the specified tree node and all child nodes recursively. */
+  /**
+   * Collapses the specified tree node and all child nodes recursively.
+   */
   @SuppressWarnings("unused")
   private static <T> void collapseTreeNode(TreeItem<T> node) {
     if (node != null) {

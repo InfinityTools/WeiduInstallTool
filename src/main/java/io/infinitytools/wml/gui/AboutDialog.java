@@ -30,12 +30,16 @@ import java.net.URL;
  * A modal dialog that displays information about the launcher.
  */
 public class AboutDialog extends Stage {
-  /** Path to the FXML definition file for this window. */
+  /**
+   * Path to the FXML definition file for this window.
+   */
   private final static URL FXML_FILE = AboutDialog.class.getResource("about.fxml");
 
   private static AboutDialog instance;
 
-  /** Shows a modal dialog with information about the launcher. */
+  /**
+   * Shows a modal dialog with information about the launcher.
+   */
   public static void showAboutDialog(Window owner) throws Exception {
     if (instance == null) {
       instance = new AboutDialog(owner);
@@ -52,7 +56,9 @@ public class AboutDialog extends Stage {
     init();
   }
 
-  /** Opens the specified URL in the default browser of the system. */
+  /**
+   * Opens the specified URL in the default browser of the system.
+   */
   private void openLink(String url) {
     if (url != null) {
       MainWindow.getInstance().getHostServices().showDocument(url);
@@ -82,7 +88,9 @@ public class AboutDialog extends Stage {
     }
   }
 
-  /** Initializes the dialog content. */
+  /**
+   * Initializes the dialog content.
+   */
   private void init() throws Exception {
     final FXMLLoader loader = new FXMLLoader(FXML_FILE);
     final Scene scene = new CustomScene(loader.load());

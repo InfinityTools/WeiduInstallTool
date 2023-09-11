@@ -28,7 +28,9 @@ public class ComponentGroup extends ComponentContainerBase {
     this.name = (name != null) ? name.strip() : "";
   }
 
-  /** Returns the name of the group. */
+  /**
+   * Returns the name of the group.
+   */
   public String getName() {
     return name;
   }

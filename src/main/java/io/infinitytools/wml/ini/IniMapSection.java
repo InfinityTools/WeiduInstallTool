@@ -26,7 +26,9 @@ public class IniMapSection implements Iterable<IniBaseNode> {
   private final String name;
   private final List<IniBaseNode> entries = new ArrayList<>();
 
-  /** Returns a new instance of the default section for the INI map. */
+  /**
+   * Returns a new instance of the default section for the INI map.
+   */
   public static IniMapSection getDefaultSection(IniMap map) {
     return new IniMapSection(map, null);
   }
@@ -42,17 +44,23 @@ public class IniMapSection implements Iterable<IniBaseNode> {
     this.name = (name != null) ? name.strip() : "";
   }
 
-  /** Returns the {@link IniMap} instance this section is associated with. */
+  /**
+   * Returns the {@link IniMap} instance this section is associated with.
+   */
   public IniMap getMap() {
     return map;
   }
 
-  /** Returns the name of the section. The default (or implied) section of the INI file returns an empty string. */
+  /**
+   * Returns the name of the section. The default (or implied) section of the INI file returns an empty string.
+   */
   public String getName() {
     return name;
   }
 
-  /** Returns whether this instance defines a default section. */
+  /**
+   * Returns whether this instance defines a default section.
+   */
   public boolean isDefaultSection() {
     return name.isEmpty();
   }
@@ -185,7 +193,9 @@ public class IniMapSection implements Iterable<IniBaseNode> {
     return retVal;
   }
 
-  /** Returns an iterator over an unmodifiable list of {@link IniEntry} instances associated with this section. */
+  /**
+   * Returns an iterator over an unmodifiable list of {@link IniEntry} instances associated with this section.
+   */
   @Override
   public Iterator<IniBaseNode> iterator() {
     return Collections.unmodifiableList(entries).iterator();

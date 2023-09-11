@@ -25,7 +25,10 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -36,7 +39,7 @@ public class ComponentRoot extends ComponentContainerBase {
    * Parses JSON data with mod component information derived from the given {@code Path}.
    *
    * @param modName Name of the mod.
-   * @param json A {@link Path} pointing to a JSON file.
+   * @param json    A {@link Path} pointing to a JSON file.
    * @return {@link ComponentRoot} instance containing all group and component elements retrieved from the JSON data..
    * @throws Exception If the JSON data could not be parsed.
    */
@@ -48,7 +51,7 @@ public class ComponentRoot extends ComponentContainerBase {
    * Parses JSON data with mod component information derived from the given {@code URL}.
    *
    * @param modName Name of the mod.
-   * @param json A {@link URL} instance pointing to a JSON file.
+   * @param json    A {@link URL} instance pointing to a JSON file.
    * @return {@link ComponentRoot} instance containing all group and component elements retrieved from the JSON data..
    * @throws Exception If the JSON data could not be parsed.
    */
@@ -63,7 +66,7 @@ public class ComponentRoot extends ComponentContainerBase {
    * Parses JSON data with mod component information derived from the given {@code Reader}.
    *
    * @param modName Name of the mod.
-   * @param json A {@link Reader} instance referencing JSON data.
+   * @param json    A {@link Reader} instance referencing JSON data.
    * @return {@link ComponentRoot} instance containing all group and component elements retrieved from the JSON data..
    * @throws Exception If the JSON data could not be parsed.
    */
@@ -82,7 +85,7 @@ public class ComponentRoot extends ComponentContainerBase {
    * Parses the given JSON string with mod component information.
    *
    * @param modName Name of the mod.
-   * @param json String containing JSON data.
+   * @param json    String containing JSON data.
    * @return {@link ComponentRoot} instance containing all group and component elements retrieved from the JSON data..
    * @throws JSONException If the JSON data could not be parsed.
    */
@@ -94,7 +97,7 @@ public class ComponentRoot extends ComponentContainerBase {
    * Parses the specified JSON structure with mod component information.
    *
    * @param modName Name of the mod.
-   * @param root The JSON content from WeiDU's {@code --list-components-json} call as {@link JSONArray} object.
+   * @param root    The JSON content from WeiDU's {@code --list-components-json} call as {@link JSONArray} object.
    * @return {@link ComponentRoot} instance containing all group and component elements retrieved from the JSON data..
    * @throws JSONException If the JSON data could not be parsed.
    */
@@ -114,9 +117,11 @@ public class ComponentRoot extends ComponentContainerBase {
       MetaData("metadata"),
       ;
       final private String name;
+
       Keys(String name) {
         this.name = name;
       }
+
       @Override
       public String toString() {
         return name;
@@ -250,17 +255,23 @@ public class ComponentRoot extends ComponentContainerBase {
     }
   }
 
-  /** Returns the name of the mod. */
+  /**
+   * Returns the name of the mod.
+   */
   public String getModName() {
     return modName;
   }
 
-  /** Returns an unmodifiable list of all available component groups. */
+  /**
+   * Returns an unmodifiable list of all available component groups.
+   */
   public List<ComponentGroup> getGroups() {
     return Collections.unmodifiableList(groups);
   }
 
-  /** Adds the specified {@link ComponentGroup} object to the groups list. Returns the added element. */
+  /**
+   * Adds the specified {@link ComponentGroup} object to the groups list. Returns the added element.
+   */
   public ComponentGroup addGroup(ComponentGroup group) {
     int index = groups.indexOf(group);
     if (index >= 0) {

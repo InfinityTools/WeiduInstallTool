@@ -63,7 +63,7 @@ public class ModIni {
     // two possible ini filename variant are possible: with or without "setup-" prefix
     final String modName = ModInfo.stripModName(tp2File, false);
     final Path modDir = tp2File.getParent();
-    final Path[] iniPaths = { modDir.resolve(modName + ".ini"), modDir.resolve("setup-" + modName + ".ini") };
+    final Path[] iniPaths = {modDir.resolve(modName + ".ini"), modDir.resolve("setup-" + modName + ".ini")};
     Path iniFile = null;
     for (final Path curPath : iniPaths) {
       if (Files.exists(curPath)) {
@@ -115,27 +115,37 @@ public class ModIni {
     }
   }
 
-  /** Returns the name of the mod. Returns an empty string if this property is not available. */
+  /**
+   * Returns the name of the mod. Returns an empty string if this property is not available.
+   */
   public String getName() {
     return (name != null) ? name : "";
   }
 
-  /** Returns a list of authors associated with the mod. Returns an empty list if this property is not available. */
+  /**
+   * Returns a list of authors associated with the mod. Returns an empty list if this property is not available.
+   */
   public List<String> getAuthorList() {
     return Collections.unmodifiableList(authorList);
   }
 
-  /** Returns a short description of the mod. Returns an empty string if this property is not available. */
+  /**
+   * Returns a short description of the mod. Returns an empty string if this property is not available.
+   */
   public String getDescription() {
     return (desc != null) ? desc : "";
   }
 
-  /** Returns the {@link URL} of the mod's homepage. Returns {@code null} if this property is not available. */
+  /**
+   * Returns the {@link URL} of the mod's homepage. Returns {@code null} if this property is not available.
+   */
   public URL getHomepage() {
     return homepage;
   }
 
-  /** Returns the label type used by the mod. Returns an empty string if this property is not available. */
+  /**
+   * Returns the label type used by the mod. Returns an empty string if this property is not available.
+   */
   public String getLabelType() {
     return (labelType != null) ? labelType : "";
   }

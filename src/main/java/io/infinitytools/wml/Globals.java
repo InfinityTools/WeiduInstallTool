@@ -28,25 +28,39 @@ import java.util.Properties;
  * Global definitions used by the application.
  */
 public class Globals {
-  /** Current application version. (Loaded from property file.) */
+  /**
+   * Current application version. (Loaded from property file.)
+   */
   public static final String APP_VERSION = loadProperty("version", "1.0-SNAPSHOT");
 
-  /** The full application title. (Loaded from property file.) */
+  /**
+   * The full application title. (Loaded from property file.)
+   */
   public static final String APP_TITLE = Objects.requireNonNull(loadProperty("title"));
 
-  /** URL to the project sources. (Loaded from property file.) */
+  /**
+   * URL to the project sources. (Loaded from property file.)
+   */
   public static final String PROJECT_URL = Objects.requireNonNull(loadProperty("project"));
 
-  /** URL to the WeiDU sources. (Loaded from property file.) */
+  /**
+   * URL to the WeiDU sources. (Loaded from property file.)
+   */
   public static final String WEIDU_URL = Objects.requireNonNull(loadProperty("weidu"));
 
-  /** Folder name for storing and retrieving application data. */
+  /**
+   * Folder name for storing and retrieving application data.
+   */
   public static final String APP_FOLDER_NAME = Objects.requireNonNull(loadProperty("config_name"));
 
-  /** Filename for storing and retrieving application options. */
+  /**
+   * Filename for storing and retrieving application options.
+   */
   public static final String APP_CONFIG_FILE = APP_FOLDER_NAME + ".ini";
 
-  /** {@link Path} to the user's appdata folder for this application. */
+  /**
+   * {@link Path} to the user's appdata folder for this application.
+   */
   public static final Path APP_DATA_PATH = SystemInfo.getLocalDataPath().resolve(APP_FOLDER_NAME);
 
   private Globals() {
@@ -65,7 +79,7 @@ public class Globals {
   /**
    * Loads a property from the resource {@code globals.properties}.
    *
-   * @param name Name of the property.
+   * @param name     Name of the property.
    * @param defValue A default value to return if the request property could not be loaded.
    * @return The requested property value if successful, {@code defValue} otherwise.
    */

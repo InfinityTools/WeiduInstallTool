@@ -30,10 +30,14 @@ import java.util.*;
  * Provides details about installed mods from the WeiDU.log file.
  */
 public class WeiduLog implements Iterable<WeiduLogEntry> {
-  /** Name of the WeiDU.log file. */
+  /**
+   * Name of the WeiDU.log file.
+   */
   public static final String WEIDU_FILENAME = "WeiDU.log";
 
-  /** Character sets to try out when loading WeiDU.log file content. */
+  /**
+   * Character sets to try out when loading WeiDU.log file content.
+   */
   private static final Charset[] CHARSETS = {
       StandardCharsets.UTF_8, StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII
   };
@@ -43,7 +47,7 @@ public class WeiduLog implements Iterable<WeiduLogEntry> {
    *
    * @param log A {@link Path} pointing to the WeiDU.log.
    * @return A fully initialized {@link WeiduLog} instance from the given WeiDU.log data. Returns {@code null} if
-   *         {@code log} is null.
+   * {@code log} is null.
    * @throws Exception If log content could not be parsed.
    */
   public static WeiduLog load(Path log) throws Exception {
@@ -69,7 +73,7 @@ public class WeiduLog implements Iterable<WeiduLogEntry> {
    *
    * @param log A {@link URL} pointing to the WeiDU.log.
    * @return A fully initialized {@link WeiduLog} instance from the given WeiDU.log data. Returns {@code null} if
-   *         {@code log} is null.
+   * {@code log} is null.
    * @throws Exception If log content could not be parsed.
    */
   public static WeiduLog load(URL log) throws Exception {
@@ -107,7 +111,7 @@ public class WeiduLog implements Iterable<WeiduLogEntry> {
    *
    * @param log String containing WeiDU.log data.
    * @return A fully initialized {@link WeiduLog} instance from the given WeiDU.log data. Returns {@code null} if
-   *         {@code log} is null.
+   * {@code log} is null.
    * @throws Exception If log content could not be parsed.
    */
   public static WeiduLog load(String log) throws Exception {
@@ -143,7 +147,9 @@ public class WeiduLog implements Iterable<WeiduLogEntry> {
     return entries.stream().filter(e -> e.getTp2Name().equals(search)).toList();
   }
 
-  /** Returns the number of available log entries. */
+  /**
+   * Returns the number of available log entries.
+   */
   public int getEntryCount() {
     return entries.size();
   }

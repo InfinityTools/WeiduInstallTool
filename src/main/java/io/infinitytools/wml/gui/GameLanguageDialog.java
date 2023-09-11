@@ -36,7 +36,9 @@ import java.util.Objects;
  * A modal dialog that displays a language selection dialog.
  */
 public class GameLanguageDialog extends Stage {
-  /** Path to the FXML definition file for this window. */
+  /**
+   * Path to the FXML definition file for this window.
+   */
   private final static URL FXML_FILE = GameLanguageDialog.class.getResource("language.fxml");
 
   public static String select(Window owner, ModInfo modInfo) {
@@ -78,7 +80,9 @@ public class GameLanguageDialog extends Stage {
     return selectedLanguage;
   }
 
-  /** Positions the dialog at the center of the parent window. */
+  /**
+   * Positions the dialog at the center of the parent window.
+   */
   private void onWindowShown(WindowEvent event) {
     if (getOwner() != null) {
       final double x = getOwner().getX() + (getOwner().getWidth() - this.getWidth()) / 2.0;
@@ -90,7 +94,9 @@ public class GameLanguageDialog extends Stage {
     }
   }
 
-  /** Called when the dialog should be closed. */
+  /**
+   * Called when the dialog should be closed.
+   */
   private void onClose(boolean assignSelected) {
     if (assignSelected) {
       selectedLanguage = controller.languageBox.getSelectionModel().getSelectedItem().getCode();
@@ -148,17 +154,23 @@ public class GameLanguageDialog extends Stage {
       this.name = items[1];
     }
 
-    /** Returns the ISO code of the language. */
+    /**
+     * Returns the ISO code of the language.
+     */
     public String getCode() {
       return code;
     }
 
-    /** Returns the English translation of the language name. */
+    /**
+     * Returns the English translation of the language name.
+     */
     public String getName() {
       return name;
     }
 
-    /** Returns the language name in the native language. */
+    /**
+     * Returns the language name in the native language.
+     */
     public String getNativeName() {
       return nameNative;
     }

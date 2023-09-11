@@ -27,13 +27,19 @@ import java.util.Objects;
  * underlying buffer as needed.
  */
 public class DynamicByteInputStream extends InputStream {
-  /** Contains buffered data for reading. */
+  /**
+   * Contains buffered data for reading.
+   */
   private final List<byte[]> buffers = new ArrayList<>();
 
-  /** Reference to the current byte array. */
+  /**
+   * Reference to the current byte array.
+   */
   private byte[] curBuffer;
 
-  /** Current offset in the byte array. */
+  /**
+   * Current offset in the byte array.
+   */
   private int offset;
 
   public DynamicByteInputStream() {
@@ -132,7 +138,9 @@ public class DynamicByteInputStream extends InputStream {
     return retVal;
   }
 
-  /** Ensures that buffer and offset are properly initialized. */
+  /**
+   * Ensures that buffer and offset are properly initialized.
+   */
   private void updateBuffer() {
     if (curBuffer != null && offset >= curBuffer.length) {
       curBuffer = null;

@@ -24,9 +24,9 @@ import io.infinitytools.wml.mod.log.WeiduLog;
 import io.infinitytools.wml.process.SysProc;
 import io.infinitytools.wml.process.SysProcChangeEvent;
 import io.infinitytools.wml.process.SysProcOutputEvent;
-import io.infinitytools.wml.weidu.Weidu;
 import io.infinitytools.wml.utils.SystemInfo;
 import io.infinitytools.wml.utils.Utils;
+import io.infinitytools.wml.weidu.Weidu;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -63,7 +63,9 @@ import java.util.stream.Collectors;
  * Implementation of the main window of the application.
  */
 public class MainWindow extends Application {
-  /** Colors for use with the visualization of process results. */
+  /**
+   * Colors for use with the visualization of process results.
+   */
   private enum StateColors {
     SUCCESS(Color.GREEN, Color.LIGHTGREEN),
     WARNING(Color.ORANGE, Color.ORANGE),
@@ -79,7 +81,9 @@ public class MainWindow extends Application {
       this.darkColor = dark;
     }
 
-    /** Returns the {@link Color} for this value based on the current UI mode. */
+    /**
+     * Returns the {@link Color} for this value based on the current UI mode.
+     */
     public Color getColor() {
       boolean isDark = Configuration.Key.DARK_UI_MODE.getDefaultValue();
       try {
@@ -89,18 +93,24 @@ public class MainWindow extends Application {
       return getColor(isDark);
     }
 
-    /** Returns the {@link Color} for the specified UI mode. */
+    /**
+     * Returns the {@link Color} for the specified UI mode.
+     */
     public Color getColor(boolean darkMode) {
       return (darkMode) ? darkColor : lightColor;
     }
   }
 
-  /** Path to the FXML definition file for this window. */
+  /**
+   * Path to the FXML definition file for this window.
+   */
   private final static URL FXML_FILE = MainWindow.class.getResource("main.fxml");
 
   private static MainWindow instance;
 
-  /** Returns the current {@link MainWindow} instance. */
+  /**
+   * Returns the current {@link MainWindow} instance.
+   */
   public static MainWindow getInstance() {
     if (instance == null) {
       throw new NullPointerException("MainWindow is null");
@@ -129,7 +139,7 @@ public class MainWindow extends Application {
    *
    * @param overwrite Whether an existing binary should be overwritten.
    * @return Success state of the operation.
-   * @throws IOException if the progress dialog could not be initialized.
+   * @throws IOException                  if the progress dialog could not be initialized.
    * @throws ProgressDialog.TaskException if the task was prematurely terminated by an error.
    */
   private boolean downloadWeidu(boolean overwrite) throws IOException, ProgressDialog.TaskException {
@@ -168,7 +178,7 @@ public class MainWindow extends Application {
     boolean updateBinary = false;
     String questionHeader = "WeiDU executable could not be found on the system.";
     String questionContent = "Do you want to download the latest WeiDU executable or choose it manually?";
-    final ButtonType[] questionButtons = { downloadButton, selectButton, cancelButton };
+    final ButtonType[] questionButtons = {downloadButton, selectButton, cancelButton};
 
     // 1. check local system
     final Exception exception; // may be thrown later
@@ -310,79 +320,109 @@ public class MainWindow extends Application {
     setupUI(scene);
   }
 
-  /** Returns the {@link ModInfo} instance for the active mod if available, {@code null} otherwise. */
+  /**
+   * Returns the {@link ModInfo} instance for the active mod if available, {@code null} otherwise.
+   */
   public ModInfo getModInfo() {
     return modInfo;
   }
 
-  /** Returns the main {@link Stage} instance of this application. */
+  /**
+   * Returns the main {@link Stage} instance of this application.
+   */
   public Stage getStage() {
     return stage;
   }
 
-  /** Provides access to the UI components of this window. */
+  /**
+   * Provides access to the UI components of this window.
+   */
   public MainWindowController getController() {
     return controller;
   }
 
-  /** Returns whether the "Quit on Enter" option is selected. */
+  /**
+   * Returns whether the "Quit on Enter" option is selected.
+   */
   public boolean isAutoQuitEnabled() {
     return getController().autoQuitCheckItem.isSelected();
   }
 
-  /** Sets the selection state of the "Quit on Enter" option. */
+  /**
+   * Sets the selection state of the "Quit on Enter" option.
+   */
   public void setAutoQuitEnabled(boolean newValue) {
     getController().autoQuitCheckItem.setSelected(newValue);
   }
 
-  /** Returns whether the "Visualize Result of WeiDU Operation" option is selected. */
+  /**
+   * Returns whether the "Visualize Result of WeiDU Operation" option is selected.
+   */
   public boolean isVisualizeResultsEnabled() {
     return getController().visualizeResultCheckItem.isSelected();
   }
 
-  /** Sets the selection state of the "Visualize Result of WeiDU Operation" option. */
+  /**
+   * Sets the selection state of the "Visualize Result of WeiDU Operation" option.
+   */
   public void setVisualizeResultsEnabled(boolean newValue) {
     getController().visualizeResultCheckItem.setSelected(newValue);
   }
 
-  /** Returns whether the "Warn about Mod Order Conflicts" option is selected. */
+  /**
+   * Returns whether the "Warn about Mod Order Conflicts" option is selected.
+   */
   public boolean isWarnModOrderEnabled() {
     return getController().warnModOrderCheckItem.isSelected();
   }
 
-  /** Sets the selection state of the "Warn about Mod Order Conflicts" option. */
+  /**
+   * Sets the selection state of the "Warn about Mod Order Conflicts" option.
+   */
   public void setWarnModOrderEnabled(boolean newValue) {
     getController().warnModOrderCheckItem.setSelected(newValue);
   }
 
-  /** Returns whether Dark Mode UI is enabled. */
+  /**
+   * Returns whether Dark Mode UI is enabled.
+   */
   public boolean isDarkModeEnabled() {
     return getController().darkModeUiCheckItem.isSelected();
   }
 
-  /** Enables or disables Dark Mode UI. */
+  /**
+   * Enables or disables Dark Mode UI.
+   */
   public void setDarkModeEnabled(boolean newValue) {
     getController().darkModeUiCheckItem.setSelected(newValue);
   }
 
-  /** Returns whether the Details window is visible. */
+  /**
+   * Returns whether the Details window is visible.
+   */
   public boolean isDetailsWindowVisible() {
     return getController().detailsButton.isSelected();
   }
 
-  /** Turns on the Details window if it is available. */
+  /**
+   * Turns on the Details window if it is available.
+   */
   public void setDetailsWindowVisible(boolean newValue) {
     if (!getController().detailsButton.isDisabled()) {
       getController().detailsButton.setSelected(newValue);
     }
   }
 
-  /** Returns the current output buffer size. */
+  /**
+   * Returns the current output buffer size.
+   */
   public int getOutputBufferSize() {
     return getOutputBufferSize(getController().bufferSizeSlider.getValue());
   }
 
-  /** Sets the new output buffer size to the specified value. */
+  /**
+   * Sets the new output buffer size to the specified value.
+   */
   public void setOutputBufferSize(int newSize) {
     getController().bufferSizeSlider.setValue(newSize);
   }
@@ -418,7 +458,9 @@ public class MainWindow extends Application {
     return getController().outputArea.getFont().getSize();
   }
 
-  /** Returns the content of the output text area. */
+  /**
+   * Returns the content of the output text area.
+   */
   public String getOutputText() {
     return getController().outputArea.getText();
   }
@@ -426,7 +468,7 @@ public class MainWindow extends Application {
   /**
    * Adds the specified text string to the output text area and scrolls down to the bottom-most line of the content.
    *
-   * @param text string to add.
+   * @param text           string to add.
    * @param autoScrollDown Whether to scroll the text area down to the last line.
    */
   public void appendOutputText(String text, boolean autoScrollDown) {
@@ -438,7 +480,7 @@ public class MainWindow extends Application {
   /**
    * Sets the specified text to the output text area and scrolls down to the bottom-most line of the content.
    *
-   * @param text string to set.
+   * @param text           string to set.
    * @param autoScrollDown Whether to scroll the text area down to the last line.
    */
   public void setOutputText(String text, boolean autoScrollDown) {
@@ -458,17 +500,23 @@ public class MainWindow extends Application {
     }
   }
 
-  /** Removes all text content from the output text area. */
+  /**
+   * Removes all text content from the output text area.
+   */
   public void clearOutputText() {
     getController().outputArea.clear();
   }
 
-  /** This method should be called whenever the visibility state of the Details window changes. */
+  /**
+   * This method should be called whenever the visibility state of the Details window changes.
+   */
   public void updateDetailsButtonSelected() {
     setDetailsWindowVisible(detailsWindow.isShowing());
   }
 
-  /** Called by listener of the Details toggle button when the selected state changes. */
+  /**
+   * Called by listener of the Details toggle button when the selected state changes.
+   */
   private void onDetailsButtonSelected(boolean newValue) {
     if (!getController().detailsButton.isDisabled()) {
       if (newValue) {
@@ -484,7 +532,9 @@ public class MainWindow extends Application {
     }
   }
 
-  /** Called by process event handler when a process starts or terminates. */
+  /**
+   * Called by process event handler when a process starts or terminates.
+   */
   private void onProcessStateChanged(SysProcChangeEvent event) {
     Platform.runLater(() -> {
       switch (event.getType()) {
@@ -502,24 +552,34 @@ public class MainWindow extends Application {
     });
   }
 
-  /** Called by process event handler whenever output data is available. */
+  /**
+   * Called by process event handler whenever output data is available.
+   */
   private void onProcessOutput(SysProcOutputEvent event) {
     Platform.runLater(() -> appendOutputText(event.getText(), true));
   }
 
-  /** Performs post-initializations when the window is about to become visible. */
+  /**
+   * Performs post-initializations when the window is about to become visible.
+   */
   private void onShowing(WindowEvent event) {
   }
 
-  /** Performs post-initializations that are only possible when the window is visible. */
+  /**
+   * Performs post-initializations that are only possible when the window is visible.
+   */
   private void onShown(WindowEvent event) {
   }
 
-  /** Performs clean up operations when the window is about to be hidden/closed. */
+  /**
+   * Performs clean up operations when the window is about to be hidden/closed.
+   */
   private void onHiding(WindowEvent event) {
   }
 
-  /** Performs clean up operations when the window is hidden/closed. */
+  /**
+   * Performs clean up operations when the window is hidden/closed.
+   */
   private void onHidden(WindowEvent event) {
     // all secondary windows must be closed to terminate the application properly
     for (int idx = Window.getWindows().size() - 1; idx >= 0; idx--) {
@@ -544,12 +604,14 @@ public class MainWindow extends Application {
     }
   }
 
-  /** Called whenever a key is pressed  */
+  /**
+   * Called whenever a key is pressed
+   */
   private void onGlobalKeyPressed(KeyEvent event) {
     switch (event.getCode()) {
       case ENTER ->
         // send input text to WeiDU process
-        sendInput(getController().inputField.getText(), true);
+          sendInput(getController().inputField.getText(), true);
       case Q -> {
         if (event.isControlDown()) {
           // signal to quit the app
@@ -561,7 +623,9 @@ public class MainWindow extends Application {
     }
   }
 
-  /** Sets the window into the running state. */
+  /**
+   * Sets the window into the running state.
+   */
   private void setWeiduRunning() {
     updateWindowTitle(true);
     getController().quitButton.setText("Terminate");
@@ -575,7 +639,9 @@ public class MainWindow extends Application {
     getController().inputYesButton.setDisable(false);
   }
 
-  /** Sets the window into the completed state. */
+  /**
+   * Sets the window into the completed state.
+   */
   private void setWeiduTerminated() {
     updateWindowTitle(true);
     getController().quitButton.setText("  Quit  ");
@@ -589,7 +655,9 @@ public class MainWindow extends Application {
     getController().inputYesButton.setDisable(true);
   }
 
-  /** Returns whether a WeiDU process is currently being executed. */
+  /**
+   * Returns whether a WeiDU process is currently being executed.
+   */
   private boolean isProcessRunning() {
     return (process != null && process.isRunning());
   }
@@ -598,7 +666,7 @@ public class MainWindow extends Application {
    * Returns the exit code of the WeiDU process.
    *
    * @return Exit code of a completed WeiDU process, {@link Integer#MIN_VALUE} if the process was forcefully terminated,
-   *         and {@code null} otherwise.
+   * and {@code null} otherwise.
    */
   private Integer getProcessResult() {
     if (processResult != null && processResult.isDone()) {
@@ -615,7 +683,9 @@ public class MainWindow extends Application {
     return null;
   }
 
-  /** Sets or update the window title. */
+  /**
+   * Sets or update the window title.
+   */
   private void updateWindowTitle(boolean showState) {
     final Path tp2Path = Configuration.getInstance().getTp2Path();
     final String tp2Name = (tp2Path != null) ? tp2Path.getFileName().toString() : null;
@@ -640,7 +710,9 @@ public class MainWindow extends Application {
     stage.setTitle(title);
   }
 
-  /** Sets the font size of the output text area to the specified value. */
+  /**
+   * Sets the font size of the output text area to the specified value.
+   */
   private void setOutputAreaFontSize(double value) {
     final Font font = getController().outputArea.getFont();
     if (font.getSize() != value) {
@@ -652,7 +724,7 @@ public class MainWindow extends Application {
   /**
    * Applies the specified font size to the font size spinner and optionally updates configuration option.
    *
-   * @param fontSize Font size to apply to the output text area.
+   * @param fontSize     Font size to apply to the output text area.
    * @param updateConfig Whether to update the corresponding {@link Configuration} option.
    */
   private void applyOutputFontSize(double fontSize, boolean updateConfig) {
@@ -671,7 +743,9 @@ public class MainWindow extends Application {
     }
   }
 
-  /** Updates the output buffer size label to the specified value. */
+  /**
+   * Updates the output buffer size label to the specified value.
+   */
   private void setOutputBufferSizeLabel(double value) {
     final int roundedValue = getOutputBufferSize(value);
     final int defaultValue = Configuration.Key.BUFFER_LIMIT.<Integer>getDefaultValue();
@@ -684,7 +758,9 @@ public class MainWindow extends Application {
     }
   }
 
-  /** Updates the UI to match the specified color scheme. */
+  /**
+   * Updates the UI to match the specified color scheme.
+   */
   private void applyDarkModeUi(boolean enable) {
     Configuration.getInstance().setOption(Configuration.Key.DARK_UI_MODE, enable);
 
@@ -727,7 +803,7 @@ public class MainWindow extends Application {
   /**
    * This method sends the specified text to the current WeiDU process.
    *
-   * @param text The text to send to the WeiDU process.
+   * @param text    The text to send to the WeiDU process.
    * @param cleanup Whether to clear the input field after the operation.
    */
   private void sendInput(String text, boolean cleanup) {
@@ -749,19 +825,25 @@ public class MainWindow extends Application {
     setInputFocus();
   }
 
-  /** Sets focus to the input text field. */
+  /**
+   * Sets focus to the input text field.
+   */
   private void setInputFocus() {
     getController().inputField.requestFocus();
   }
 
-  /** Initializes the UI. */
+  /**
+   * Initializes the UI.
+   */
   private void setupUI(Scene scene) {
     stage.setScene(Objects.requireNonNull(scene));
 
     // assigning application icon
     stage.getIcons().addAll(Icons.Icon.getImages());
 
-    stage.focusedProperty().addListener((ob, ov, nv) -> { if (nv) setInputFocus(); });
+    stage.focusedProperty().addListener((ob, ov, nv) -> {
+      if (nv) setInputFocus();
+    });
     stage.setOnCloseRequest(this::onCloseApplication);
     stage.setOnShowing(this::onShowing);
     stage.setOnShown(this::onShown);
@@ -790,14 +872,38 @@ public class MainWindow extends Application {
     getController().sendButton.setOnAction(event -> sendInput(getController().inputField.getText(), true));
 
     // shortcut buttons
-    getController().inputQuitButton.setOnAction(event -> { sendInput("q", false); event.consume(); });
-    getController().inputAskButton.setOnAction(event -> { sendInput("a", false); event.consume(); });
-    getController().inputSkipButton.setOnAction(event -> { sendInput("s", false); event.consume(); });
-    getController().inputReinstallButton.setOnAction(event -> { sendInput("r", false); event.consume(); });
-    getController().inputUninstallButton.setOnAction(event -> { sendInput("u", false); event.consume(); });
-    getController().inputInstallButton.setOnAction(event -> { sendInput("i", false); event.consume(); });
-    getController().inputNoButton.setOnAction(event -> { sendInput("n", false); event.consume(); });
-    getController().inputYesButton.setOnAction(event -> { sendInput("y", false); event.consume(); });
+    getController().inputQuitButton.setOnAction(event -> {
+      sendInput("q", false);
+      event.consume();
+    });
+    getController().inputAskButton.setOnAction(event -> {
+      sendInput("a", false);
+      event.consume();
+    });
+    getController().inputSkipButton.setOnAction(event -> {
+      sendInput("s", false);
+      event.consume();
+    });
+    getController().inputReinstallButton.setOnAction(event -> {
+      sendInput("r", false);
+      event.consume();
+    });
+    getController().inputUninstallButton.setOnAction(event -> {
+      sendInput("u", false);
+      event.consume();
+    });
+    getController().inputInstallButton.setOnAction(event -> {
+      sendInput("i", false);
+      event.consume();
+    });
+    getController().inputNoButton.setOnAction(event -> {
+      sendInput("n", false);
+      event.consume();
+    });
+    getController().inputYesButton.setOnAction(event -> {
+      sendInput("y", false);
+      event.consume();
+    });
 
     // setting initial window title
     updateWindowTitle(false);
@@ -884,7 +990,9 @@ public class MainWindow extends Application {
     Utils.showErrorDialog(getStage(), "Error", "WeiDU Error", "WeiDU could not be executed:\n" + message);
   }
 
-  /** Updates the {@link Configuration} instance with the current application state. */
+  /**
+   * Updates the {@link Configuration} instance with the current application state.
+   */
   private void updateConfiguration() {
     final Configuration cfg = Configuration.getInstance();
     cfg.setOption(Configuration.Key.WINDOW_X, (int) getStage().getX());
@@ -967,7 +1075,7 @@ public class MainWindow extends Application {
   /**
    * Applies a border to the specified UI control.
    *
-   * @param enabled Whether the border should be visible.
+   * @param enabled  Whether the border should be visible.
    * @param exitCode A numeric value that is used to determine the color for the border.
    *                 Ignored if {@code enabled} is {@code false}.
    */
@@ -997,7 +1105,6 @@ public class MainWindow extends Application {
    * Checks if there are potential mod order conflicts.
    *
    * @param interactive Whether to allow the user to confirm or override the suggested action.
-   *
    * @return {@code true} if the mod can be installed, {@code false} to cancel the operation.
    */
   private boolean checkModOrder(boolean interactive) {
@@ -1098,7 +1205,9 @@ public class MainWindow extends Application {
     }
   }
 
-  /** Executes a custom WeiDU command. */
+  /**
+   * Executes a custom WeiDU command.
+   */
   private void executeCustom() throws IndexOutOfBoundsException, NullPointerException, UnsupportedOperationException {
     final List<String> command = new ArrayList<>(Configuration.getInstance().getWeiduArgs());
     command.add(0, Weidu.getInstance().getWeidu().toString());
@@ -1107,7 +1216,9 @@ public class MainWindow extends Application {
     runProcess(sp);
   }
 
-  /** Executes a guided WeiDU command. */
+  /**
+   * Executes a guided WeiDU command.
+   */
   private void executeGuided() throws IllegalArgumentException, IndexOutOfBoundsException, NullPointerException {
     if (getModInfo() == null) {
       throw new NullPointerException("Mod information are unavailable.");
@@ -1135,7 +1246,9 @@ public class MainWindow extends Application {
     runProcess(sp);
   }
 
-  /** Assembles the WeiDU command line for a guided mod installation. */
+  /**
+   * Assembles the WeiDU command line for a guided mod installation.
+   */
   private String[] getWeiduCommand(String gameLang, Path tp2File) {
     final List<String> command = new ArrayList<>(Configuration.getInstance().getWeiduArgs());
 
@@ -1166,7 +1279,9 @@ public class MainWindow extends Application {
     return command.toArray(new String[0]);
   }
 
-  /** Shows the About dialog as a modal dialog. */
+  /**
+   * Shows the About dialog as a modal dialog.
+   */
   private void showAboutDialog() {
     try {
       AboutDialog.showAboutDialog(getStage());

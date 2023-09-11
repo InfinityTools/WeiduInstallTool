@@ -39,7 +39,9 @@ public class InputStreamConsumer implements Runnable {
   private final CharsetDecoder decoder;
   private final Thread runner;
 
-  /** Bytes remaining after a string conversion pass. */
+  /**
+   * Bytes remaining after a string conversion pass.
+   */
   private byte[] remaining;
 
   /**
@@ -72,7 +74,9 @@ public class InputStreamConsumer implements Runnable {
     this.runner = Thread.ofVirtual().start(this);
   }
 
-  /** Returns the content that has been accumulated since the last call of this method. */
+  /**
+   * Returns the content that has been accumulated since the last call of this method.
+   */
   public String getBufferedContent() {
     try {
       bufferLock.lock();
@@ -84,7 +88,9 @@ public class InputStreamConsumer implements Runnable {
     }
   }
 
-  /** Returns the {@link Thread} instance that runs this consumer. */
+  /**
+   * Returns the {@link Thread} instance that runs this consumer.
+   */
   public Thread getRunner() {
     return runner;
   }

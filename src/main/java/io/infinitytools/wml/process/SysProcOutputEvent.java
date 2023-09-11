@@ -26,7 +26,9 @@ public class SysProcOutputEvent extends SysProcEvent {
     this.text = text;
   }
 
-  /** Returns the text content that was produced by the process since the last event of this type. */
+  /**
+   * Returns the text content that was produced by the process since the last event of this type.
+   */
   public String getText() {
     return text;
   }

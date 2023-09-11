@@ -28,7 +28,9 @@ public class ComponentMetaData extends ComponentBase {
     this.data = data;
   }
 
-  /** Returns the metadata associated with the parent {@link ComponentBase} object. */
+  /**
+   * Returns the metadata associated with the parent {@link ComponentBase} object.
+   */
   public String getData() {
     return data;
   }

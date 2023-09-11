@@ -83,9 +83,9 @@ public class Asset implements Comparable<Asset> {
    * retrieved from the GitHub server, using timeout values defined by {@link Helpers#DEFAULT_CONNECT_TIMEOUT} and
    * {@link Helpers#DEFAULT_READ_TIMEOUT}.
    *
-   * @param owner          User or organization name owning the repository.
-   * @param repo           Name of the repository.
-   * @param id             Unique identifier of the asset.
+   * @param owner User or organization name owning the repository.
+   * @param repo  Name of the repository.
+   * @param id    Unique identifier of the asset.
    * @throws IOException   if the method failed to retrieve data from the GitHub server.
    * @throws JSONException if the JSON structure could not be parsed.
    */

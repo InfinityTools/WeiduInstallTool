@@ -27,13 +27,21 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class IniMap implements Iterable<IniMapSection> {
-  /** Available comment styles. */
+  /**
+   * Available comment styles.
+   */
   public enum Style {
-    /** C-style type of comment, starting with two consecutive slashes ({@code //}). */
+    /**
+     * C-style type of comment, starting with two consecutive slashes ({@code //}).
+     */
     C("//"),
-    /** Windows-style type of comment, starting with a semicolon ({@code ;}). */
+    /**
+     * Windows-style type of comment, starting with a semicolon ({@code ;}).
+     */
     Windows(";"),
-    /** Unix-style type of comment, starting with a hash sign ({@code #}). */
+    /**
+     * Unix-style type of comment, starting with a hash sign ({@code #}).
+     */
     Unix("#"),
     /**
      * Any of the available comment styles are supported.
@@ -48,12 +56,16 @@ public class IniMap implements Iterable<IniMapSection> {
       this.prefix = prefix;
     }
 
-    /** Returns the comment prefix as string. The first prefix is returned if more than one prefix is available. */
+    /**
+     * Returns the comment prefix as string. The first prefix is returned if more than one prefix is available.
+     */
     public String getPrefix() {
       return (prefix.length > 0) ? prefix[0] : "";
     }
 
-    /** Returns all supported comment prefixes by this style. */
+    /**
+     * Returns all supported comment prefixes by this style.
+     */
     public String[] getPrefixes() {
       return Arrays.copyOf(prefix, prefix.length);
     }
@@ -63,7 +75,9 @@ public class IniMap implements Iterable<IniMapSection> {
       return getPrefix();
     }
 
-    /** Returns the default comment type for this application. */
+    /**
+     * Returns the default comment type for this application.
+     */
     public static Style getDefault() {
       return Style.Unix;
     }
@@ -77,7 +91,7 @@ public class IniMap implements Iterable<IniMapSection> {
    * Parses the data derived from the given {@code Path} into a INI map structure.
    * <p>UTF-8 encoding is used for string encoding.</p>
    *
-   * @param ini      A {@link Path} pointing to an INI file.
+   * @param ini A {@link Path} pointing to an INI file.
    * @return A fully initialized {@link IniMap} instance from the given INI data.
    * @throws Exception If the INI content cannot be parsed.
    */
@@ -108,7 +122,7 @@ public class IniMap implements Iterable<IniMapSection> {
   /**
    * Parses the data derived from the given {@code URL} into a INI map structure.
    *
-   * @param ini A {@link URL} pointing to INI data.
+   * @param ini      A {@link URL} pointing to INI data.
    * @param encoding {@link Charset} required to convert binary data into valid string content.
    * @return A fully initialized {@link IniMap} instance from the given INI data.
    * @throws Exception If the INI content cannot be parsed.
@@ -191,7 +205,7 @@ public class IniMap implements Iterable<IniMapSection> {
     final Predicate<Character> fnKey = c -> (fnKeyStart.test(c) || Character.isDigit(c) || "-+".indexOf(c) >= 0);
     final Predicate<Character> fnValue = c -> (!fnComment.test(c));
     // Testing for byte order mark in unicode strings
-    final Predicate<Character> fnBOM = c -> (c =='\uFEFF');
+    final Predicate<Character> fnBOM = c -> (c == '\uFEFF');
     final Predicate<Character> fnBOMAsciiFirst = c -> (c == 0xef);
     final Predicate<Character> fnBOMAsciiSecond = c -> (c == 0xbb);
     final Predicate<Character> fnBOMAsciiThird = c -> (c == 0xbf);
@@ -376,12 +390,18 @@ public class IniMap implements Iterable<IniMapSection> {
       return ch;
     } else {
       switch (ch) {
-        case '0': return '\0';
-        case 't': return '\t';
-        case 'r': return '\r';
-        case 'n': return '\n';
-        case 'f': return '\f';
-        case 'b': return '\b';
+        case '0':
+          return '\0';
+        case 't':
+          return '\t';
+        case 'r':
+          return '\r';
+        case 'n':
+          return '\n';
+        case 'f':
+          return '\f';
+        case 'b':
+          return '\b';
         case '\\':
         case '\'':
         case '"':
@@ -393,7 +413,9 @@ public class IniMap implements Iterable<IniMapSection> {
     return null;
   }
 
-  /** Escapes characters with special meaning. */
+  /**
+   * Escapes characters with special meaning.
+   */
   static String getEscapedString(String s, Style style) {
     // building escape sequence map
     if (style == null) {
@@ -428,23 +450,31 @@ public class IniMap implements Iterable<IniMapSection> {
     return s;
   }
 
-  /** Constructs a new empty INI map with the default comment style. */
+  /**
+   * Constructs a new empty INI map with the default comment style.
+   */
   public IniMap() {
     this(Style.getDefault());
   }
 
-  /** Constructs a new empty INI map with the specified comment style. */
+  /**
+   * Constructs a new empty INI map with the specified comment style.
+   */
   public IniMap(Style commentStyle) {
     setStyle(commentStyle);
     addSection(IniMapSection.getDefaultSection(this));
   }
 
-  /** Returns the currently used comment style. */
+  /**
+   * Returns the currently used comment style.
+   */
   public Style getStyle() {
     return style;
   }
 
-  /** Assigns a new comment style to the INI map. */
+  /**
+   * Assigns a new comment style to the INI map.
+   */
   public void setStyle(Style newStyle) {
     this.style = (newStyle != null) ? newStyle : Style.getDefault();
   }
@@ -463,7 +493,9 @@ public class IniMap implements Iterable<IniMapSection> {
     return sections.stream().filter(s -> s.getName().equalsIgnoreCase(n)).findAny().orElse(null);
   }
 
-  /** Returns the default section of this INI map. */
+  /**
+   * Returns the default section of this INI map.
+   */
   public IniMapSection getDefaultSection() {
     return getSection("");
   }
@@ -507,7 +539,9 @@ public class IniMap implements Iterable<IniMapSection> {
     return retVal;
   }
 
-  /** Returns an iterator over an unmodifiable list of {@link IniMapSection} instances associated with this map. */
+  /**
+   * Returns an iterator over an unmodifiable list of {@link IniMapSection} instances associated with this map.
+   */
   @Override
   public Iterator<IniMapSection> iterator() {
     return Collections.unmodifiableList(sections).iterator();

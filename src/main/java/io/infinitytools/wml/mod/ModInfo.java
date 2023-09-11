@@ -17,9 +17,9 @@ package io.infinitytools.wml.mod;
 
 import io.infinitytools.wml.mod.info.ComponentRoot;
 import io.infinitytools.wml.mod.ini.ModIni;
-import io.infinitytools.wml.weidu.Weidu;
 import io.infinitytools.wml.utils.SystemInfo;
 import io.infinitytools.wml.utils.Utils;
+import io.infinitytools.wml.weidu.Weidu;
 import org.json.JSONArray;
 import org.tinylog.Logger;
 
@@ -37,19 +37,29 @@ import java.util.regex.Pattern;
  * Provides detailed information about a single mod.
  */
 public class ModInfo {
-  /** Name of the default language. */
+  /**
+   * Name of the default language.
+   */
   public static final String DEFAULT_LANGUAGE = "(Default)";
 
-  /** Path to the game's installation directory. */
+  /**
+   * Path to the game's installation directory.
+   */
   private final Path gamePath;
 
-  /** Path to the mod's tp2 file. */
+  /**
+   * Path to the mod's tp2 file.
+   */
   private final Path tp2File;
 
-  /** Normalized mod name (tp2 filename without "setup-" prefix and file extension). */
+  /**
+   * Normalized mod name (tp2 filename without "setup-" prefix and file extension).
+   */
   private final String tp2Name;
 
-  /** List of available mod languages (as defined by the mod). */
+  /**
+   * List of available mod languages (as defined by the mod).
+   */
   private final List<String> languages = new ArrayList<>();
 
   /**
@@ -89,32 +99,44 @@ public class ModInfo {
     init();
   }
 
-  /** Returns the full path to the game where this mod should be installed. */
+  /**
+   * Returns the full path to the game where this mod should be installed.
+   */
   public Path getGamePath() {
     return gamePath;
   }
 
-  /** Returns the full path to the tp2 file of the mod. */
+  /**
+   * Returns the full path to the tp2 file of the mod.
+   */
   public Path getTp2File() {
     return tp2File;
   }
 
-  /** Returns the normalized tp2 name without "setup-" prefix and file extension. */
+  /**
+   * Returns the normalized tp2 name without "setup-" prefix and file extension.
+   */
   public String getTp2Name() {
     return tp2Name;
   }
 
-  /** Returns the full path to the log file of the mod. */
+  /**
+   * Returns the full path to the log file of the mod.
+   */
   public Path getLogFile() {
     return getGamePath().resolve("setup-" + getTp2Name() + ".debug");
   }
 
-  /** Returns the number of available mod languages. */
+  /**
+   * Returns the number of available mod languages.
+   */
   public int getLanguageCount() {
     return languages.size();
   }
 
-  /** Returns the language name at the specified language index. */
+  /**
+   * Returns the language name at the specified language index.
+   */
   public String getLanguage(int index) throws IndexOutOfBoundsException {
     return languages.get(index);
   }
@@ -124,7 +146,7 @@ public class ModInfo {
    *
    * @param languageIndex Index of the language for the requested mod component information.
    * @return {@code List<BaseInfo>} instance with component information. Returns {@code null} if the information are not
-   *         available.
+   * available.
    * @throws IndexOutOfBoundsException if the language index is out of range.
    */
   public ComponentRoot getComponentInfo(int languageIndex) {
@@ -150,7 +172,9 @@ public class ModInfo {
     return modIni;
   }
 
-  /** Returns whether the game directory points to an Enhanced Edition game. */
+  /**
+   * Returns whether the game directory points to an Enhanced Edition game.
+   */
   public boolean isEnhancedEdition() {
     return isEE;
   }
@@ -159,7 +183,7 @@ public class ModInfo {
    * Returns whether the file "weidu.conf" exists in the game directory.
    *
    * @return {@code true} if the game is an Enhanced Edition game and the "weidu.conf" file exists in the game
-   *         directory, {@code false} otherwise.
+   * directory, {@code false} otherwise.
    */
   public boolean isWeiduConfAvailable() {
     return weiduConfExists;
@@ -207,7 +231,7 @@ public class ModInfo {
    * @param code      The ISO language code.
    * @param overwrite Whether an existing "weidu.conf" file should be overwritten.
    * @return {@code true} if the "weidu.conf" was created successfully, {@code false} otherwise. Always returns
-   *         {@code false} for non-EE games.
+   * {@code false} for non-EE games.
    */
   public boolean writeWeiduConf(String code, boolean overwrite) {
     boolean retVal = false;
@@ -247,7 +271,9 @@ public class ModInfo {
     }
   }
 
-  /** Retrieves component information from cache. Failing that, component information is retrieved from WeiDU. */
+  /**
+   * Retrieves component information from cache. Failing that, component information is retrieved from WeiDU.
+   */
   private ComponentRoot retrieveComponentInfo(int languageIndex) {
     ComponentRoot retVal = null;
 
@@ -270,6 +296,7 @@ public class ModInfo {
 
   /**
    * Initializes available mod languages and components.
+   *
    * @throws FileNotFoundException if the tp2 file is not available.
    */
   private void init() throws FileNotFoundException {
@@ -293,7 +320,9 @@ public class ModInfo {
     initEE();
   }
 
-  /** Initializes EE-specific properties. */
+  /**
+   * Initializes EE-specific properties.
+   */
   private void initEE() {
     final Path langDir = this.gamePath.resolve("lang");
     if (!Files.isDirectory(langDir)) {
@@ -357,7 +386,7 @@ public class ModInfo {
    * A normalized mod name is trimmed, (optionally) lowercased and does not contain "setup-" prefix or ".tp2" extension.
    * </p>
    *
-   * @param tp2Name tp2 filename with or without path.
+   * @param tp2Name   tp2 filename with or without path.
    * @param lowerCase Whether the return value should be in lowercase.
    * @return normalized mod name. Returns {@code null} if {@code modName} is {@code null}.
    */
@@ -374,7 +403,7 @@ public class ModInfo {
    * A normalized mod name is trimmed, (optionally) lowercased and does not contain "setup-" prefix or ".tp2" extension.
    * </p>
    *
-   * @param tp2File {@link Path} to a tp2 filename.
+   * @param tp2File   {@link Path} to a tp2 filename.
    * @param lowerCase Whether the return value should be in lowercase.
    * @return normalized mod name. Returns {@code null} if {@code modName} is {@code null}.
    */

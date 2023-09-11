@@ -29,53 +29,97 @@ import java.util.List;
  * Available icons and graphics resources.
  */
 public enum Icons {
-  /** Application icon */
+  /**
+   * Application icon
+   */
   Icon256("icon/256x256.png"),
-  /** Application icon */
+  /**
+   * Application icon
+   */
   Icon128("icon/128x128.png"),
-  /** Application icon */
+  /**
+   * Application icon
+   */
   Icon64("icon/64x64.png"),
-  /** Application icon */
+  /**
+   * Application icon
+   */
   Icon32("icon/32x32.png"),
-  /** Application icon */
+  /**
+   * Application icon
+   */
   Icon22("icon/22x22.png"),
-  /** Application icon */
+  /**
+   * Application icon
+   */
   Icon16("icon/16x16.png"),
-  /** Collection of application icons in all available dimensions. */
+  /**
+   * Collection of application icons in all available dimensions.
+   */
   Icon(Icon256.getFileName(), Icon128.getFileName(), Icon64.getFileName(), Icon32.getFileName(), Icon22.getFileName(),
       Icon16.getFileName()),
 
-  /** Transparent application logo */
+  /**
+   * Transparent application logo
+   */
   Logo256("logo/256x256.png"),
-  /** Transparent application logo */
+  /**
+   * Transparent application logo
+   */
   Logo128("logo/128x128.png"),
-  /** Transparent application logo */
+  /**
+   * Transparent application logo
+   */
   Logo64("logo/64x64.png"),
-  /** Transparent application logo */
+  /**
+   * Transparent application logo
+   */
   Logo32("logo/32x32.png"),
-  /** Collection of application logos in all available dimensions. */
+  /**
+   * Collection of application logos in all available dimensions.
+   */
   Logo(Logo256.getFileName(), Logo128.getFileName(), Logo64.getFileName(), Logo32.getFileName()),
 
-  /** Icon for Options menu */
+  /**
+   * Icon for Options menu
+   */
   Options256("options/256x256.png"),
-  /** Icon for Options menu */
+  /**
+   * Icon for Options menu
+   */
   Options128("options/128x128.png"),
-  /** Icon for Options menu */
+  /**
+   * Icon for Options menu
+   */
   Options64("options/64x64.png"),
-  /** Icon for Options menu */
+  /**
+   * Icon for Options menu
+   */
   Options32("options/32x32.png"),
-  /** Collection of options menu icons in all available dimensions. */
+  /**
+   * Collection of options menu icons in all available dimensions.
+   */
   Options(Options256.getFileName(), Options128.getFileName(), Options64.getFileName(), Options32.getFileName()),
 
-  /** Icon for Options menu (Dark Mode UI version) */
+  /**
+   * Icon for Options menu (Dark Mode UI version)
+   */
   OptionsDark256("options-dark/256x256.png"),
-  /** Icon for Options menu (Dark Mode UI version) */
+  /**
+   * Icon for Options menu (Dark Mode UI version)
+   */
   OptionsDark128("options-dark/128x128.png"),
-  /** Icon for Options menu (Dark Mode UI version) */
+  /**
+   * Icon for Options menu (Dark Mode UI version)
+   */
   OptionsDark64("options-dark/64x64.png"),
-  /** Icon for Options menu (Dark Mode UI version) */
+  /**
+   * Icon for Options menu (Dark Mode UI version)
+   */
   OptionsDark32("options-dark/32x32.png"),
-  /** Collection of options menu icons in all available dimensions (Dark Mode UI version). */
+  /**
+   * Collection of options menu icons in all available dimensions (Dark Mode UI version).
+   */
   OptionsDark(OptionsDark256.getFileName(), OptionsDark128.getFileName(), OptionsDark64.getFileName(),
       OptionsDark32.getFileName()),
   ;
@@ -91,12 +135,16 @@ public enum Icons {
     }
   }
 
-  /** Returns the filename of the icon. For icon groups the filename of the first available icon is returned. */
+  /**
+   * Returns the filename of the icon. For icon groups the filename of the first available icon is returned.
+   */
   public String getFileName() {
     return fileNames.get(0);
   }
 
-  /** Returns the filenames of all available icons associated with the enum value. */
+  /**
+   * Returns the filenames of all available icons associated with the enum value.
+   */
   public List<String> getFileNames() {
     return Collections.unmodifiableList(fileNames);
   }
@@ -110,7 +158,9 @@ public enum Icons {
     return images.get(0);
   }
 
-  /** Returns the {@link Image} objects of all available icons associated with the enum value. */
+  /**
+   * Returns the {@link Image} objects of all available icons associated with the enum value.
+   */
   public List<Image> getImages() {
     // lazy initialization
     for (int i = 0; i < images.size(); i++) {
@@ -119,7 +169,9 @@ public enum Icons {
     return Collections.unmodifiableList(images);
   }
 
-  /** Ensures that the image at the specified list index is initialized. */
+  /**
+   * Ensures that the image at the specified list index is initialized.
+   */
   private void ensureImage(int index) {
     if (index >= 0 && index < images.size()) {
       if (images.get(index) == null) {

@@ -35,7 +35,9 @@ public class AboutWindowController {
   public AboutWindowController() {
   }
 
-  /** Initializes the UI components. This method should be called after the UI has been loaded. */
+  /**
+   * Initializes the UI components. This method should be called after the UI has been loaded.
+   */
   public void init() {
     try {
       titleLabel.setText(Globals.APP_TITLE);

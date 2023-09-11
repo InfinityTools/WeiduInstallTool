@@ -19,11 +19,17 @@ package io.infinitytools.wml.process;
  * Event class that indicates a change in the process execution.
  */
 public class SysProcChangeEvent extends SysProcEvent {
-  /** Defines specific change types. */
+  /**
+   * Defines specific change types.
+   */
   public enum Type {
-    /** This type indicates that execution of the process has started. */
+    /**
+     * This type indicates that execution of the process has started.
+     */
     Started,
-    /** This type indicates that the process has terminated. */
+    /**
+     * This type indicates that the process has terminated.
+     */
     Terminated,
   }
 
@@ -34,7 +40,9 @@ public class SysProcChangeEvent extends SysProcEvent {
     this.type = type;
   }
 
-  /** Returns the change type of the process. */
+  /**
+   * Returns the change type of the process.
+   */
   public SysProcChangeEvent.Type getType() {
     return type;
   }

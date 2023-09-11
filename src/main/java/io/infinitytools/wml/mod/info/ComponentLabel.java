@@ -28,7 +28,9 @@ public class ComponentLabel extends ComponentBase {
     this.label = label;
   }
 
-  /** Returns the label associated with the parent {@link ComponentBase} object. */
+  /**
+   * Returns the label associated with the parent {@link ComponentBase} object.
+   */
   public String getLabel() {
     return label;
   }

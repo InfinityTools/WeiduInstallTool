@@ -35,7 +35,9 @@ public class DetailsWindowController {
   public DetailsWindowController() {
   }
 
-  /** Initializes the UI components. This method should be called after the UI has been loaded. */
+  /**
+   * Initializes the UI components. This method should be called after the UI has been loaded.
+   */
   public void init() {
     try {
       componentsTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);

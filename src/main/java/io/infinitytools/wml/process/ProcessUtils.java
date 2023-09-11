@@ -40,7 +40,7 @@ public class ProcessUtils {
    *
    * @param command A string array containing the program and arguments.
    * @return A string containing the whole content of the output and error stream of the program. Returns {@code null}
-   *         if the program did not execute successfully.
+   * if the program did not execute successfully.
    */
   public static String getProcessOutput(String... command) {
     return getProcessOutput(null, true, StandardCharsets.UTF_8, 1000L, command);
@@ -53,10 +53,10 @@ public class ProcessUtils {
    * before it is forcefully terminated.
    * </p>
    *
-   * @param workingDir   The working directory where the process should be invoked. Specify {@code null} to ignore.
-   * @param command A string array containing the program and arguments.
+   * @param workingDir The working directory where the process should be invoked. Specify {@code null} to ignore.
+   * @param command    A string array containing the program and arguments.
    * @return A string containing the whole content of the output and error stream of the program. Returns {@code null}
-   *         if the program did not execute successfully.
+   * if the program did not execute successfully.
    */
   public static String getProcessOutput(Path workingDir, String... command) {
     return getProcessOutput(workingDir, true, StandardCharsets.UTF_8, 1000L, command);
@@ -72,7 +72,7 @@ public class ProcessUtils {
    *                     forcefully terminated. Specify {@code -1L} to wait indefinitely.
    * @param command      A string array containing the program and arguments.
    * @return A string containing the whole output of the program. Returns {@code null} if the program does not execute
-   *         successfully.
+   * successfully.
    */
   public static String getProcessOutput(Path workingDir, boolean includeError, Charset cs, long maxWaitMs, String... command) {
     String retVal = null;

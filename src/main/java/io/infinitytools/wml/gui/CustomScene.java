@@ -30,17 +30,23 @@ import java.util.Objects;
  * This class expands the {@link Scene} class by optional dark mode coloring.
  */
 public class CustomScene extends Scene {
-  /** Path to the dark mode stylesheet file. */
+  /**
+   * Path to the dark mode stylesheet file.
+   */
   private static final String DARK_MODE = Utils.getClassPath(CustomScene.class, "darkMode.css");
 
   private static final HashSet<Scene> SCENE_CACHE = new HashSet<>();
 
-  /** Returns whether the specified {@link Scene} has dark mode enabled. */
+  /**
+   * Returns whether the specified {@link Scene} has dark mode enabled.
+   */
   public static boolean isDarkMode(Scene scene) {
     return Objects.requireNonNull(scene).getStylesheets().contains(DARK_MODE);
   }
 
-  /** Enables or disables dark mode for the specified {@link Scene} object based on the current {@link Configuration}.*/
+  /**
+   * Enables or disables dark mode for the specified {@link Scene} object based on the current {@link Configuration}.
+   */
   public static void setDarkMode(Scene scene) {
     try {
       boolean enabled = Configuration.getInstance().getOption(Configuration.Key.DARK_UI_MODE);
@@ -50,7 +56,9 @@ public class CustomScene extends Scene {
     }
   }
 
-  /** Enables or disables dark mode for the specified {@link Scene} object. */
+  /**
+   * Enables or disables dark mode for the specified {@link Scene} object.
+   */
   public static void setDarkMode(Scene scene, boolean enabled) {
     if (scene != null) {
       if (enabled && !scene.getStylesheets().contains(DARK_MODE)) {
@@ -61,28 +69,36 @@ public class CustomScene extends Scene {
     }
   }
 
-  /** Adds the specified {@link Scene} to the cache for updating the dark mode state. */
+  /**
+   * Adds the specified {@link Scene} to the cache for updating the dark mode state.
+   */
   public static void registerScene(Scene scene) {
     if (scene != null) {
       SCENE_CACHE.add(scene);
     }
   }
 
-  /** Removes the specified {@link Scene} from the cache for updating the dark mode state. */
+  /**
+   * Removes the specified {@link Scene} from the cache for updating the dark mode state.
+   */
   public static void unregisterScene(Scene scene) {
     if (scene != null) {
       SCENE_CACHE.remove(scene);
     }
   }
 
-  /** Updates the current dark mode state for all cached {@link Scene} objects. */
+  /**
+   * Updates the current dark mode state for all cached {@link Scene} objects.
+   */
   public static void updateSceneCache() {
     for (final Scene scene : SCENE_CACHE) {
       setDarkMode(scene);
     }
   }
 
-  /** Enforces the specified dark mode state to all cached {@link Scene} objects. */
+  /**
+   * Enforces the specified dark mode state to all cached {@link Scene} objects.
+   */
   public static void updateSceneCache(boolean enable) {
     for (final Scene scene : SCENE_CACHE) {
       setDarkMode(scene, enable);
@@ -126,17 +142,23 @@ public class CustomScene extends Scene {
     setDarkMode();
   }
 
-  /** Returns whether dark mode is applied to the scene. */
+  /**
+   * Returns whether dark mode is applied to the scene.
+   */
   public boolean isDarkMode() {
     return isDarkMode(this);
   }
 
-  /** Enables or disables dark mode for this scene based on the current {@link Configuration}.*/
+  /**
+   * Enables or disables dark mode for this scene based on the current {@link Configuration}.
+   */
   public void setDarkMode() {
     setDarkMode(this);
   }
 
-  /** Enables or disables dark mode for this scene. */
+  /**
+   * Enables or disables dark mode for this scene.
+   */
   public void setDarkMode(boolean enabled) {
     setDarkMode(this, enabled);
   }

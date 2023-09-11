@@ -42,22 +42,30 @@ public class ComponentBase {
     return parent;
   }
 
-  /** Returns an unmodifiable list of all child elements. Empty method in the {@code BaseInfo} class. */
+  /**
+   * Returns an unmodifiable list of all child elements. Empty method in the {@code BaseInfo} class.
+   */
   protected List<ComponentBase> getChildren() {
     return null;
   }
 
-  /** Associated the specified child with this object. Empty method in the {@code BaseInfo} class. */
+  /**
+   * Associated the specified child with this object. Empty method in the {@code BaseInfo} class.
+   */
   protected ComponentBase add(ComponentBase child) {
     return null;
   }
 
-  /** Removes the specified child from the list. Empty method in the {@code BaseInfo} class. */
+  /**
+   * Removes the specified child from the list. Empty method in the {@code BaseInfo} class.
+   */
   protected boolean remove(ComponentBase child) {
     return false;
   }
 
-  /** Removes the child at the specified index from the list. Empty method in the {@code BaseInfo} class. */
+  /**
+   * Removes the child at the specified index from the list. Empty method in the {@code BaseInfo} class.
+   */
   protected boolean remove(int index) {
     return false;
   }

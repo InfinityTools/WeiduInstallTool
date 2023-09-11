@@ -37,28 +37,44 @@ import java.util.stream.Collectors;
  * Handles execution of a single system process.
  */
 public class SysProc {
-  /** Storage for the total output since the start of the process. */
+  /**
+   * Storage for the total output since the start of the process.
+   */
   private final StringBuilder output = new StringBuilder(65536);
 
-  /** Temporary buffer for input text that is sent to the process. */
+  /**
+   * Temporary buffer for input text that is sent to the process.
+   */
   private final List<String> input = new ArrayList<>();
 
-  /** Stores all SysProcOutputEvent handlers registered for this instance. */
+  /**
+   * Stores all SysProcOutputEvent handlers registered for this instance.
+   */
   private final List<SysProcEventHandler<SysProcOutputEvent>> outputHandlers = new ArrayList<>();
 
-  /** Stores all SysProcChangeEvent handlers registered for this instance. */
+  /**
+   * Stores all SysProcChangeEvent handlers registered for this instance.
+   */
   private final List<SysProcEventHandler<SysProcChangeEvent>> changeHandlers = new ArrayList<>();
 
-  /** Used internally to synchronize SysProcOutputEvents. */
+  /**
+   * Used internally to synchronize SysProcOutputEvents.
+   */
   private final ReentrantLock outputEventLock = new ReentrantLock();
 
-  /** Used internally to synchronize SysProcChangeEvents. */
+  /**
+   * Used internally to synchronize SysProcChangeEvents.
+   */
   private final ReentrantLock changeEventLock = new ReentrantLock();
 
-  /** Used internally to synchronize handling output data. */
+  /**
+   * Used internally to synchronize handling output data.
+   */
   private final ReentrantLock outputLock = new ReentrantLock();
 
-  /** Used internally to synchronize handling input data. */
+  /**
+   * Used internally to synchronize handling input data.
+   */
   private final ReentrantLock inputLock = new ReentrantLock();
 
   private final List<String> commands = new ArrayList<>();
@@ -67,17 +83,21 @@ public class SysProc {
   private boolean includeError;
   private Charset charset;
 
-  /** Internally used to prevent executing the process multiple times. */
+  /**
+   * Internally used to prevent executing the process multiple times.
+   */
   private boolean executed;
 
-  /** {@link Process} instance of the currently running process, {@code null} otherwise. */
+  /**
+   * {@link Process} instance of the currently running process, {@code null} otherwise.
+   */
   private Process process;
 
   /**
    * Initializes a new process that can be executed by the {@link #execute()} method. Error stream is redirected to the
    * output stream. Output data is treated as UTF-8 encoded text.
    *
-   * @param command      Array of strings containing the program and optional arguments.
+   * @param command Array of strings containing the program and optional arguments.
    * @throws NullPointerException      if the program string is {@code null}.
    * @throws IndexOutOfBoundsException if the command array is empty.
    */
@@ -89,8 +109,8 @@ public class SysProc {
    * Initializes a new process that can be executed by the {@link #execute()} method. Error stream is redirected to the
    * output stream. Output data is treated as UTF-8 encoded text.
    *
-   * @param workingDir   The working directory where the process should be invoked. Specify {@code null} to ignore.
-   * @param command      Array of strings containing the program and optional arguments.
+   * @param workingDir The working directory where the process should be invoked. Specify {@code null} to ignore.
+   * @param command    Array of strings containing the program and optional arguments.
    * @throws NullPointerException      if the program string is {@code null}.
    * @throws IndexOutOfBoundsException if the command array is empty.
    */
@@ -169,7 +189,9 @@ public class SysProc {
     return retVal;
   }
 
-  /** Returns whether the {@link #execute()} method has already been called for this instance. */
+  /**
+   * Returns whether the {@link #execute()} method has already been called for this instance.
+   */
   public boolean isExecuted() {
     return executed;
   }
@@ -186,7 +208,9 @@ public class SysProc {
     return false;
   }
 
-  /** Kills the currently running process. */
+  /**
+   * Kills the currently running process.
+   */
   public void killProcess() {
     if (process != null && process.isAlive()) {
       process.destroy();
@@ -217,7 +241,9 @@ public class SysProc {
     }
   }
 
-  /** Returns the character set for converting input and output data from or to textual content. */
+  /**
+   * Returns the character set for converting input and output data from or to textual content.
+   */
   public Charset getCharset() {
     return charset;
   }
@@ -234,12 +260,16 @@ public class SysProc {
     }
   }
 
-  /** Returns an unmodifiable list of the command line for this process. */
+  /**
+   * Returns an unmodifiable list of the command line for this process.
+   */
   public List<String> getCommand() {
     return Collections.unmodifiableList(commands);
   }
 
-  /** Returns a string representation of the command that is executed by this process. */
+  /**
+   * Returns a string representation of the command that is executed by this process.
+   */
   public String getCommandLine() {
     return commands.stream().map(c -> {
       if (c.indexOf(' ') >= 0 && (c.charAt(0) != '"')) {
@@ -250,7 +280,9 @@ public class SysProc {
     }).collect(Collectors.joining(" "));
   }
 
-  /** Returns whether the error stream of the external process is redirected to the output stream. */
+  /**
+   * Returns whether the error stream of the external process is redirected to the output stream.
+   */
   public boolean isIncludeError() {
     return includeError;
   }
@@ -267,7 +299,9 @@ public class SysProc {
     }
   }
 
-  /** Registers the specified event handler for {@link SysProcOutputEvent}s. */
+  /**
+   * Registers the specified event handler for {@link SysProcOutputEvent}s.
+   */
   public void addOutputEventHandler(SysProcEventHandler<SysProcOutputEvent> handler) {
     if (handler != null) {
       try {
@@ -279,7 +313,9 @@ public class SysProc {
     }
   }
 
-  /** Unregisters the specified event handler. */
+  /**
+   * Unregisters the specified event handler.
+   */
   public boolean removeOutputEventHandler(SysProcEventHandler<SysProcOutputEvent> handler) {
     if (handler != null) {
       try {
@@ -292,12 +328,16 @@ public class SysProc {
     return false;
   }
 
-  /** Returns an unmodifiable list of registered handlers for {@link SysProcOutputEvent}s. */
+  /**
+   * Returns an unmodifiable list of registered handlers for {@link SysProcOutputEvent}s.
+   */
   public List<SysProcEventHandler<SysProcOutputEvent>> getOutputEventHandler() {
     return Collections.unmodifiableList(outputHandlers);
   }
 
-  /** Registers the specified event handler for {@link SysProcChangeEvent}s. */
+  /**
+   * Registers the specified event handler for {@link SysProcChangeEvent}s.
+   */
   public void addChangeEventHandler(SysProcEventHandler<SysProcChangeEvent> handler) {
     if (handler != null) {
       try {
@@ -309,7 +349,9 @@ public class SysProc {
     }
   }
 
-  /** Unregisters the specified event handler. */
+  /**
+   * Unregisters the specified event handler.
+   */
   public boolean removeChangeEventHandler(SysProcEventHandler<SysProcChangeEvent> handler) {
     if (handler != null) {
       try {
@@ -322,12 +364,16 @@ public class SysProc {
     return false;
   }
 
-  /** Returns an unmodifiable list of registered handlers for {@link SysProcChangeEvent}s. */
+  /**
+   * Returns an unmodifiable list of registered handlers for {@link SysProcChangeEvent}s.
+   */
   public List<SysProcEventHandler<SysProcChangeEvent>> getChangeEventHandler() {
     return Collections.unmodifiableList(changeHandlers);
   }
 
-  /** Specifies input text that is sent to the process at the next occasion. */
+  /**
+   * Specifies input text that is sent to the process at the next occasion.
+   */
   public void setInput(String text) {
     if (text != null) {
       try {
@@ -339,7 +385,9 @@ public class SysProc {
     }
   }
 
-  /** Returns the total output that has been accumulated since the start of the process. */
+  /**
+   * Returns the total output that has been accumulated since the start of the process.
+   */
   public String getOutput() {
     try {
       outputLock.lock();
@@ -349,7 +397,9 @@ public class SysProc {
     }
   }
 
-  /** Adds the specified string to the total output string. */
+  /**
+   * Adds the specified string to the total output string.
+   */
   private void putBuffer(String text) {
     if (text != null) {
       try {
@@ -404,7 +454,9 @@ public class SysProc {
     return retVal;
   }
 
-  /** A helper method that runs the specified {@link Runnable} object asynchronously. */
+  /**
+   * A helper method that runs the specified {@link Runnable} object asynchronously.
+   */
   private void runAsync(Runnable runnable) {
     if (runnable != null) {
       try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
@@ -413,7 +465,9 @@ public class SysProc {
     }
   }
 
-  /** Used internally to fire a {@link SysProcOutputEvent}. */
+  /**
+   * Used internally to fire a {@link SysProcOutputEvent}.
+   */
   private void fireOutputEvent(String text) {
     try {
       outputEventLock.lock();
@@ -426,7 +480,9 @@ public class SysProc {
     }
   }
 
-  /** Used internally to fire a {@link SysProcChangeEvent}. */
+  /**
+   * Used internally to fire a {@link SysProcChangeEvent}.
+   */
   private void fireChangeEvent(SysProcChangeEvent.Type type) {
     try {
       changeEventLock.lock();

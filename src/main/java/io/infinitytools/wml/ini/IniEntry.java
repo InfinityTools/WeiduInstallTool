@@ -43,12 +43,16 @@ public class IniEntry extends IniBaseNode {
     setValue(value);
   }
 
-  /** Returns the entry key. */
+  /**
+   * Returns the entry key.
+   */
   public String getKey() {
     return key;
   }
 
-  /** Returns the entry value. */
+  /**
+   * Returns the entry value.
+   */
   public String getValue() {
     return value;
   }
@@ -63,6 +67,7 @@ public class IniEntry extends IniBaseNode {
    * <li>Or an integer value in decimal notation.</li>
    * </ul>
    * </p>
+   *
    * @param defValue A default value that is returned if the entry value cannot be converted to a number.
    * @return Numeric representation of the entry value. Returns {@code defValue} if the value could not be converted.
    */
@@ -89,6 +94,7 @@ public class IniEntry extends IniBaseNode {
    * <li>{@code true}: "true", "yes", "y", "1"</li>
    * </ul>
    * </p>
+   *
    * @param defValue A default value that is returned if the entry value cannot be evaluated as a boolean value.
    * @return A boolean representation of the entry value. Returns {@code defValue} if the value could not be interpreted.
    */
@@ -111,7 +117,9 @@ public class IniEntry extends IniBaseNode {
     return defValue;
   }
 
-  /** Assigns a new value to the entry. */
+  /**
+   * Assigns a new value to the entry.
+   */
   public IniEntry setValue(String newValue) {
     this.value = (newValue != null) ? newValue.strip() : "";
     return this;

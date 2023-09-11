@@ -40,13 +40,17 @@ public class ComponentContainerBase extends ComponentBase {
     }
   }
 
-  /** Returns an unmodifiable list of all child elements associated with this object. */
+  /**
+   * Returns an unmodifiable list of all child elements associated with this object.
+   */
   @Override
   public List<ComponentBase> getChildren() {
     return Collections.unmodifiableList(children);
   }
 
-  /** Adds the specified {@link ComponentBase} object to the child list. Returns the added element. */
+  /**
+   * Adds the specified {@link ComponentBase} object to the child list. Returns the added element.
+   */
   @Override
   public ComponentBase add(ComponentBase child) {
     int index = children.indexOf(child);

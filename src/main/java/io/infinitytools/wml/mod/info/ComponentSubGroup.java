@@ -28,7 +28,9 @@ public class ComponentSubGroup extends ComponentContainerBase {
     this.name = Objects.requireNonNull(name).strip();
   }
 
-  /** Returns the name of the subgroup. */
+  /**
+   * Returns the name of the subgroup.
+   */
   public String getName() {
     return name;
   }
