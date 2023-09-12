@@ -4,7 +4,7 @@ plugins {
   id 'java'
   id 'application'
   id 'org.javamodularity.moduleplugin' version '1.8.12'
-  id 'org.openjfx.javafxplugin' version '0.0.14'
+  id 'org.openjfx.javafxplugin' version '0.1.0'
   id 'org.beryx.jlink' version '2.26.0'
 }
 
@@ -86,7 +86,7 @@ dependencies {
 //}
 
 jlink {
-  imageZip.fileValue(project.file("${buildDir}/distributions/app-${javafx.platform.classifier}.zip"))
+  imageZip.fileValue(project.file("${layout.buildDirectory}/distributions/app-${javafx.platform.classifier}.zip"))
   addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
   addExtraDependencies("javafx")
 
@@ -138,28 +138,14 @@ jlink {
       ])
     } else if (OperatingSystem.current().isMacOsX()) {
       imageOptions = [
-              "--icon", "${projectDir}/buildres/mac/wml.icns",
-              "--resource-dir", "${projectDir}/buildres/mac"
+              "--icon", "${projectDir}/buildres/macos/wml.icns",
       ]
       installerType = "pkg"
       installerOptions.addAll([
               "--mac-package-name", "${appName}",
-              "--resource-dir", "${projectDir}/buildres/mac",
-              "--file-associations", "${projectDir}/buildres/mac/open_with.properties"
+              "--resource-dir", "${projectDir}/buildres/macos",
+              "--file-associations", "${projectDir}/buildres/macos/open_with.properties"
       ])
     }
   }
 }
-
-jlinkZip {
-  group = 'distribution'
-}
-
-//if (OperatingSystem.current().isMacOsX()) {
-//  tasks.jpackageImage.doLast {
-//    copy {
-//      from("${projectDir}/buildres/mac")
-//      into "${buildDir}/${jlinkZip.group}/${appName}.app/Contents/Resources"
-//    }
-//  }
-//}
