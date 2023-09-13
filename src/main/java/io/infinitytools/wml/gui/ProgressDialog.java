@@ -79,10 +79,10 @@ public class ProgressDialog extends Stage implements AutoCloseable {
           throw new TaskException(ex);
         }
       } catch (ExecutionException e) {
-        Logger.error("Performed task was aborted", e);
+        Logger.error(e, "Performed task was aborted");
         throw new TaskException(e.getCause());
       } catch (CancellationException | InterruptedException e) {
-        Logger.debug("Performed task cancelled by user", e);
+        Logger.debug(e, "Performed task cancelled by user");
         return false;
       } finally {
         if (owner != null) {

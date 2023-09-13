@@ -53,7 +53,7 @@ public class AboutWindowController {
         weiduLink.setDisable(true);
       }
     } catch (NullPointerException e) {
-      Logger.error("Controls is null", e);
+      Logger.error(e, "Controls is null");
     }
   }
 }

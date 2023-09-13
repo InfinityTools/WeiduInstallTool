@@ -96,7 +96,7 @@ public class ProcessUtils {
         retVal = sp.getOutput();
       }
     } catch (IOException | InterruptedException | ExecutionException | TimeoutException e) {
-      Logger.error("Error while getting process output", e);
+      Logger.error(e, "Error while getting process output");
     }
 
     return retVal;

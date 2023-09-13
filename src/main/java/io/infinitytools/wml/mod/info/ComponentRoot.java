@@ -155,7 +155,7 @@ public class ComponentRoot extends ComponentContainerBase {
             }
           }
         } catch (JSONException e) {
-          Logger.debug("Parsing mod info JSON group (ignored)", e);
+          Logger.debug(e, "Parsing mod info JSON group (ignored)");
         }
 
         // handling subgroup
@@ -170,7 +170,7 @@ public class ComponentRoot extends ComponentContainerBase {
             }
           }
         } catch (JSONException e) {
-          Logger.debug("Parsing mod info JSON subgroup (ignored)", e);
+          Logger.debug(e, "Parsing mod info JSON subgroup (ignored)");
         }
 
         // handling component
@@ -189,7 +189,7 @@ public class ComponentRoot extends ComponentContainerBase {
             }
           }
         } catch (JSONException e) {
-          Logger.debug("Parsing mod info JSON component (ignored)", e);
+          Logger.debug(e, "Parsing mod info JSON component (ignored)");
         }
 
         // handling component groups
@@ -205,7 +205,7 @@ public class ComponentRoot extends ComponentContainerBase {
               }
             }
           } catch (JSONException e) {
-            Logger.debug("Parsing mod info JSON component group (ignored)", e);
+            Logger.debug(e, "Parsing mod info JSON component group (ignored)");
           }
         }
 
@@ -219,7 +219,7 @@ public class ComponentRoot extends ComponentContainerBase {
               ci.getLabelList().add(li);
             }
           } catch (JSONException e) {
-            Logger.debug("Parsing mod info JSON component label (ignored)", e);
+            Logger.debug(e, "Parsing mod info JSON component label (ignored)");
           }
         }
 
@@ -233,7 +233,7 @@ public class ComponentRoot extends ComponentContainerBase {
               ci.getMetadataList().add(mi);
             }
           } catch (JSONException e) {
-            Logger.debug("Parsing mod info JSON component metadata (ignored)", e);
+            Logger.debug(e, "Parsing mod info JSON component metadata (ignored)");
           }
         }
       }

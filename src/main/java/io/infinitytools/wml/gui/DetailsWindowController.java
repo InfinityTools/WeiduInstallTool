@@ -43,7 +43,7 @@ public class DetailsWindowController {
       componentsTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       iniTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     } catch (NullPointerException e) {
-      Logger.error(String.format("Components are null (componentsTree=%s, iniTree=%s)", componentsTree, iniTree), e);
+      Logger.error(e, "Components are null (componentsTree={}, iniTree={})", componentsTree, iniTree);
     }
   }
 }

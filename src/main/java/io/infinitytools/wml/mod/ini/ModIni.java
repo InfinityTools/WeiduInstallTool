@@ -95,7 +95,7 @@ public class ModIni {
               homepage = new URI(entry.getValue()).toURL();
             } catch (Exception e) {
               // ignore
-              Logger.debug("Mod Ini: invalid homepage url", e);
+              Logger.debug(e, "Mod Ini: invalid homepage url");
             }
           }
           case "download" -> downloadList.addAll(stringArrayToUrlList(entry.getValue().split(",")));
@@ -197,7 +197,7 @@ public class ModIni {
           return new URI(item.strip()).toURL();
         } catch (Exception e) {
           // ignore
-          Logger.debug("Mod Ini: invalid url entry", e);
+          Logger.debug(e, "Mod Ini: invalid url entry");
         }
       }
       return null;

@@ -170,7 +170,7 @@ public class Utils {
       try {
         return OffsetDateTime.parse(dateTimeString, fmt);
       } catch (DateTimeParseException e) {
-        Logger.debug("DateTimeParser error", e);
+        Logger.debug(e, "DateTimeParser error");
       }
     }
 

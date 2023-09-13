@@ -80,7 +80,7 @@ public class OutputStreamProducer implements Runnable {
         Thread.sleep(1000);
       } catch (InterruptedException e) {
         // woken up by external trigger
-        Logger.trace("Polling thread interrupted", e);
+        Logger.trace(e, "Polling thread interrupted");
       }
     }
 
@@ -117,7 +117,7 @@ public class OutputStreamProducer implements Runnable {
               writer.flush();
             }
           } catch (IOException e) {
-            Logger.error("I/O error while writing input content to process stream", e);
+            Logger.error(e, "I/O error while writing input content to process stream");
           }
         });
       }

@@ -37,6 +37,8 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -115,7 +117,7 @@ public class Weidu {
     try {
       makeBinaryExecutable(weiduPath);
     } catch (IOException e) {
-      Logger.error("chmod +x failed on WeiDU binary", e);
+      Logger.error(e, "chmod +x failed on WeiDU binary");
       throw new UnsupportedOperationException("Could not make WeiDU binary executable.");
     }
 
@@ -140,25 +142,25 @@ public class Weidu {
   public String getHelp() {
     String retVal = null;
 
-    if (SystemInfo.IS_WINDOWS) {
-      // Windows-only procedure:
+    if (!SystemInfo.IS_LINUX) {
+      // Originally a Windows-only procedure, but appears to be required for macOS, too.
       // WeiDU expects the user to press ENTER repeatedly to advance output by one more page until the process
-      // terminates
-      final SysProc sp = new SysProc(weidu.toString(), "--help");
+      // terminates.
+      final SysProc sp = new SysProc(weidu.toString(), "--help", "--no-exit-pause");
       try {
         final Future<Integer> result = sp.execute();
-        // as of WeiDU 249 there are 12 line breaks needed to terminate WeiDU help output
-        for (int i = 0; i < 12; i++) {
+        long waitTime = 0;
+        long waitTimeTotal = 0;
+        while (sp.isRunning() && waitTimeTotal < 2000) {
           sp.setInput(SystemInfo.NEWLINE);
-        }
-        while (sp.isRunning()) {
-          sp.setInput(SystemInfo.NEWLINE);
-          Thread.sleep(5);
+          Thread.sleep(waitTime);
+          waitTime = Math.min(waitTime + 1, 10L);
+          waitTimeTotal += waitTime;
         }
 
-        result.get();
-      } catch (ExecutionException | IOException | InterruptedException e) {
-        Logger.error("Error executing WeiDU process", e);
+        result.get(1000, TimeUnit.MILLISECONDS);
+      } catch (ExecutionException | IOException | InterruptedException | TimeoutException e) {
+        Logger.error(e, "Error executing WeiDU process");
       }
       String output = sp.getOutput();
       if (output != null) {
@@ -176,7 +178,7 @@ public class Weidu {
       }
     } else {
       // Other systems are much less painful
-      retVal = ProcessUtils.getProcessOutput(weidu.toString(), "--help");
+      retVal = ProcessUtils.getProcessOutput(weidu.toString(), "--help", "--no-exit-pause");
     }
 
     if (retVal == null) {
@@ -309,7 +311,7 @@ public class Weidu {
             int key = Integer.parseInt(items[0]);
             map.put(key, items[1].strip());
           } catch (NumberFormatException e) {
-            Logger.error("Unexpected language number", e);
+            Logger.error(e, "Unexpected language number");
           }
         }
       }
@@ -339,12 +341,12 @@ public class Weidu {
             try {
               retVal = new JSONArray(curLine);
             } catch (JSONException e) {
-              Logger.error("Invalid component info JSON structure", e);
+              Logger.error(e, "Invalid component info JSON structure");
             }
             break;
           }
         } catch (PatternSyntaxException e) {
-          Logger.error("Invalid regular expression. NEEDS FIX!!!");
+          Logger.error(e, "Invalid regular expression. NEEDS FIX!!!");
         }
       }
     }
@@ -376,7 +378,7 @@ public class Weidu {
       try (final InputStream is = Globals.class.getClassLoader().getResourceAsStream(PROPERTY_FILE)) {
         properties.load(is);
       } catch (Exception e) {
-        Logger.error("Could not load \"weidu.properties\"", e);
+        Logger.error(e, "Could not load \"weidu.properties\"");
         properties = null;
         return retVal;
       }
@@ -520,9 +522,9 @@ public class Weidu {
           retVal = output.strip().matches(".*\\bWeiDU version [0-9]+");
         }
       } catch (PatternSyntaxException e) {
-        Logger.error("Invalid regular expression. NEEDS FIX!!!");
+        Logger.error(e, "Invalid regular expression. NEEDS FIX!!!");
       } catch (Exception e) {
-        Logger.error("Process execution error", e);
+        Logger.error(e, "Process execution error");
       }
     }
 
@@ -558,7 +560,7 @@ public class Weidu {
     try {
       zipAsset = findWeiduAsset();
     } catch (IOException e) {
-      Logger.debug("Unrecoverable findWeiduAsset() error", e);
+      Logger.debug(e, "Unrecoverable findWeiduAsset() error");
       throw new IOException("Could not determine WeiDU binary URL.", e);
     }
 
@@ -584,7 +586,7 @@ public class Weidu {
         }
       }
     } catch (IOException e) {
-      Logger.debug("Error downloading WeiDU archive", e);
+      Logger.debug(e, "Error downloading WeiDU archive");
       throw new IOException("Could not download WeiDU binary.", e);
     }
 
@@ -712,7 +714,7 @@ public class Weidu {
           try {
             return Integer.parseInt(s);
           } catch (NumberFormatException e) {
-            Logger.debug("Unexpected WeiDU version string", e);
+            Logger.debug(e, "Unexpected WeiDU version string");
             return 0;
           }
         };
@@ -729,7 +731,7 @@ public class Weidu {
       try {
         return Double.parseDouble(major + "." + minor);
       } catch (NumberFormatException e) {
-        Logger.warn("Unexpected number parsing error", e);
+        Logger.warn(e, "Unexpected number parsing error");
         return major;
       }
     }

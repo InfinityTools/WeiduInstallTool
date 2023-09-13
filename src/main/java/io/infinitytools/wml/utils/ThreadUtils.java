@@ -91,7 +91,7 @@ public class ThreadUtils {
           try {
             Thread.sleep(1);
           } catch (InterruptedException e) {
-            Logger.trace("Waiting loop interrupted", e);
+            Logger.trace(e, "Waiting loop interrupted");
           }
           curWaitMs++;
         }

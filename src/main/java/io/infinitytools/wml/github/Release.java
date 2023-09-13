@@ -63,11 +63,11 @@ public class Release implements Comparable<Release> {
         retVal.add(new Release(json.getJSONObject(i)));
       }
     } catch (JSONException e) {
-      Logger.warn("GitHub Release JSON parsing error", e);
+      Logger.warn(e, "GitHub Release JSON parsing error");
     } catch (IOException e) {
-      Logger.warn("GitHub Release JSON data could not be retrieved", e);
+      Logger.warn(e, "GitHub Release JSON data could not be retrieved");
     } catch (IllegalArgumentException e) {
-      Logger.error("Retrieving GitHub Release data", e);
+      Logger.error(e, "Retrieving GitHub Release data");
     }
 
     return retVal;

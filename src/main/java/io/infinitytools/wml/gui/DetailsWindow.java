@@ -69,7 +69,7 @@ public class DetailsWindow extends Stage {
       ComponentRoot components = modInfo.getComponentInfo(newIndex);
       initComponentsTree(components);
     } catch (IndexOutOfBoundsException e) {
-      Logger.error("Language item selected at index " + newIndex, e);
+      Logger.error(e, "Language item selected at index {}", newIndex);
     }
   }
 

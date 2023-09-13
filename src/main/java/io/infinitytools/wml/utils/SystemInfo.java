@@ -191,7 +191,7 @@ public class SystemInfo {
     try {
       retVal = Path.of(System.getProperty("user.home"));
     } catch (InvalidPathException e) {
-      Logger.debug("User path not found", e);
+      Logger.debug(e, "User path not found");
     }
     return retVal;
   }

@@ -182,7 +182,7 @@ public class SysProc {
       try {
         Thread.sleep(1);
       } catch (InterruptedException e) {
-        Logger.trace("Blocking loop interrupted", e);
+        Logger.trace(e, "Blocking loop interrupted");
       }
     }
 
@@ -538,7 +538,7 @@ public class SysProc {
           Thread.sleep(duration);
         } catch (InterruptedException e) {
           // thread was interrupted by external event
-          Logger.trace("Polling loop interrupted", e);
+          Logger.trace(e, "Polling loop interrupted");
         }
       }
 

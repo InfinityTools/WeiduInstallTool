@@ -40,15 +40,17 @@
   <key>CFBundleDocumentTypes</key>
   <array>
     <dict>
-      <key>CFBundleTypeName</key>
-      <string>TP2</string>
-      <key>CFBundleTypeRole</key>
-      <string>Editor</string>
-      <key>LSHandlerRank</key>
-      <string>Default</string>
-      <key>LSItemContentTypes</key>
+      <key>CFBundleTypeExtensions</key>
       <array>
         <string>tp2</string>
+      </array>
+      <key>CFBundleTypeName</key>
+      <string>tp2</string>
+      <key>CFBundleTypeRole</key>
+      <string>Viewer</string>
+      <key>CFBundleTypeMIMETypes</key>
+      <array>
+        <string>application/x-tp2</string>
       </array>
       <key>CFBundleTypeIconFile</key>
       <string>wml_open</string>

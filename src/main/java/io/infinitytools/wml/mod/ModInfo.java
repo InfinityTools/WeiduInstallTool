@@ -244,7 +244,7 @@ public class ModInfo {
               StandardOpenOption.WRITE);
           retVal = true;
         } catch (IOException e) {
-          Logger.debug("Error writing weidu.conf", e);
+          Logger.debug(e, "Error writing weidu.conf");
         }
       }
     }
@@ -286,7 +286,7 @@ public class ModInfo {
             retVal = ComponentRoot.parse(tp2File.getFileName().toString(), json);
           }
         } catch (Exception e) {
-          Logger.debug("Error retrieving component information", e);
+          Logger.debug(e, "Error retrieving component information");
         }
       }
     }

@@ -186,8 +186,8 @@ public class MainWindow extends Application {
       final Weidu.Version versionFound = Weidu.getInstance().getVersion();
       if (versionFound != null) {
         final Weidu.Version versionRecommended = Weidu.Version.of(Weidu.getProperty(Weidu.PROP_WEIDU_VERSION));
-        Logger.debug(String.format("WeiDU version (found: %s, recommended: %s, cmp value: %s)",
-            versionFound, versionRecommended, versionFound.compareTo(versionRecommended)));
+        Logger.debug("WeiDU version (found: {}, recommended: {}, cmp value: {})",
+            versionFound, versionRecommended, versionFound.compareTo(versionRecommended));
 
         if (versionFound.compareTo(versionRecommended) < 0) {
           // notify about outdated WeiDU version
@@ -200,11 +200,11 @@ public class MainWindow extends Application {
           throw new UnsupportedOperationException("Outdated WeiDU version found: " + versionFound);
         }
       } else {
-        Logger.debug("Not a valid WeiDU binary: " + Weidu.getInstance().getWeidu());
+        Logger.debug("Not a valid WeiDU binary: {}", Weidu.getInstance().getWeidu());
       }
       return Weidu.getInstance();
     } catch (UnsupportedOperationException e) {
-      Logger.debug("Local WeiDU binary instance not found", e);
+      Logger.debug(e, "Local WeiDU binary instance not found");
       exception = e;
     }
 
@@ -229,17 +229,17 @@ public class MainWindow extends Application {
       // Install/Update: download from WeiDU release page
       try {
         boolean retVal = downloadWeidu(updateBinary);
-        Logger.debug("Download WeiDU result: " + retVal);
+        Logger.debug("Download WeiDU result: {}", retVal);
       } catch (ProgressDialog.TaskException e) {
-        Logger.error("Download WeiDU terminated prematurely", e);
+        Logger.error(e, "Download WeiDU terminated prematurely");
       } catch (Exception e) {
-        Logger.warn("Download WeiDU internal error: no further actions required", e);
+        Logger.warn(e, "Download WeiDU internal error: no further actions required");
       }
 
       try {
         return Weidu.getInstance();
       } catch (UnsupportedOperationException e) {
-        Logger.debug("After download: Local Weidu binary instance not found", e);
+        Logger.debug(e, "After download: Local Weidu binary instance not found");
       }
 
       final ButtonType confirmType = Utils.showConfirmationDialog(null,
@@ -275,9 +275,9 @@ public class MainWindow extends Application {
       Configuration.getInstance().load();
     } catch (NoSuchFileException e) {
       // not an error
-      Logger.debug("Loading configuration: configuration not found (expected)", e);
+      Logger.debug(e, "Loading configuration: configuration not found (expected)");
     } catch (Exception e) {
-      Logger.error("Loading configuration", e);
+      Logger.error(e, "Loading configuration");
     }
 
     // Platform check
@@ -294,7 +294,7 @@ public class MainWindow extends Application {
         throw new Exception("Weidu is null");
       }
     } catch (Exception e) {
-      Logger.info("WeiDU existence check failed", e);
+      Logger.info(e, "WeiDU existence check failed");
       Utils.showErrorDialog(null, "Error", "WeiDU executable not found.",
           "The WeiDU executable could not be found on the system path or any of the supported locations.");
       return;
@@ -307,7 +307,7 @@ public class MainWindow extends Application {
     try {
       this.modInfo = loadModInfo(Configuration.getInstance().getMode(), true);
     } catch (Exception e) {
-      Logger.error("Loading mod information in setup mode", e);
+      Logger.error(e, "Loading mod information in setup mode");
       Configuration.getInstance().save();
       return;
     }
@@ -669,11 +669,11 @@ public class MainWindow extends Application {
       try {
         return processResult.get();
       } catch (CancellationException e) {
-        Logger.debug("WeiDU process cancelled", e);
+        Logger.debug(e, "WeiDU process cancelled");
         return Integer.MIN_VALUE;
       } catch (Exception e) {
         // don't really care
-        Logger.warn("WeiDU process error", e);
+        Logger.warn(e, "WeiDU process error");
       }
     }
     return null;
@@ -911,7 +911,7 @@ public class MainWindow extends Application {
       try {
         detailsWindow = new DetailsWindow(this.modInfo);
       } catch (Exception e) {
-        Logger.error("Could not create DetailsWindow instance", e);
+        Logger.error(e, "Could not create DetailsWindow instance");
         getController().detailsButton.setDisable(true);
       }
     }
@@ -974,7 +974,7 @@ public class MainWindow extends Application {
       try {
         processResult = this.process.execute();
       } catch (IOException e) {
-        Logger.info("WeiDU process execution error", e);
+        Logger.info(e, "WeiDU process execution error");
         this.process = null;
         this.processResult = null;
         handleProcessError(e.getMessage());
@@ -1056,7 +1056,7 @@ public class MainWindow extends Application {
       try {
         return new ModInfo(gamePath, Configuration.getInstance().getTp2Path());
       } catch (Exception e) {
-        Logger.debug("Error creating ModInfo instance", e);
+        Logger.debug(e, "Error creating ModInfo instance");
         if (feedback) {
           Utils.showErrorDialog(null, "Error", "Mod does not exist.",
               "TP2 file of the mod does not exist:\n" + Configuration.getInstance().getTp2Path().toString());
@@ -1118,7 +1118,7 @@ public class MainWindow extends Application {
           mods = log.getEntries().stream().map(e -> e.getTp2Name().toLowerCase()).collect(Collectors.toSet());
         } catch (Exception e) {
           // WeiDU.log may not exist
-          Logger.debug("WeiDU.log not available or could not be parsed", e);
+          Logger.debug(e, "WeiDU.log not available or could not be parsed");
         }
 
         if (mods != null) {
@@ -1179,7 +1179,7 @@ public class MainWindow extends Application {
         default -> executeCustom();
       }
     } catch (Exception e) {
-      Logger.debug("Error executing WeiDU command", e);
+      Logger.debug(e, "Error executing WeiDU command");
       Utils.showErrorDialog(getStage(), "Error", "Could not execute WeiDU command.", e.getMessage());
     }
   }
@@ -1194,7 +1194,7 @@ public class MainWindow extends Application {
         Utils.showErrorDialog(getStage(), "Error", "No WeiDU help available.", null);
       }
     } catch (Exception e) {
-      Logger.debug("Error showing WeiDU help", e);
+      Logger.debug(e, "Error showing WeiDU help");
       Utils.showErrorDialog(getStage(), "Error", "No WeiDU help available.", null);
     } finally {
       setWeiduTerminated();
@@ -1282,7 +1282,7 @@ public class MainWindow extends Application {
     try {
       AboutDialog.showAboutDialog(getStage());
     } catch (Exception e) {
-      Logger.error("Error creating About dialog", e);
+      Logger.error(e, "Error creating About dialog");
       // Fall-back option
       Utils.showMessageDialog(stage, "About", Globals.APP_TITLE, "Version " + Globals.APP_VERSION);
     }
@@ -1311,7 +1311,7 @@ public class MainWindow extends Application {
       try {
         Configuration.getInstance().save();
       } catch (Exception e) {
-        Logger.warn("Error saving configuration", e);
+        Logger.warn(e, "Error saving configuration");
       }
       stage.close();
       return true;

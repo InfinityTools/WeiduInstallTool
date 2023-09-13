@@ -117,14 +117,14 @@ public class InputStreamConsumer implements Runnable {
           Thread.sleep(duration);
         } catch (InterruptedException e) {
           // no feedback; may be intentional
-          Logger.trace("Polling thread interrupted", e);
+          Logger.trace(e, "Polling thread interrupted");
         }
       }
 
       // forward pending process output
       forward();
     } catch (IOException e) {
-      Logger.error("Error in polling loop", e);
+      Logger.error(e, "Error in polling loop");
     }
   }
 
@@ -175,7 +175,7 @@ public class InputStreamConsumer implements Runnable {
           remaining = null;
         }
       } catch (CharacterCodingException e) {
-        Logger.debug("Incompatible character encoding", e);
+        Logger.debug(e, "Incompatible character encoding");
       }
     }
 
