@@ -485,18 +485,14 @@ public class MainWindow extends Application {
    */
   public void setOutputText(String text, boolean autoScrollDown) {
     int caretPos = getController().outputArea.getCaretPosition();
-    if (autoScrollDown) {
-      getController().outputArea.positionCaret(0);
-    }
 
     clearOutputText();
     if (text != null) {
       getController().outputArea.appendText(ensureOutputTextLimit(text));
 
-      if (autoScrollDown) {
-        caretPos = getController().outputArea.getText().length();
+      if (!autoScrollDown) {
+        getController().outputArea.positionCaret(caretPos);
       }
-      getController().outputArea.positionCaret(caretPos);
     }
   }
 
