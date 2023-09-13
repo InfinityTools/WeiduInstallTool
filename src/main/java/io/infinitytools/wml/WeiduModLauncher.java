@@ -23,5 +23,8 @@ import io.infinitytools.wml.gui.MainWindow;
 public class WeiduModLauncher {
   public static void main(String[] args) {
     MainWindow.launch(MainWindow.class, args);
+
+    // Terminate JVM without delay: workaround for macOS which keeps the app available for reuse, otherwise.
+    Runtime.getRuntime().exit(0);
   }
 }
