@@ -17,17 +17,17 @@
   <Label fx:id="promptLabel"
          styleClass="boldLabel,bigLabel"
          textAlignment="CENTER"
-         text="Please choose the language in which you wish to play the game."
+         text="%ui.language.prompt.label"
          wrapText="true"/>
   
   <Label fx:id="infoLabel"
          textAlignment="CENTER"
-         text="If you later wish to play the game in a different language you will need to edit the file weidu.conf and reinstall your mods."
+         text="%ui.language.info.label"
          wrapText="true"/>
 
   <Label fx:id="notesLabel"
          textAlignment="CENTER"
-         text="Press &quot;Cancel&quot; to let the mod installation itself handle game language selection."
+         text="%ui.language.notes.label"
          wrapText="true"/>
 
   <!-- Language selection -->
@@ -37,7 +37,7 @@
       <Insets top="8"/>
     </padding>
     <Label styleClass="boldLabel"
-           text="Language:"/>
+           text="%ui.language.language.label"/>
 
     <ComboBox fx:id="languageBox"
               HBox.hgrow="ALWAYS"/>
@@ -52,11 +52,11 @@
     <Button fx:id="okButton"
             styleClass="boldLabel"
             defaultButton="true"
-            text="    OK    "/>
+            text="%ui.language.ok.button"/>
     <Button fx:id="cancelButton"
             styleClass="boldLabel"
             cancelButton="true"
-            text="Cancel"/>
+            text="%ui.language.cancel.button"/>
   </HBox>
 
 </VBox>

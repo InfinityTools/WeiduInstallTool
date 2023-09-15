@@ -24,6 +24,7 @@ import io.infinitytools.wml.mod.log.WeiduLog;
 import io.infinitytools.wml.process.SysProc;
 import io.infinitytools.wml.process.SysProcChangeEvent;
 import io.infinitytools.wml.process.SysProcOutputEvent;
+import io.infinitytools.wml.utils.R;
 import io.infinitytools.wml.utils.SystemInfo;
 import io.infinitytools.wml.utils.Utils;
 import io.infinitytools.wml.weidu.Weidu;
@@ -104,7 +105,7 @@ public class MainWindow extends Application {
   /**
    * Path to the FXML definition file for this window.
    */
-  private final static URL FXML_FILE = MainWindow.class.getResource("main.fxml");
+  private final static URL FXML_FILE = Objects.requireNonNull(MainWindow.class.getResource("main.fxml"));
 
   private static MainWindow instance;
 
@@ -143,8 +144,8 @@ public class MainWindow extends Application {
    * @throws ProgressDialog.TaskException if the task was prematurely terminated by an error.
    */
   private boolean downloadWeidu(boolean overwrite) throws IOException, ProgressDialog.TaskException {
-    return ProgressDialog.performTask(null, "Download",
-        "Downloading and installing WeiDU executable.",
+    return ProgressDialog.performTask(null, R.get("ui.checkWeidu.downloadProgress.title"),
+        R.get("ui.checkWeidu.downloadProgress.message"),
         dlg -> {
           final String weiduFileName = Weidu.WEIDU_NAME + SystemInfo.EXE_SUFFIX;
           final Path targetDir = Globals.APP_DATA_PATH
@@ -170,14 +171,14 @@ public class MainWindow extends Application {
    * @throws Exception if the WeiDU binary could not be found on the system.
    */
   private Weidu checkWeidu() throws Exception {
-    final ButtonType downloadButton = new ButtonType("Download", ButtonBar.ButtonData.YES);
-    final ButtonType selectButton = new ButtonType("Choose", ButtonBar.ButtonData.NO);
-    final ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-    final ButtonType keepButton = new ButtonType("Keep", ButtonBar.ButtonData.CANCEL_CLOSE);
+    final ButtonType downloadButton = new ButtonType(R.get("ui.checkWeidu.download.button"), ButtonBar.ButtonData.YES);
+    final ButtonType selectButton = new ButtonType(R.get("ui.checkWeidu.choose.button"), ButtonBar.ButtonData.NO);
+    final ButtonType cancelButton = new ButtonType(R.get("ui.checkWeidu.cancel.button"), ButtonBar.ButtonData.CANCEL_CLOSE);
+    final ButtonType keepButton = new ButtonType(R.get("ui.checkWeidu.keep.button"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
     boolean updateBinary = false;
-    String questionHeader = "WeiDU executable could not be found on the system.";
-    String questionContent = "Do you want to download the latest WeiDU executable or choose it manually?";
+    String questionHeader = R.get("ui.checkWeidu.message.notFound.header");
+    String questionContent = R.get("ui.checkWeidu.message.notFound.content");
     final ButtonType[] questionButtons = {downloadButton, selectButton, cancelButton};
 
     // 1. check local system
@@ -192,10 +193,9 @@ public class MainWindow extends Application {
         if (versionFound.compareTo(versionRecommended) < 0) {
           // notify about outdated WeiDU version
           updateBinary = true;
-          questionHeader = String.format("WeiDU executable found on the system is outdated.\n(found: %d, recommended: %d)",
+          questionHeader = String.format(R.get("ui.checkWeidu.message.foundOutdated.header"),
               versionFound.major(), versionRecommended.major());
-          questionContent = "Do you want to download the latest WeiDU executable,\n" +
-              "choose manually, or keep the current version?";
+          questionContent = R.get("ui.checkWeidu.message.foundOutdated.content");
           questionButtons[questionButtons.length - 1] = keepButton;
           throw new UnsupportedOperationException("Outdated WeiDU version found: " + versionFound);
         }
@@ -209,8 +209,8 @@ public class MainWindow extends Application {
     }
 
     // ask user before downloading binary
-    final ButtonType result = Utils.showCustomDialog(null, Alert.AlertType.CONFIRMATION, "Question",
-        questionHeader, questionContent, questionButtons);
+    final ButtonType result = Utils.showCustomDialog(null, Alert.AlertType.CONFIRMATION,
+        R.QUESTION(), questionHeader, questionContent, questionButtons);
 
     if (result == cancelButton) {
       // Install: cancel install operation
@@ -243,18 +243,21 @@ public class MainWindow extends Application {
       }
 
       final ButtonType confirmType = Utils.showConfirmationDialog(null,
-          "WeiDU executable",
-          "The WeiDU executable could not be downloaded.",
-          "Do you want to specify the path to the WeiDU executable manually?");
+          R.get("ui.checkWeidu.message.choose.title"),
+          R.get("ui.checkWeidu.message.choose.header"),
+          R.get("ui.checkWeidu.message.choose.content"));
       if (confirmType != ButtonType.OK) {
         throw new Exception("WeiDU executable selection cancelled by the user.");
       }
     }
 
     // Install/Update: allow user to choose WeiDU binary path
-    final Path binPath = Utils.chooseOpenFile(null, "Choose WeiDU executable", SystemInfo.getUserPath(),
-        new FileChooser.ExtensionFilter("WeiDU executable", Weidu.WEIDU_NAME + SystemInfo.EXE_SUFFIX),
-        new FileChooser.ExtensionFilter("Executable Files", "*" + SystemInfo.EXE_SUFFIX));
+    final Path binPath = Utils.chooseOpenFile(null, R.get("ui.checkWeidu.fileDialog.choose.title"),
+        SystemInfo.getUserPath(),
+        new FileChooser.ExtensionFilter(R.get("ui.checkWeidu.fileDialog.choose.filter.weidu"),
+            Weidu.WEIDU_NAME + SystemInfo.EXE_SUFFIX),
+        new FileChooser.ExtensionFilter(R.get("ui.checkWeidu.fileDialog.choose.filter.executable"),
+            "*" + SystemInfo.EXE_SUFFIX));
     if (binPath != null) {
       Configuration.getInstance().setOption(Configuration.Key.WEIDU_PATH, binPath.toString());
       return Weidu.getInstance();
@@ -280,11 +283,18 @@ public class MainWindow extends Application {
       Logger.error(e, "Loading configuration");
     }
 
+    // Applying application language override (if available)
+    final String languageOverride = Configuration.getInstance().getOption(Configuration.Key.UI_LANGUAGE_OVERRIDE);
+    if (languageOverride != null) {
+      final String[] items = languageOverride.split("[_-]");
+      R.setLocale(items);
+    }
+
     // Platform check
     if (!SystemInfo.isSystemSupported()) {
-      Utils.showErrorDialog(null, "Error", "System not supported.",
-          String.format("This system is currently not supported by the launcher. (platform: %s, architecture: %s)",
-              SystemInfo.getPlatform(), SystemInfo.getArchitecture()));
+      Utils.showErrorDialog(null, R.ERROR(), R.get("ui.main.message.platformCheck.header"),
+          String.format(R.get("ui.main.message.platformCheck.content"), SystemInfo.getPlatform(),
+              SystemInfo.getArchitecture()));
       return;
     }
 
@@ -295,8 +305,8 @@ public class MainWindow extends Application {
       }
     } catch (Exception e) {
       Logger.info(e, "WeiDU existence check failed");
-      Utils.showErrorDialog(null, "Error", "WeiDU executable not found.",
-          "The WeiDU executable could not be found on the system path or any of the supported locations.");
+      Utils.showErrorDialog(null, R.ERROR(), R.get("ui.main.message.weiduCheck.header"),
+          R.get("ui.main.message.weiduCheck.content"));
       return;
     }
 
@@ -313,7 +323,7 @@ public class MainWindow extends Application {
     }
 
     // loading UI layout
-    final FXMLLoader loader = new FXMLLoader(FXML_FILE);
+    final FXMLLoader loader = new FXMLLoader(FXML_FILE, R.getBundle());
     final Scene scene = new CustomScene(loader.load());
     this.controller = loader.getController();
     this.stage = stage;
@@ -624,7 +634,7 @@ public class MainWindow extends Application {
    */
   private void setWeiduRunning() {
     updateWindowTitle(true);
-    getController().quitButton.setText("Terminate");
+    getController().quitButton.setText(R.get("ui.main.terminate.button"));
     getController().inputQuitButton.setDisable(false);
     getController().inputAskButton.setDisable(false);
     getController().inputSkipButton.setDisable(false);
@@ -640,7 +650,7 @@ public class MainWindow extends Application {
    */
   private void setWeiduTerminated() {
     updateWindowTitle(true);
-    getController().quitButton.setText("  Quit  ");
+    getController().quitButton.setText(R.get("ui.main.quit.button"));
     getController().inputQuitButton.setDisable(true);
     getController().inputAskButton.setDisable(true);
     getController().inputSkipButton.setDisable(true);
@@ -699,7 +709,8 @@ public class MainWindow extends Application {
     }
 
     if (showState) {
-      final String state = isProcessRunning() ? " [running]" : " [completed]";
+      final String key = isProcessRunning() ? "ui.main.windowTitle.state.running" : "ui.main.windowTitle.state.completed";
+      final String state = String.format(" [%s]", R.get(key));
       title += state;
     }
 
@@ -746,9 +757,11 @@ public class MainWindow extends Application {
     final int roundedValue = getOutputBufferSize(value);
     final int defaultValue = Configuration.Key.BUFFER_LIMIT.<Integer>getDefaultValue();
     if (roundedValue == defaultValue) {
-      getController().bufferSizeValueLabel.setText(String.format("%,d (Default)", roundedValue));
+      final String strDefault = R.get("ui.main.menu.item.bufferSize.default");
+      getController().bufferSizeValueLabel.setText(String.format("%,d (%s)", roundedValue, strDefault));
     } else if (roundedValue == Integer.MAX_VALUE) {
-      getController().bufferSizeValueLabel.setText("Unlimited");
+      final String strUnlimited = R.get("ui.main.menu.item.bufferSize.unlimited");
+      getController().bufferSizeValueLabel.setText(strUnlimited);
     } else {
       getController().bufferSizeValueLabel.setText(String.format("%,d", roundedValue));
     }
@@ -983,7 +996,8 @@ public class MainWindow extends Application {
   }
 
   private void handleProcessError(String message) {
-    Utils.showErrorDialog(getStage(), "Error", "WeiDU Error", "WeiDU could not be executed:\n" + message);
+    Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.message.process.header"),
+        String.format("%s\n%s", R.get("ui.main.message.process.content"), message));
   }
 
   /**
@@ -1041,14 +1055,15 @@ public class MainWindow extends Application {
           initialPath = SystemInfo.getLocalDataPath();
         }
 
-        gamePath = Utils.chooseOpenFile(null, "Choose Game: Locate Key File", initialPath,
-            new ExtensionFilter("Key Files", "*.key"));
+        gamePath = Utils.chooseOpenFile(null, R.get("ui.main.modInfo.fileDialog.title"), initialPath,
+            new ExtensionFilter(R.get("ui.main.modInfo.fileDialog.filter.key"), "*.key"));
       }
 
       if (gamePath == null) {
         // cancel launcher
         if (feedback) {
-          Utils.showErrorDialog(null, "Error", "Could not find game directory.", "Quitting application.");
+          Utils.showErrorDialog(null, R.ERROR(), R.get("ui.main.modInfo.message.gameNotFound.header"),
+              R.get("ui.main.modInfo.message.gameNotFound.content"));
         }
         throw new Exception("Could not find game directory");
       }
@@ -1058,8 +1073,9 @@ public class MainWindow extends Application {
       } catch (Exception e) {
         Logger.debug(e, "Error creating ModInfo instance");
         if (feedback) {
-          Utils.showErrorDialog(null, "Error", "Mod does not exist.",
-              "TP2 file of the mod does not exist:\n" + Configuration.getInstance().getTp2Path().toString());
+          Utils.showErrorDialog(null, R.ERROR(), R.get("ui.main.modInfo.message.modNotFound.header"),
+              String.format("%s\n%s", R.get("ui.main.modInfo.message.modNotFound.content"),
+                  Configuration.getInstance().getTp2Path()));
         }
         throw e;
       }
@@ -1133,18 +1149,15 @@ public class MainWindow extends Application {
             retVal = false;
             if (interactive) {
               final String modSequence = String.join(", ", conflicts);
-              final String title = "Warning";
-              final String header = "Mod order conflict.";
+              final String title = R.WARNING();
+              final String header = R.get("ui.main.modOrder.message.header");
               final String modName;
               if (modInfo.getModIni() != null && !modInfo.getModIni().getName().isEmpty()) {
                 modName = modInfo.getModIni().getName();
               } else {
                 modName = modInfo.getTp2Name();
               }
-              final String content = String.format("""
-                  One or more installed mods should be installed after "%s".
-                  Conflicting mods: %s
-                  Continue anyway?""", modName, modSequence);
+              final String content = String.format(R.get("ui.main.modOrder.message.content"), modName, modSequence);
               final ButtonType type = Utils.showCustomDialog(getStage(), Alert.AlertType.CONFIRMATION, title, header,
                   content, ButtonType.YES, ButtonType.NO);
               retVal = (type == ButtonType.YES);
@@ -1172,7 +1185,8 @@ public class MainWindow extends Application {
           if (confirm) {
             executeGuided();
           } else {
-            appendOutputText(String.format("*** Skipped installation of \"%s\" ***\n", getModInfo().getTp2Name()),
+            final String fmt = String.format("*** %s ***\n", R.get("ui.main.execute.message.skip"));
+            appendOutputText(String.format(fmt, getModInfo().getTp2Name()),
                 false);
           }
         }
@@ -1180,7 +1194,7 @@ public class MainWindow extends Application {
       }
     } catch (Exception e) {
       Logger.debug(e, "Error executing WeiDU command");
-      Utils.showErrorDialog(getStage(), "Error", "Could not execute WeiDU command.", e.getMessage());
+      Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.execute.message.error.header"), e.getMessage());
     }
   }
 
@@ -1191,11 +1205,11 @@ public class MainWindow extends Application {
       if (helpDesc != null) {
         appendOutputText(helpDesc, false);
       } else {
-        Utils.showErrorDialog(getStage(), "Error", "No WeiDU help available.", null);
+        Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.weiduHelp.message.header"), null);
       }
     } catch (Exception e) {
       Logger.debug(e, "Error showing WeiDU help");
-      Utils.showErrorDialog(getStage(), "Error", "No WeiDU help available.", null);
+      Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.weiduHelp.message.header"), null);
     } finally {
       setWeiduTerminated();
     }
@@ -1298,8 +1312,8 @@ public class MainWindow extends Application {
   private boolean quit(boolean forced) {
     ButtonType result = ButtonType.OK;
     if (!forced && isProcessRunning()) {
-      result = Utils.showConfirmationDialog(stage, "Quit", "Quit application",
-          "A WeiDU process is still running.\nDo you really want to quit the launcher?");
+      result = Utils.showConfirmationDialog(stage, R.get("ui.main.quit.message.title"),
+          R.get("ui.main.quit.message.header"), R.get("ui.main.quit.message.content"));
     }
 
     if (result == ButtonType.OK) {

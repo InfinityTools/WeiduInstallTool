@@ -38,7 +38,7 @@
     </padding>
     <Button fx:id="closeButton"
             alignment="CENTER"
-            text="  Close  "/>
+            text="%ui.progress.close.button"/>
   </HBox>
 
 </VBox>

@@ -15,6 +15,8 @@
  */
 package io.infinitytools.wml.utils;
 
+import org.tinylog.Logger;
+
 /**
  * Collection of static methods for debugging and profiling needs.
  */
@@ -43,9 +45,9 @@ public class Debugging {
    */
   public static synchronized void timerShow(String msg, TimeFormat fmt) {
     if (msg != null && !msg.isEmpty()) {
-      System.out.println("[" + msg + "] " + toTimeFormatString(fmt, System.nanoTime() - timeBase));
+      Logger.debug("[" + msg + "] " + toTimeFormatString(fmt, System.nanoTime() - timeBase));
     } else {
-      System.out.println(toTimeFormatString(fmt, System.nanoTime() - timeBase));
+      Logger.debug(toTimeFormatString(fmt, System.nanoTime() - timeBase));
     }
     timerReset();
   }

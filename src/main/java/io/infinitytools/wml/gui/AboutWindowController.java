@@ -16,6 +16,7 @@
 package io.infinitytools.wml.gui;
 
 import io.infinitytools.wml.Globals;
+import io.infinitytools.wml.utils.R;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -41,7 +42,7 @@ public class AboutWindowController {
   public void init() {
     try {
       titleLabel.setText(Globals.APP_TITLE);
-      versionLabel.setText("Version " + Globals.APP_VERSION);
+      versionLabel.setText(String.format("%s %s", R.get("ui.about.version.label"), Globals.APP_VERSION));
       if (Globals.PROJECT_URL != null) {
         projectLink.setText(Globals.PROJECT_URL);
       } else {

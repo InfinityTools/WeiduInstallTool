@@ -21,6 +21,7 @@ import io.infinitytools.wml.mod.info.ComponentBase;
 import io.infinitytools.wml.mod.info.ComponentContainerBase;
 import io.infinitytools.wml.mod.info.ComponentRoot;
 import io.infinitytools.wml.mod.ini.ModIni;
+import io.infinitytools.wml.utils.R;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -45,8 +46,6 @@ public class DetailsWindow extends Stage {
    * Path to the FXML definition file for this window.
    */
   private final static URL FXML_FILE = MainWindow.class.getResource("details.fxml");
-
-  private static final String TITLE = "Details";
 
   private final ModInfo modInfo;
 
@@ -99,15 +98,15 @@ public class DetailsWindow extends Stage {
   }
 
   private void init() throws Exception {
-    final FXMLLoader loader = new FXMLLoader(FXML_FILE);
+    final FXMLLoader loader = new FXMLLoader(FXML_FILE, R.getBundle());
     final SplitPane splitter = loader.load();
     controller = loader.getController();
     controller.init();
 
     if (modInfo != null) {
-      setTitle(String.format("%s - %s", TITLE, modInfo.getTp2File().getFileName().toString()));
+      setTitle(String.format("%s - %s", R.get("ui.details.title"), modInfo.getTp2File().getFileName().toString()));
     } else {
-      setTitle(TITLE);
+      setTitle(R.get("ui.details.title"));
     }
 
     // populating language list
@@ -122,15 +121,15 @@ public class DetailsWindow extends Stage {
     if (modInfo != null && modInfo.getModIni() != null) {
       // initializing mod information tree
       final ModIni ini = modInfo.getModIni();
-      final TreeItem<Node> root = new TreeItem<>(new Label("Mod information"));
+      final TreeItem<Node> root = new TreeItem<>(new Label(R.get("ui.details.modInfo.root")));
       if (!ini.getName().isEmpty()) {
-        final TreeItem<Node> label = new TreeItem<>(new Label("Name"));
+        final TreeItem<Node> label = new TreeItem<>(new Label(R.get("ui.details.modInfo.name")));
         label.getChildren().add(new TreeItem<>(new Label(ini.getName())));
         root.getChildren().add(label);
       }
 
       if (!ini.getAuthorList().isEmpty()) {
-        final TreeItem<Node> label = new TreeItem<>(new Label("Author(s)"));
+        final TreeItem<Node> label = new TreeItem<>(new Label(R.get("ui.details.modInfo.authors")));
         for (final String author : ini.getAuthorList()) {
           label.getChildren().add(new TreeItem<>(new Label(author)));
         }
@@ -138,13 +137,13 @@ public class DetailsWindow extends Stage {
       }
 
       if (!ini.getDescription().isEmpty()) {
-        final TreeItem<Node> labelNode = new TreeItem<>(new Label("Description"));
+        final TreeItem<Node> labelNode = new TreeItem<>(new Label(R.get("ui.details.modInfo.description")));
         labelNode.getChildren().add(new TreeItem<>(new Label(ini.getDescription())));
         root.getChildren().add(labelNode);
       }
 
       if (!ini.getReadmeList().isEmpty()) {
-        final TreeItem<Node> label = new TreeItem<>(new Label("Readme"));
+        final TreeItem<Node> label = new TreeItem<>(new Label(R.get("ui.details.modInfo.readme")));
         for (final URL link : ini.getReadmeList()) {
           final Hyperlink hl = new Hyperlink(link.toExternalForm());
           hl.setOnAction(event -> onHyperlinkClick(hl));
@@ -154,7 +153,7 @@ public class DetailsWindow extends Stage {
       }
 
       if (!ini.getForumList().isEmpty()) {
-        final TreeItem<Node> label = new TreeItem<>(new Label("Forum"));
+        final TreeItem<Node> label = new TreeItem<>(new Label(R.get("ui.details.modInfo.forum")));
         for (final URL link : ini.getForumList()) {
           final Hyperlink hl = new Hyperlink(link.toExternalForm());
           hl.setOnAction(event -> onHyperlinkClick(hl));
@@ -164,7 +163,7 @@ public class DetailsWindow extends Stage {
       }
 
       if (ini.getHomepage() != null) {
-        final TreeItem<Node> label = new TreeItem<>(new Label("Homepage"));
+        final TreeItem<Node> label = new TreeItem<>(new Label(R.get("ui.details.modInfo.homepage")));
         final Hyperlink hl = new Hyperlink(ini.getHomepage().toExternalForm());
         hl.setOnAction(event -> onHyperlinkClick(hl));
         label.getChildren().add(new TreeItem<>(hl));
@@ -172,7 +171,7 @@ public class DetailsWindow extends Stage {
       }
 
       if (!ini.getDownloadList().isEmpty()) {
-        final TreeItem<Node> label = new TreeItem<>(new Label("Download"));
+        final TreeItem<Node> label = new TreeItem<>(new Label(R.get("ui.details.modInfo.download")));
         for (final URL link : ini.getDownloadList()) {
           final Hyperlink hl = new Hyperlink(link.toExternalForm());
           hl.setOnAction(event -> onHyperlinkClick(hl));
@@ -182,7 +181,7 @@ public class DetailsWindow extends Stage {
       }
 
       if (!ini.getBeforeList().isEmpty()) {
-        final TreeItem<Node> label = new TreeItem<>(new Label("Install before"));
+        final TreeItem<Node> label = new TreeItem<>(new Label(R.get("ui.details.modInfo.installBefore")));
         for (final String name : ini.getBeforeList()) {
           label.getChildren().add(new TreeItem<>(new Label(name)));
         }
@@ -190,7 +189,7 @@ public class DetailsWindow extends Stage {
       }
 
       if (!ini.getAfterList().isEmpty()) {
-        final TreeItem<Node> label = new TreeItem<>(new Label("Install after"));
+        final TreeItem<Node> label = new TreeItem<>(new Label(R.get("ui.details.modInfo.installAfter")));
         for (final String name : ini.getAfterList()) {
           label.getChildren().add(new TreeItem<>(new Label(name)));
         }
@@ -201,7 +200,8 @@ public class DetailsWindow extends Stage {
       controller.iniTree.setRoot(root);
     } else {
       // initializing message for non-existing mod information
-      final Label label = new Label("*** No information available for this mod ***");
+      final String msg = String.format("*** %s ***", R.get("ui.details.modInfo.message.unavailable"));
+      final Label label = new Label(msg);
       label.setStyle("-fx-font-weight: bold;");
       final TreeItem<Node> root = new TreeItem<>(label);
       controller.iniTree.setRoot(root);

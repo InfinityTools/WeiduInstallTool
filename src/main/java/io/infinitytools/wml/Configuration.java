@@ -18,6 +18,7 @@ package io.infinitytools.wml;
 import io.infinitytools.wml.ini.IniEntry;
 import io.infinitytools.wml.ini.IniMap;
 import io.infinitytools.wml.ini.IniMapSection;
+import io.infinitytools.wml.utils.R;
 import io.infinitytools.wml.utils.SystemInfo;
 import io.infinitytools.wml.utils.Utils;
 import javafx.stage.FileChooser;
@@ -96,6 +97,15 @@ public class Configuration {
      * Specifies the directory to the last used mod's tp2 file.
      */
     LAST_MOD_PATH("Last Mod Path", String.class, null),
+    /**
+     * Specifies the language in which all text of the application should be displayed.
+     * System language is used if this option is not defined.
+     * <p>
+     * Language can be defined as two-letter ISO language code with an optional two-letter country code, separated by
+     * an underscore or hyphen.
+     * </p>
+     */
+    UI_LANGUAGE_OVERRIDE("UI Language Override", String.class, null),
     ;
 
     private final Object defValue;
@@ -403,9 +413,9 @@ public class Configuration {
       }
 
       final Path initialPath = (path != null) ? Path.of(path) : null;
-      tp2File = Utils.chooseOpenFile(null, "Specify TP2 Mod Script File", initialPath,
-          new FileChooser.ExtensionFilter("TP2 Files", "*.tp2"),
-          new FileChooser.ExtensionFilter("All Files", "*.*"));
+      tp2File = Utils.chooseOpenFile(null, R.get("ui.configuration.fileDialog.tp2.title"), initialPath,
+          new FileChooser.ExtensionFilter(R.get("ui.configuration.fileDialog.tp2.filter.tp2"), "*.tp2"),
+          new FileChooser.ExtensionFilter(R.get("ui.configuration.fileDialog.tp2.filter.all"), "*.*"));
       if (tp2File != null) {
         mode = Mode.WEIDU_GUIDED;
       } else {

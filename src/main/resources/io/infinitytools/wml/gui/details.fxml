@@ -21,7 +21,7 @@
     <!-- Language selection -->
     <HBox alignment="CENTER_LEFT"
           spacing="8">
-      <Label text="Language:"
+      <Label text="%ui.details.language.label"
              styleClass="boldLabel"/>
       <ChoiceBox fx:id="languageChoiceBox"
                  minWidth="0"
@@ -41,7 +41,7 @@
         spacing="8"
         styleClass="subPane">
     <Label fx:id="iniLabel"
-           text="About the mod:"
+           text="%ui.details.aboutMod.label"
            styleClass="boldLabel"/>
     <TreeView fx:id="iniTree"
               showRoot="false"

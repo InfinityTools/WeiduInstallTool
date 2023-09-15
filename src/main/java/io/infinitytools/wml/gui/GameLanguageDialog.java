@@ -18,6 +18,7 @@ package io.infinitytools.wml.gui;
 import io.infinitytools.wml.icons.Icons;
 import io.infinitytools.wml.mod.ModInfo;
 import io.infinitytools.wml.utils.FontMetrics;
+import io.infinitytools.wml.utils.R;
 import io.infinitytools.wml.utils.Utils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -105,7 +106,7 @@ public class GameLanguageDialog extends Stage {
   }
 
   private void init(ModInfo modInfo) throws Exception {
-    final FXMLLoader loader = new FXMLLoader(FXML_FILE);
+    final FXMLLoader loader = new FXMLLoader(FXML_FILE, R.getBundle());
     final VBox vbox = loader.load();
     controller = loader.getController();
 
@@ -127,7 +128,7 @@ public class GameLanguageDialog extends Stage {
 
     final Scene scene = new CustomScene(vbox);
     setScene(scene);
-    setTitle("Choose Game Language");
+    setTitle(R.get("ui.language.title"));
     setResizable(false);
     controller.languageBox.requestFocus();
 

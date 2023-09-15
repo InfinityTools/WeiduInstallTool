@@ -76,6 +76,8 @@ dependencies {
   // https://tinylog.org/v2/download/
   implementation group: 'org.tinylog', name: 'tinylog-api', version: '2.6.2'
   implementation group: 'org.tinylog', name: 'tinylog-impl', version: '2.6.2'
+  // https://mvnrepository.com/artifact/org.apache.commons/commons-text
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
@@ -105,7 +107,7 @@ jlink {
             "--verbose",
             "--app-version", "${project.version}",
             "--copyright", "Copyright © 2023 Argent77",
-            "--description", "A graphical frontend for WeiDU.",
+            "--description", "A graphical front end for WeiDU.",
     ]
 
     if (OperatingSystem.current().isWindows()) {

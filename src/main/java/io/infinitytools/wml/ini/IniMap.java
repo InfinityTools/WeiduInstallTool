@@ -15,6 +15,8 @@
  */
 package io.infinitytools.wml.ini;
 
+import org.tinylog.Logger;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
@@ -277,7 +279,7 @@ public class IniMap implements Iterable<IniMapSection> {
               // no change
             } else {
               state = State.Unknown;
-              System.err.printf("Skipping invalid characters at line:%d, pos:%d\n", i + 1, pos + 1);
+              Logger.debug(String.format("Skipping invalid characters at line:%d, pos:%d\n", i + 1, pos + 1));
             }
             break;
           case Section:
@@ -342,7 +344,7 @@ public class IniMap implements Iterable<IniMapSection> {
           final String name = cb.flip().toString();
           cb.clear();
           curSection = curMap.addSection(name);
-          System.err.printf("Expected closing bracket (]) at line:%d, pos:%d\n", i + 1, pos + 1);
+          Logger.debug(String.format("Expected closing bracket (]) at line:%d, pos:%d\n", i + 1, pos + 1));
           break;
         }
         case Key: {
@@ -350,7 +352,7 @@ public class IniMap implements Iterable<IniMapSection> {
           final String key = cb.flip().toString();
           cb.clear();
           curEntry = curSection.addEntry(key, "");
-          System.err.printf("Expected equals sign (=) at line:%d, pos:%d\n", i + 1, pos + 1);
+          Logger.debug(String.format("Expected equals sign (=) at line:%d, pos:%d\n", i + 1, pos + 1));
           break;
         }
         case Value: {

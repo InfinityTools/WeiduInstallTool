@@ -16,6 +16,7 @@
 package io.infinitytools.wml.gui;
 
 import io.infinitytools.wml.icons.Icons;
+import io.infinitytools.wml.utils.R;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
@@ -92,7 +93,7 @@ public class AboutDialog extends Stage {
    * Initializes the dialog content.
    */
   private void init() throws Exception {
-    final FXMLLoader loader = new FXMLLoader(FXML_FILE);
+    final FXMLLoader loader = new FXMLLoader(FXML_FILE, R.getBundle());
     final Scene scene = new CustomScene(loader.load());
     controller = loader.getController();
     controller.init();
@@ -102,7 +103,7 @@ public class AboutDialog extends Stage {
     controller.okButton.setOnAction(event -> onOkButtonClick());
 
     setScene(scene);
-    setTitle("About");
+    setTitle(R.get("ui.about.title"));
     setResizable(false);
     controller.okButton.requestFocus();
 

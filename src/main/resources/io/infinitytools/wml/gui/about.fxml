@@ -47,7 +47,7 @@
 
       <HBox alignment="CENTER_LEFT"
             styleClass="link">
-        <Label text="Project:"/>
+        <Label text="%ui.about.project.label"/>
         <Hyperlink fx:id="projectLink"
                    text="::project-link::">
         </Hyperlink>
@@ -65,7 +65,7 @@
             VBox.vgrow="NEVER"/>
 
       <Label fx:id="descLabel"
-             text="A graphical frontend for WeiDU."/>
+             text="%ui.about.description.label"/>
 
       <Label fx:id="copyLabel"
              text="Copyright (c) 2023 Argent77"/>

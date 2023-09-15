@@ -353,10 +353,10 @@ public class Utils {
 
     if (title == null) {
       title = switch (alertType) {
-        case CONFIRMATION -> "Confirmation";
-        case ERROR -> "Error";
-        case WARNING -> "Warning";
-        default -> "Information";
+        case CONFIRMATION -> R.CONFIRMATION();
+        case ERROR -> R.ERROR();
+        case WARNING -> R.WARNING();
+        default -> R.INFORMATION();
       };
     }
 

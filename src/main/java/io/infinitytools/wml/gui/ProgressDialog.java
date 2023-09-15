@@ -16,6 +16,7 @@
 package io.infinitytools.wml.gui;
 
 import io.infinitytools.wml.icons.Icons;
+import io.infinitytools.wml.utils.R;
 import io.infinitytools.wml.utils.ThreadUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
@@ -110,7 +111,7 @@ public class ProgressDialog extends Stage implements AutoCloseable {
     if (owner != null) {
       initOwner(owner);
     }
-    setTitle(title != null ? title : "Progress");
+    setTitle(title != null ? title : R.get("ui.progress.title"));
     initModality(Objects.isNull(owner) ? Modality.APPLICATION_MODAL : Modality.WINDOW_MODAL);
 
     init(message);
@@ -282,7 +283,7 @@ public class ProgressDialog extends Stage implements AutoCloseable {
   }
 
   private void init(String message) throws NullPointerException, IOException {
-    final FXMLLoader loader = new FXMLLoader(FXML_FILE);
+    final FXMLLoader loader = new FXMLLoader(FXML_FILE, R.getBundle());
     final VBox vbox = loader.load();
     controller = loader.getController();
 
