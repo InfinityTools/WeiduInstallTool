@@ -16,7 +16,6 @@
 package io.infinitytools.wml;
 
 import io.infinitytools.wml.gui.MainWindow;
-import io.infinitytools.wml.utils.R;
 
 /**
  * Container class for the {@code main(String[]} method. Launches the main window of the application.

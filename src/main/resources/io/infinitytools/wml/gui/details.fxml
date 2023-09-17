@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TreeView?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.VBox?>
 
 <SplitPane xmlns="http://javafx.com/javafx"
@@ -13,22 +13,47 @@
            stylesheets="@detailsStyles.css"
            orientation="VERTICAL"
            dividerPositions="0.5">
+
   <!-- Top region of the split pane: language selection and components tree -->
   <VBox alignment="CENTER"
         spacing="8"
         styleClass="subPane">
 
-    <!-- Language selection -->
-    <HBox alignment="CENTER_LEFT"
-          spacing="8">
+    <GridPane alignment="CENTER"
+              hgap="8"
+              vgap="8">
+
+      <!-- Language selection -->
       <Label text="%ui.details.language.label"
-             styleClass="boldLabel"/>
-      <ChoiceBox fx:id="languageChoiceBox"
-                 minWidth="0"
-                 prefWidth="32"
-                 maxWidth="Infinity"
-                 HBox.hgrow="ALWAYS"/>
-    </HBox>
+             styleClass="boldLabel"
+             GridPane.rowIndex="0"
+             GridPane.columnIndex="0"
+             GridPane.halignment="LEFT"/>
+      <ComboBox fx:id="languageComboBox"
+                minWidth="0"
+                prefWidth="32"
+                maxWidth="Infinity"
+                GridPane.rowIndex="0"
+                GridPane.columnIndex="1"
+                GridPane.halignment="LEFT"
+                GridPane.hgrow="ALWAYS"/>
+
+      <!-- Component Group selection -->
+      <Label text="%ui.details.group.label"
+             styleClass="boldLabel"
+             GridPane.rowIndex="1"
+             GridPane.columnIndex="0"
+             GridPane.halignment="LEFT"/>
+      <ComboBox fx:id="groupComboBox"
+                minWidth="0"
+                prefWidth="32"
+                maxWidth="Infinity"
+                GridPane.rowIndex="1"
+                GridPane.columnIndex="1"
+                GridPane.halignment="LEFT"
+                GridPane.hgrow="ALWAYS"/>
+
+    </GridPane>
 
     <!-- Components tree -->
     <TreeView fx:id="componentsTree"

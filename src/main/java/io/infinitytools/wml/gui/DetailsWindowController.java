@@ -16,18 +16,21 @@
 package io.infinitytools.wml.gui;
 
 import io.infinitytools.wml.mod.info.ComponentBase;
+import io.infinitytools.wml.mod.info.ComponentGroup;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import org.tinylog.Logger;
+
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
  * Controller class for the DetailsWindow UI. It is automatically initialized by the JavaFX FXML loader.
  */
-public class DetailsWindowController {
-  public ChoiceBox<String> languageChoiceBox;
+public class DetailsWindowController implements Initializable {
+  public ComboBox<String> languageComboBox;
+  public ComboBox<ComponentGroup> groupComboBox;
   public TreeView<ComponentBase> componentsTree;
   public Label iniLabel;
   public TreeView<Node> iniTree;
@@ -35,10 +38,8 @@ public class DetailsWindowController {
   public DetailsWindowController() {
   }
 
-  /**
-   * Initializes the UI components. This method should be called after the UI has been loaded.
-   */
-  public void init() {
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
     try {
       componentsTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       iniTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);

@@ -15,12 +15,19 @@
  */
 package io.infinitytools.wml.mod.info;
 
+import io.infinitytools.wml.utils.R;
+
 import java.util.Objects;
 
 /**
  * A mod group includes one or more components. (See WeiDU {@code GROUP} directive.)
  */
 public class ComponentGroup extends ComponentContainerBase {
+  /**
+   * An independent meta-group that can be used as filter.
+   */
+  public static final ComponentGroup GROUP_NONE = new ComponentGroup(null, R.get("ui.details.group.entry.none"));
+
   private final String name;
 
   public ComponentGroup(ComponentBase parent, String name, ComponentBase... children) {

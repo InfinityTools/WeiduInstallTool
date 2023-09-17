@@ -17,9 +17,7 @@ package io.infinitytools.wml.gui;
 
 import io.infinitytools.wml.icons.Icons;
 import io.infinitytools.wml.mod.ModInfo;
-import io.infinitytools.wml.mod.info.ComponentBase;
-import io.infinitytools.wml.mod.info.ComponentContainerBase;
-import io.infinitytools.wml.mod.info.ComponentRoot;
+import io.infinitytools.wml.mod.info.*;
 import io.infinitytools.wml.mod.ini.ModIni;
 import io.infinitytools.wml.utils.R;
 import javafx.collections.ObservableList;
@@ -37,6 +35,7 @@ import javafx.stage.WindowEvent;
 import org.tinylog.Logger;
 
 import java.net.URL;
+import java.util.List;
 
 /**
  * Provides detailed information about mod components and optional mod.ini content.
@@ -60,48 +59,100 @@ public class DetailsWindow extends Stage {
     init();
   }
 
-  /**
-   * Called by listener of the language combobox when the item selection changes.
-   */
-  private void onLanguageItemSelected(int newIndex) {
+  private void onLanguageItemSelected(int newLanguageIndex) {
+    Logger.debug("Selecting language index {}", newLanguageIndex);
+
+    // repopulating components group list with entries in the new language
     try {
-      ComponentRoot components = modInfo.getComponentInfo(newIndex);
-      initComponentsTree(components);
+      final ComponentRoot components = modInfo.getComponentInfo(newLanguageIndex);
+      final List<ComponentGroup> groupList = components.getGroups();
+
+      final int curGroupIndex = Math.max(0, controller.groupComboBox.getSelectionModel().getSelectedIndex());
+      controller.groupComboBox.getItems().clear();
+      controller.groupComboBox.getItems().add(ComponentGroup.GROUP_NONE);
+      controller.groupComboBox.getItems().addAll(groupList);
+      controller.groupComboBox.getSelectionModel().select(curGroupIndex);
     } catch (IndexOutOfBoundsException e) {
-      Logger.error(e, "Language item selected at index {}", newIndex);
+      Logger.error(e, "Language item selected at index {}", newLanguageIndex);
+    }
+
+    onComponentsTreeChanged(newLanguageIndex, controller.groupComboBox.getSelectionModel().getSelectedItem());
+  }
+
+  private void onGroupItemSelected(ComponentGroup newGroup) {
+    Logger.debug("Selecting component group {}", newGroup);
+    onComponentsTreeChanged(controller.languageComboBox.getSelectionModel().getSelectedIndex(), newGroup);
+  }
+
+  /**
+   * Called whenever the content of the mod components tree should be reinitialized.
+   *
+   * @param newLanguageIndex Language index to use
+   * @param newGroup Component Group to use
+   */
+  private void onComponentsTreeChanged(int newLanguageIndex, ComponentGroup newGroup) {
+    Logger.debug("Components Tree changes (languageIndex={}, group={})", newLanguageIndex, newGroup);
+    try {
+      ComponentRoot components = modInfo.getComponentInfo(newLanguageIndex);
+
+      if (newGroup == null) {
+        newGroup = ComponentGroup.GROUP_NONE;
+      }
+
+      initComponentsTree(components, newGroup);
+    } catch (IndexOutOfBoundsException e) {
+      Logger.error(e, "Components Tree changed (languageIndex={}, group={})", newLanguageIndex, newGroup);
     }
   }
 
-  private void initComponentsTree(ComponentRoot components) {
+  /**
+   * Rebuilds the mod components tree based on the given parameters.
+   *
+   * @param components {@link ComponentRoot} instance of the mod.
+   * @param group {@link ComponentGroup} filter.
+   */
+  private void initComponentsTree(final ComponentRoot components, final ComponentGroup group) {
     controller.componentsTree.setRoot(null);
+    if (components == null) {
+      controller.componentsTree.setDisable(true);
+      return;
+    }
 
-    if (components != null) {
-      TreeItem<ComponentBase> rootItem = new TreeItem<>(components);
+    // simplifies filter checks
+    final boolean isAnyGroup = (group == ComponentGroup.GROUP_NONE);
 
-      for (final ComponentBase child : components.getChildren()) {
-        if (child instanceof ComponentContainerBase container) {
+    final TreeItem<ComponentBase> rootItem = new TreeItem<>(components);
+    for (final ComponentBase child : components.getChildren()) {
+      if (child instanceof ComponentContainerBase container) {
+        // checking whether subcomponent is included in the given group
+        final boolean groupMatches = isAnyGroup ||
+            container
+                .getChildren()
+                .stream()
+                .anyMatch(cb -> cb instanceof ComponentInfo ci && ci.getGroups().contains(group));
+
+        if (groupMatches) {
           final TreeItem<ComponentBase> parentItem = new TreeItem<>(container);
           for (final ComponentBase subChild : container.getChildren()) {
             parentItem.getChildren().add(new TreeItem<>(subChild));
           }
           rootItem.getChildren().add(parentItem);
-        } else {
-          rootItem.getChildren().add(new TreeItem<>(child));
+        }
+      } else if (child instanceof ComponentInfo ci) {
+        if (isAnyGroup || ci.getGroups().contains(group)) {
+          rootItem.getChildren().add(new TreeItem<>(ci));
         }
       }
-
-      expandTreeNodes(rootItem);
-      controller.componentsTree.setRoot(rootItem);
-    } else {
-      controller.componentsTree.setDisable(true);
     }
+
+    expandTreeNodes(rootItem);
+    controller.componentsTree.setRoot(rootItem);
   }
 
   private void init() throws Exception {
     final FXMLLoader loader = new FXMLLoader(FXML_FILE, R.getBundle());
     final SplitPane splitter = loader.load();
     controller = loader.getController();
-    controller.init();
 
     if (modInfo != null) {
       setTitle(String.format("%s - %s", R.get("ui.details.title"), modInfo.getTp2File().getFileName().toString()));
@@ -109,14 +160,16 @@ public class DetailsWindow extends Stage {
       setTitle(R.get("ui.details.title"));
     }
 
-    // populating language list
     if (modInfo != null) {
+      // populating language list
       for (int i = 0; i < modInfo.getLanguageCount(); i++) {
-        controller.languageChoiceBox.getItems().add(modInfo.getLanguage(i));
+        controller.languageComboBox.getItems().add(modInfo.getLanguage(i));
       }
     }
-    controller.languageChoiceBox.setOnAction(
-        event -> onLanguageItemSelected(controller.languageChoiceBox.getSelectionModel().getSelectedIndex()));
+    controller.languageComboBox.setOnAction(
+        event -> onLanguageItemSelected(controller.languageComboBox.getSelectionModel().getSelectedIndex()));
+    controller.groupComboBox.setOnAction(
+        event -> onGroupItemSelected(controller.groupComboBox.getSelectionModel().getSelectedItem()));
 
     if (modInfo != null && modInfo.getModIni() != null) {
       // initializing mod information tree
@@ -227,9 +280,10 @@ public class DetailsWindow extends Stage {
    */
   private void onShowing(WindowEvent event) {
     // one-time initialization
-    if (!controller.languageChoiceBox.getItems().isEmpty() &&
-        controller.languageChoiceBox.getSelectionModel().getSelectedIndex() < 0) {
-      controller.languageChoiceBox.getSelectionModel().select(0);
+    if (!controller.languageComboBox.getItems().isEmpty() &&
+        controller.languageComboBox.getSelectionModel().getSelectedIndex() < 0) {
+      controller.languageComboBox.getSelectionModel().select(0);
+      onLanguageItemSelected(controller.languageComboBox.getSelectionModel().getSelectedIndex());
     }
   }
 
