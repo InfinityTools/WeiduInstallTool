@@ -25,6 +25,8 @@ import org.tinylog.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -41,6 +43,60 @@ public class ModInfo {
    * Name of the default language.
    */
   public static final String DEFAULT_LANGUAGE = "(Default)";
+
+  /**
+   * Name patterns that can be used to determine the right mod language.
+   * <p>
+   * Multiple charset definitions for the same language are allowed, but should be avoided for charsets
+   * that cannot fail at the decode operation (e.g. for single-byte charsets).
+   * </p>
+   */
+  private static final List<Map.Entry<Charset, List<String>>> LANGUAGE_PATTERNS = Arrays.asList(
+      // English, French, German, Italian, Spanish, Portuguese
+      new AbstractMap.SimpleImmutableEntry<>(Charset.forName("cp1252"), Arrays.asList(
+          "english", "american", "british",
+          "french", "français", "francais",
+          "german", "deutsch",
+          "italian",
+          "spanish", "castilian", "español", "espanol", "castellano",
+          "portuguese", "brazilian", "portugués", "portugues", "brasil")),
+
+      // Czech, Polish
+      new AbstractMap.SimpleImmutableEntry<>(Charset.forName("cp1250"), Arrays.asList(
+          "czech", "česky", "cesky",
+          "polish", "polski")),
+
+      // Russian
+      new AbstractMap.SimpleImmutableEntry<>(Charset.forName("cp866"), Arrays.asList(
+          "russian", "russki", "русский"
+      )),
+      new AbstractMap.SimpleImmutableEntry<>(Charset.forName("cp1251"), Arrays.asList(
+          "russian", "russki", "русский"
+      )),
+
+      // Traditional Chinese
+      new AbstractMap.SimpleImmutableEntry<>(Charset.forName("cp950"), Arrays.asList(
+          "traditional chinese", "traditional", "繁體"
+      )),
+
+      // Simplified Chinese
+      new AbstractMap.SimpleImmutableEntry<>(Charset.forName("cp936"), Arrays.asList(
+          "simplified chinese", "simplified", "chinese", "简体", "中文"
+      )),
+
+      // Japanese
+      new AbstractMap.SimpleImmutableEntry<>(Charset.forName("cp932"), Arrays.asList(
+          "japanese", "nihon", "日本語", "日本"
+      )),
+
+      // Korean
+      new AbstractMap.SimpleImmutableEntry<>(Charset.forName("cp949"), Arrays.asList(
+          "korean", "hangug", "한국"
+      )),
+      new AbstractMap.SimpleImmutableEntry<>(Charset.forName("euc-kr"), Arrays.asList(
+          "korean", "hangug", "한국"
+      ))
+  );
 
   /**
    * Path to the game's installation directory.
@@ -281,7 +337,8 @@ public class ModInfo {
       retVal = components.get(languageIndex);
       if (retVal == null) {
         try {
-          final JSONArray json = Weidu.getInstance().getModComponentInfo(getTp2File(), languageIndex);
+          final Charset[] charsets = determineCharsets(languages.get(languageIndex));
+          final JSONArray json = Weidu.getInstance().getModComponentInfo(getTp2File(), languageIndex, charsets);
           if (json != null) {
             retVal = ComponentRoot.parse(tp2File.getFileName().toString(), json);
           }
@@ -292,6 +349,29 @@ public class ModInfo {
     }
 
     return retVal;
+  }
+
+  /**
+   * Attempts to determine the most likely charsets that can decode text available for the given language.
+   *
+   * @param language An arbitrary string prividing hints of the used language.
+   * @return A list of potential {@link Charset} instances.
+   */
+  private Charset[] determineCharsets(String language) {
+    final List<Charset> retVal = new ArrayList<>();
+
+    retVal.add(StandardCharsets.UTF_8);
+
+    if (language != null && !language.isEmpty()) {
+      final String languageName = language.toLowerCase();
+      retVal.addAll(LANGUAGE_PATTERNS
+          .stream()
+          .filter(entry -> entry.getValue().stream().anyMatch(languageName::contains))
+          .map(Map.Entry::getKey)
+          .toList());
+    }
+
+    return retVal.toArray(new Charset[0]);
   }
 
   /**

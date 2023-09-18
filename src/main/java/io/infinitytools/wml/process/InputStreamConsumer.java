@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * standard output of the main process.
  */
 public class InputStreamConsumer implements Runnable {
+  private final ByteArrayOutputStream bufferRaw = new ByteArrayOutputStream(16384);
   private final StringBuilder buffer = new StringBuilder(16384);
   private final ReentrantLock bufferLock = new ReentrantLock();
   private final ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
@@ -75,16 +76,61 @@ public class InputStreamConsumer implements Runnable {
   }
 
   /**
-   * Returns the content that has been accumulated since the last call of this method.
+   * Returns the content that has been accumulated since the last call of this method, {@link #getBuffer()} or
+   * {@link #getBufferedBytes()}.
    */
   public String getBufferedContent() {
     try {
       bufferLock.lock();
       final String retVal = buffer.toString();
-      buffer.delete(0, buffer.length());
+      resetBuffer(false);
       return retVal;
     } finally {
       bufferLock.unlock();
+    }
+  }
+
+  /**
+   * Returns the raw bytes that have been accumulated since the last call of this method, {@link #getBuffer()} or
+   * {@link #getBufferedContent()}.
+   */
+  public byte[] getBufferedBytes() {
+    try {
+      bufferLock.lock();
+      final byte[] retVal = bufferRaw.toByteArray();
+      resetBuffer(false);
+      return retVal;
+    } finally {
+      bufferLock.unlock();
+    }
+  }
+
+  /**
+   * Returns the buffered data that has been accumulated since the last call of this method, {@link #getBufferedContent()}
+   * or {@link #getBufferedBytes()}.
+   */
+  public ProcessOutput getBuffer() {
+    try {
+      bufferLock.lock();
+      final ProcessOutput retVal = new ProcessOutput(bufferRaw.toByteArray(), buffer.toString());
+      resetBuffer(false);
+      return retVal;
+    } finally {
+      bufferLock.unlock();
+    }
+  }
+
+  private void resetBuffer(boolean lock) {
+    try {
+      if (lock) {
+        bufferLock.lock();
+      }
+      buffer.delete(0, buffer.length());
+      bufferRaw.reset();
+    } finally {
+      if (lock) {
+        bufferLock.unlock();
+      }
     }
   }
 
@@ -159,6 +205,7 @@ public class InputStreamConsumer implements Runnable {
           try {
             bufferLock.lock();
             buffer.append(cb);
+            bufferRaw.write(outBuf, 0, bb.limit());
           } finally {
             bufferLock.unlock();
           }

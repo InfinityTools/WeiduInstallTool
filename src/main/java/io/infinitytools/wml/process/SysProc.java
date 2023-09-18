@@ -17,6 +17,7 @@ package io.infinitytools.wml.process;
 
 import org.tinylog.Logger;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +39,11 @@ import java.util.stream.Collectors;
  */
 public class SysProc {
   /**
-   * Storage for the total output since the start of the process.
+   * Storage for the total output of raw byte data since the start of the process.
+   */
+  private final ByteArrayOutputStream outputRaw = new ByteArrayOutputStream(65536);
+  /**
+   * Storage for the total output of textual data since the start of the process.
    */
   private final StringBuilder output = new StringBuilder(65536);
 
@@ -388,23 +393,26 @@ public class SysProc {
   /**
    * Returns the total output that has been accumulated since the start of the process.
    */
-  public String getOutput() {
+  public ProcessOutput getOutput() {
     try {
       outputLock.lock();
-      return output.toString();
+      return new ProcessOutput(outputRaw.toByteArray(), output.toString());
     } finally {
       outputLock.unlock();
     }
   }
 
   /**
-   * Adds the specified string to the total output string.
+   * Adds the specified data to the total output data.
    */
-  private void putBuffer(String text) {
-    if (text != null) {
+  private void putBuffer(ProcessOutput processOutput) {
+    if (processOutput != null) {
       try {
         outputLock.lock();
-        output.append(text);
+        output.append(processOutput.text());
+        outputRaw.write(processOutput.data());
+      } catch (IOException e) {
+        Logger.error(e, "Writing process data to output buffer");
       } finally {
         outputLock.unlock();
       }
@@ -420,10 +428,10 @@ public class SysProc {
   private boolean pollProcessOutput(InputStreamConsumer consumer) {
     // consuming process output
     boolean retVal = false;
-    final String text = consumer.getBufferedContent();
-    if (text != null && !text.isEmpty()) {
-      runAsync(() -> fireOutputEvent(text));
-      putBuffer(text);
+    final ProcessOutput processOutput = consumer.getBuffer();
+    if (processOutput.data() != null && processOutput.data().length > 0) {
+      runAsync(() -> fireOutputEvent(processOutput));
+      putBuffer(processOutput);
       retVal = true;
     }
     return retVal;
@@ -468,10 +476,10 @@ public class SysProc {
   /**
    * Used internally to fire a {@link SysProcOutputEvent}.
    */
-  private void fireOutputEvent(String text) {
+  private void fireOutputEvent(ProcessOutput processOutput) {
     try {
       outputEventLock.lock();
-      final SysProcOutputEvent event = new SysProcOutputEvent(this, text);
+      final SysProcOutputEvent event = new SysProcOutputEvent(this, processOutput);
       for (final SysProcEventHandler<SysProcOutputEvent> handler : outputHandlers) {
         handler.handle(event);
       }

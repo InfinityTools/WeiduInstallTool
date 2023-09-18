@@ -30,6 +30,8 @@ import org.tinylog.Logger;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.charset.*;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -162,7 +164,7 @@ public class Weidu {
       } catch (ExecutionException | IOException | InterruptedException | TimeoutException e) {
         Logger.error(e, "Error executing WeiDU process");
       }
-      String output = sp.getOutput();
+      String output = sp.getOutput().text();
       if (output != null) {
         // Removing useless extra lines
         List<String> list = new ArrayList<>(Arrays.asList(output.split("\r?\n")));
@@ -178,7 +180,7 @@ public class Weidu {
       }
     } else {
       // Other systems are much less painful
-      retVal = ProcessUtils.getProcessOutput(weidu.toString(), "--help", "--no-exit-pause");
+      retVal = ProcessUtils.getProcessOutput(weidu.toString(), "--help", "--no-exit-pause").text();
     }
 
     if (retVal == null) {
@@ -198,7 +200,7 @@ public class Weidu {
    */
   public Version getVersion() {
     String retVal = null;
-    String output = ProcessUtils.getProcessOutput(weidu.toString(), "--version");
+    String output = ProcessUtils.getProcessOutput(weidu.toString(), "--version").text();
     if (output != null) {
       // stripping weidu path portion
       output = output.substring(output.lastIndexOf(']') + 1).strip();
@@ -236,7 +238,7 @@ public class Weidu {
     }
 
     final String output = ProcessUtils.getProcessOutput(getWorkingDir(tp2File), weidu.toString(), "--nogame",
-        "--list-languages", tp2File.toString());
+        "--list-languages", tp2File.toString()).text();
 
     return parseLanguages(output);
   }
@@ -247,10 +249,13 @@ public class Weidu {
    * @param tp2File  {@link Path} to the tp2 file of the mod.
    * @param language Index of the language component information should be retrieved for. An out-of-bounds index
    *                 defaults to the first available language.
+   * @param charsets List of suggested {@link Charset} instances to use for converting process output to text.
+   *                 Uses a generic set of default charsets if not specified.
+   *                 (Note: Text encoding may differ wildly across mods and languages.)
    * @return A {@link JSONArray} object containing parsed JSON data with mod component information.
    * @throws FileNotFoundException if {@code tp2File} is not available.
    */
-  public JSONArray getModComponentInfo(Path tp2File, int language) throws FileNotFoundException {
+  public JSONArray getModComponentInfo(Path tp2File, int language, Charset... charsets) throws FileNotFoundException {
     if (tp2File == null) {
       throw new NullPointerException("tp2File is null");
     }
@@ -259,8 +264,33 @@ public class Weidu {
       throw new FileNotFoundException("File does not exist: " + tp2File);
     }
 
-    final String output = ProcessUtils.getProcessOutput(getWorkingDir(tp2File), weidu.toString(), "--nogame",
-        "--list-components-json", tp2File.toString(), Integer.toString(language));
+    // Getting mod info data as raw byte data and determine best character encoding based on selected language
+    final byte[] outputData = ProcessUtils.getProcessOutput(getWorkingDir(tp2File), weidu.toString(), "--nogame",
+        "--list-components-json", tp2File.toString(), Integer.toString(language)).data();
+    Logger.debug("Parsing mod component JSON data (buffer={} bytes)", outputData.length);
+
+    // preparing list of potential character sets
+    final List<Charset> csList = new ArrayList<>(Arrays.asList(charsets));
+    if (csList.isEmpty()) {
+      csList.add(StandardCharsets.UTF_8);
+    }
+
+    // determining a working charset for the given mod information data and convert to text
+    String output = null;
+    for (int i = 0; i < csList.size(); i++) {
+      final Charset cs = csList.get(i);
+      final CharsetDecoder decoder = cs.newDecoder();
+      final CodingErrorAction action = (i + 1 < csList.size()) ? CodingErrorAction.REPORT : CodingErrorAction.REPLACE;
+      decoder.onMalformedInput(action);
+      decoder.onUnmappableCharacter(action);
+      try {
+        output = decoder.decode(ByteBuffer.wrap(outputData)).toString();
+        Logger.debug("Successfully decoding mod component info (charset={})", cs);
+        break;
+      } catch (CharacterCodingException e) {
+        Logger.debug(e, "Error decoding mod component info (charset={})", cs);
+      }
+    }
 
     return parseJson(output);
   }
@@ -517,7 +547,7 @@ public class Weidu {
 
     if (filePath != null && Files.isRegularFile(filePath)) {
       try {
-        final String output = ProcessUtils.getProcessOutput(filePath.toString(), "--version");
+        final String output = ProcessUtils.getProcessOutput(filePath.toString(), "--version").text();
         if (output != null) {
           retVal = output.strip().matches(".*\\bWeiDU version [0-9]+");
         }

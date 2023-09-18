@@ -219,7 +219,7 @@ public class SystemInfo {
       if (dataRoot == null) {
         // Fallback solution
         final String output = ProcessUtils.getProcessOutput("reg", "query",
-            "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", "/v", "local appdata");
+            "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", "/v", "local appdata").text();
         final String[] splitted = output.split("\\s\\s+");
         userPrefix = splitted[splitted.length - 1];
         dataRoot = Path.of(userPrefix);

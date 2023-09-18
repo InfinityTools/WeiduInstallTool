@@ -42,7 +42,7 @@ public class ProcessUtils {
    * @return A string containing the whole content of the output and error stream of the program. Returns {@code null}
    * if the program did not execute successfully.
    */
-  public static String getProcessOutput(String... command) {
+  public static ProcessOutput getProcessOutput(String... command) {
     return getProcessOutput(null, true, StandardCharsets.UTF_8, 1000L, command);
   }
 
@@ -58,7 +58,7 @@ public class ProcessUtils {
    * @return A string containing the whole content of the output and error stream of the program. Returns {@code null}
    * if the program did not execute successfully.
    */
-  public static String getProcessOutput(Path workingDir, String... command) {
+  public static ProcessOutput getProcessOutput(Path workingDir, String... command) {
     return getProcessOutput(workingDir, true, StandardCharsets.UTF_8, 1000L, command);
   }
 
@@ -74,8 +74,9 @@ public class ProcessUtils {
    * @return A string containing the whole output of the program. Returns {@code null} if the program does not execute
    * successfully.
    */
-  public static String getProcessOutput(Path workingDir, boolean includeError, Charset cs, long maxWaitMs, String... command) {
-    String retVal = null;
+  public static ProcessOutput getProcessOutput(Path workingDir, boolean includeError, Charset cs, long maxWaitMs,
+                                               String... command) {
+    ProcessOutput retVal = null;
 
     if (cs == null) {
       cs = StandardCharsets.UTF_8;
