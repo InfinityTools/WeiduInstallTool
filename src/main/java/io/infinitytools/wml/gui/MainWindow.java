@@ -1245,8 +1245,8 @@ public class MainWindow extends Application {
       throw new NullPointerException("No TP2 file specified.");
     }
 
-    final Path workingDir = Weidu.getInstance().getWorkingDir(tp2File);
-    if (workingDir != null) {
+    final Path workingDir = getModInfo().getGamePath();
+    if (workingDir != null && tp2File.startsWith(workingDir)) {
       tp2File = workingDir.relativize(tp2File);
     }
 
