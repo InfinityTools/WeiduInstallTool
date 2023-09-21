@@ -18,7 +18,6 @@ package io.infinitytools.wml.gui;
 import io.infinitytools.wml.utils.R;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import org.tinylog.Logger;
 
 import java.net.URL;
 import java.util.ResourceBundle;

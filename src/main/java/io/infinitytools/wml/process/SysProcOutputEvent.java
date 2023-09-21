@@ -19,9 +19,9 @@ package io.infinitytools.wml.process;
  * Event class that indicates that some amount of output data from the process is available.
  */
 public class SysProcOutputEvent extends SysProcEvent {
-  private final ProcessOutput output;
+  private final byte[] output;
 
-  public SysProcOutputEvent(SysProc source, ProcessOutput output) {
+  public SysProcOutputEvent(SysProc source, byte[] output) {
     super(source);
     this.output = output;
   }
@@ -30,13 +30,6 @@ public class SysProcOutputEvent extends SysProcEvent {
    * Returns the raw byte data that was produced by the process since the last event of this type.
    */
   public byte[] getData() {
-    return output.data();
-  }
-
-  /**
-   * Returns the text content that was produced by the process since the last event of this type.
-   */
-  public String getText() {
-    return output.text();
+    return output;
   }
 }

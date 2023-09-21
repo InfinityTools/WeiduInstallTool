@@ -15,6 +15,7 @@
  */
 package io.infinitytools.wml.utils;
 
+import io.infinitytools.wml.process.BufferConvert;
 import io.infinitytools.wml.process.ProcessUtils;
 import org.tinylog.Logger;
 
@@ -218,8 +219,9 @@ public class SystemInfo {
 
       if (dataRoot == null) {
         // Fallback solution
-        final String output = ProcessUtils.getProcessOutput("reg", "query",
-            "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", "/v", "local appdata").text();
+        final byte[] data = ProcessUtils.getProcessOutput("reg", "query",
+            "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", "/v", "local appdata");
+        final String output = BufferConvert.decodeBytes(data).decoded();
         final String[] splitted = output.split("\\s\\s+");
         userPrefix = splitted[splitted.length - 1];
         dataRoot = Path.of(userPrefix);

@@ -331,7 +331,7 @@ public class ModInfo {
    * Removes all cached mod information.
    */
   public void clearCache() {
-    components.replaceAll(ignored -> null);
+    Collections.fill(components, null);
   }
 
   private void ensureComponentExists(int languageIndex) throws Exception {

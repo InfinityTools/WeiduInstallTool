@@ -20,6 +20,7 @@ import io.infinitytools.wml.Globals;
 import io.infinitytools.wml.github.Asset;
 import io.infinitytools.wml.github.Release;
 import io.infinitytools.wml.mod.ModInfo;
+import io.infinitytools.wml.process.BufferConvert;
 import io.infinitytools.wml.process.ProcessUtils;
 import io.infinitytools.wml.process.SysProc;
 import io.infinitytools.wml.utils.SystemInfo;
@@ -164,7 +165,8 @@ public class Weidu {
       } catch (ExecutionException | IOException | InterruptedException | TimeoutException e) {
         Logger.error(e, "Error executing WeiDU process");
       }
-      String output = sp.getOutput().text();
+      final byte[] data = sp.getOutput();
+      final String output = BufferConvert.decodeBytes(data).decoded();
       if (output != null) {
         // Removing useless extra lines
         List<String> list = new ArrayList<>(Arrays.asList(output.split("\r?\n")));
@@ -180,7 +182,8 @@ public class Weidu {
       }
     } else {
       // Other systems are much less painful
-      retVal = ProcessUtils.getProcessOutput(weidu.toString(), "--help", "--no-exit-pause").text();
+      final byte[] data = ProcessUtils.getProcessOutput(weidu.toString(), "--help", "--no-exit-pause");
+      retVal = BufferConvert.decodeBytes(data).decoded();
     }
 
     if (retVal == null) {
@@ -200,8 +203,9 @@ public class Weidu {
    */
   public Version getVersion() {
     String retVal = null;
-    String output = ProcessUtils.getProcessOutput(weidu.toString(), "--version").text();
-    if (output != null) {
+    try {
+      final byte[] data = ProcessUtils.getProcessOutput(weidu.toString(), "--version");
+      String output = BufferConvert.decodeBytes(data).decoded();
       // stripping weidu path portion
       output = output.substring(output.lastIndexOf(']') + 1).strip();
       final String[] items = output.split("[ \t]+");
@@ -211,6 +215,8 @@ public class Weidu {
           break;
         }
       }
+    } catch (NullPointerException e) {
+      Logger.debug(e, "Getting WeiDU version");
     }
 
     if (retVal != null) {
@@ -237,8 +243,9 @@ public class Weidu {
       throw new FileNotFoundException("File does not exist: " + tp2File);
     }
 
-    final String output = ProcessUtils.getProcessOutput(getWorkingDir(tp2File), weidu.toString(), "--nogame",
-        "--list-languages", tp2File.toString()).text();
+    final byte[] data = ProcessUtils.getProcessOutput(getWorkingDir(tp2File), weidu.toString(), "--nogame",
+        "--list-languages", tp2File.toString());
+    final String output = BufferConvert.decodeBytes(data).decoded();
 
     return parseLanguages(output);
   }
@@ -266,7 +273,7 @@ public class Weidu {
 
     // Getting mod info data as raw byte data and determine best character encoding based on selected language
     final byte[] outputData = ProcessUtils.getProcessOutput(getWorkingDir(tp2File), weidu.toString(), "--nogame",
-        "--list-components-json", tp2File.toString(), Integer.toString(language)).data();
+        "--list-components-json", tp2File.toString(), Integer.toString(language));
     Logger.debug("Parsing mod component JSON data (buffer={} bytes)", outputData.length);
 
     // preparing list of potential character sets
@@ -547,7 +554,8 @@ public class Weidu {
 
     if (filePath != null && Files.isRegularFile(filePath)) {
       try {
-        final String output = ProcessUtils.getProcessOutput(filePath.toString(), "--version").text();
+        final byte[] data = ProcessUtils.getProcessOutput(filePath.toString(), "--version");
+        final String output = BufferConvert.decodeBytes(data).decoded();
         if (output != null) {
           retVal = output.strip().matches(".*\\bWeiDU version [0-9]+");
         }

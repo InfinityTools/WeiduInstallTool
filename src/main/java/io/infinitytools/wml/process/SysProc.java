@@ -42,10 +42,6 @@ public class SysProc {
    * Storage for the total output of raw byte data since the start of the process.
    */
   private final ByteArrayOutputStream outputRaw = new ByteArrayOutputStream(65536);
-  /**
-   * Storage for the total output of textual data since the start of the process.
-   */
-  private final StringBuilder output = new StringBuilder(65536);
 
   /**
    * Temporary buffer for input text that is sent to the process.
@@ -393,10 +389,10 @@ public class SysProc {
   /**
    * Returns the total output that has been accumulated since the start of the process.
    */
-  public ProcessOutput getOutput() {
+  public byte[] getOutput() {
     try {
       outputLock.lock();
-      return new ProcessOutput(outputRaw.toByteArray(), output.toString());
+      return outputRaw.toByteArray();
     } finally {
       outputLock.unlock();
     }
@@ -405,12 +401,11 @@ public class SysProc {
   /**
    * Adds the specified data to the total output data.
    */
-  private void putBuffer(ProcessOutput processOutput) {
+  private void putBuffer(byte[] processOutput) {
     if (processOutput != null) {
       try {
         outputLock.lock();
-        output.append(processOutput.text());
-        outputRaw.write(processOutput.data());
+        outputRaw.write(processOutput);
       } catch (IOException e) {
         Logger.error(e, "Writing process data to output buffer");
       } finally {
@@ -428,8 +423,8 @@ public class SysProc {
   private boolean pollProcessOutput(InputStreamConsumer consumer) {
     // consuming process output
     boolean retVal = false;
-    final ProcessOutput processOutput = consumer.getBuffer();
-    if (processOutput.data() != null && processOutput.data().length > 0) {
+    final byte[] processOutput = consumer.getBuffer();
+    if (processOutput != null && processOutput.length > 0) {
       runAsync(() -> fireOutputEvent(processOutput));
       putBuffer(processOutput);
       retVal = true;
@@ -476,7 +471,7 @@ public class SysProc {
   /**
    * Used internally to fire a {@link SysProcOutputEvent}.
    */
-  private void fireOutputEvent(ProcessOutput processOutput) {
+  private void fireOutputEvent(byte[] processOutput) {
     try {
       outputEventLock.lock();
       final SysProcOutputEvent event = new SysProcOutputEvent(this, processOutput);
@@ -522,7 +517,7 @@ public class SysProc {
       }
 
       process = pb.start();
-      final InputStreamConsumer consumer = new InputStreamConsumer(process, getCharset());
+      final InputStreamConsumer consumer = new InputStreamConsumer(process);
       final OutputStreamProducer producer = new OutputStreamProducer(process, getCharset());
 
       // process execution has started

@@ -39,10 +39,10 @@ public class ProcessUtils {
    * </p>
    *
    * @param command A string array containing the program and arguments.
-   * @return A string containing the whole content of the output and error stream of the program. Returns {@code null}
-   * if the program did not execute successfully.
+   * @return A byte array containing the whole content of the output and error stream of the program.
+   * Returns {@code null} if the program did not execute successfully.
    */
-  public static ProcessOutput getProcessOutput(String... command) {
+  public static byte[] getProcessOutput(String... command) {
     return getProcessOutput(null, true, StandardCharsets.UTF_8, 1000L, command);
   }
 
@@ -55,10 +55,10 @@ public class ProcessUtils {
    *
    * @param workingDir The working directory where the process should be invoked. Specify {@code null} to ignore.
    * @param command    A string array containing the program and arguments.
-   * @return A string containing the whole content of the output and error stream of the program. Returns {@code null}
-   * if the program did not execute successfully.
+   * @return A byte array containing the whole content of the output and error stream of the program.
+   * Returns {@code null} if the program did not execute successfully.
    */
-  public static ProcessOutput getProcessOutput(Path workingDir, String... command) {
+  public static byte[] getProcessOutput(Path workingDir, String... command) {
     return getProcessOutput(workingDir, true, StandardCharsets.UTF_8, 1000L, command);
   }
 
@@ -71,12 +71,12 @@ public class ProcessUtils {
    * @param maxWaitMs    Max. number of milliseconds to wait for the program to complete execution before it is
    *                     forcefully terminated. Specify {@code -1L} to wait indefinitely.
    * @param command      A string array containing the program and arguments.
-   * @return A string containing the whole output of the program. Returns {@code null} if the program does not execute
-   * successfully.
+   * @return A byte array containing the whole output of the program. Returns {@code null} if the program does not
+   * execute successfully.
    */
-  public static ProcessOutput getProcessOutput(Path workingDir, boolean includeError, Charset cs, long maxWaitMs,
-                                               String... command) {
-    ProcessOutput retVal = null;
+  public static byte[] getProcessOutput(Path workingDir, boolean includeError, Charset cs, long maxWaitMs,
+                                        String... command) {
+    byte[] retVal = null;
 
     if (cs == null) {
       cs = StandardCharsets.UTF_8;

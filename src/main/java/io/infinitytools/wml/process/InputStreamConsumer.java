@@ -20,10 +20,6 @@ import org.tinylog.Logger;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.*;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -32,74 +28,31 @@ import java.util.concurrent.locks.ReentrantLock;
  * standard output of the main process.
  */
 public class InputStreamConsumer implements Runnable {
-  private final ByteArrayOutputStream bufferRaw = new ByteArrayOutputStream(16384);
-  private final StringBuilder buffer = new StringBuilder(16384);
+  private final ByteArrayOutputStream buffer = new ByteArrayOutputStream(16384);
   private final ReentrantLock bufferLock = new ReentrantLock();
   private final ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
 
   private final Process process;
-  private final CharsetDecoder decoder;
   private final Thread runner;
 
   /**
-   * Bytes remaining after a string conversion pass.
-   */
-  private byte[] remaining;
-
-  /**
-   * Creates a new consumer that monitors a given {@link Process} and fetches process output as text in
-   * UTF-8.
+   * Creates a new consumer that monitors a given {@link Process} and fetches process output as raw byte data.
    *
    * @param process The underlying {@link Process}.
    */
   public InputStreamConsumer(Process process) {
-    this(process, StandardCharsets.UTF_8);
-  }
-
-  /**
-   * Creates a new consumer that monitors a given {@link Process} and fetches process output as text in the specified
-   * character encoding.
-   *
-   * @param process The underlying {@link Process}.
-   * @param charset {@link Charset} used to convert process raw output data into text.
-   */
-  public InputStreamConsumer(Process process, Charset charset) {
     this.process = Objects.requireNonNull(process);
-
-    final Charset charset1 = (charset != null) ? charset : StandardCharsets.UTF_8;
-    this.decoder = charset1.newDecoder();
-
-    this.decoder.replaceWith("\ufffd"); // default replacement character
-    this.decoder.onMalformedInput(CodingErrorAction.REPLACE);
-    this.decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
-
     this.runner = Thread.ofVirtual().start(this);
   }
 
   /**
-   * Returns the content that has been accumulated since the last call of this method, {@link #getBuffer()} or
-   * {@link #getBufferedBytes()}.
-   */
-  public String getBufferedContent() {
-    try {
-      bufferLock.lock();
-      final String retVal = buffer.toString();
-      resetBuffer(false);
-      return retVal;
-    } finally {
-      bufferLock.unlock();
-    }
-  }
-
-  /**
-   * Returns the raw bytes that have been accumulated since the last call of this method, {@link #getBuffer()} or
-   * {@link #getBufferedContent()}.
+   * Returns the raw bytes that have been accumulated since the last call of this method or {@link #getBuffer()}.
    */
   public byte[] getBufferedBytes() {
     try {
       bufferLock.lock();
-      final byte[] retVal = bufferRaw.toByteArray();
-      resetBuffer(false);
+      final byte[] retVal = buffer.toByteArray();
+      buffer.reset();
       return retVal;
     } finally {
       bufferLock.unlock();
@@ -107,31 +60,17 @@ public class InputStreamConsumer implements Runnable {
   }
 
   /**
-   * Returns the buffered data that has been accumulated since the last call of this method, {@link #getBufferedContent()}
-   * or {@link #getBufferedBytes()}.
+   * Returns the buffered data that has been accumulated since the last call of this method or
+   * {@link #getBufferedBytes()}.
    */
-  public ProcessOutput getBuffer() {
+  public byte[] getBuffer() {
     try {
       bufferLock.lock();
-      final ProcessOutput retVal = new ProcessOutput(bufferRaw.toByteArray(), buffer.toString());
-      resetBuffer(false);
+      final byte[] retVal = buffer.toByteArray();
+      buffer.reset();
       return retVal;
     } finally {
       bufferLock.unlock();
-    }
-  }
-
-  private void resetBuffer(boolean lock) {
-    try {
-      if (lock) {
-        bufferLock.lock();
-      }
-      buffer.delete(0, buffer.length());
-      bufferRaw.reset();
-    } finally {
-      if (lock) {
-        bufferLock.unlock();
-      }
     }
   }
 
@@ -189,38 +128,17 @@ public class InputStreamConsumer implements Runnable {
     }
 
     if (baos.size() > 0) {
-      final byte[] outBuf;
-      if (remaining != null) {
-        final byte[] osBuf = baos.toByteArray();
-        outBuf = new byte[remaining.length + osBuf.length];
-        System.arraycopy(remaining, 0, outBuf, 0, remaining.length);
-        System.arraycopy(osBuf, 0, outBuf, remaining.length, osBuf.length);
-      } else {
-        outBuf = baos.toByteArray();
-      }
-
+      final byte[] outBuf = baos.toByteArray();
       try {
-        final ByteBuffer bb = ByteBuffer.wrap(outBuf);
-        final CharBuffer cb = decoder.decode(bb);
-        if (cb.limit() > 0) {
-          try {
-            bufferLock.lock();
-            buffer.append(cb);
-            bufferRaw.write(outBuf, 0, bb.limit());
-          } finally {
-            bufferLock.unlock();
-          }
+        try {
+          bufferLock.lock();
+          buffer.write(outBuf);
+        } finally {
+          bufferLock.unlock();
         }
         baos.reset();
-
-        // remaining undecodable bytes (if any) are stored for the next pass
-        if (bb.limit() < bb.capacity()) {
-          remaining = Arrays.copyOfRange(bb.array(), bb.limit(), bb.capacity());
-        } else {
-          remaining = null;
-        }
-      } catch (CharacterCodingException e) {
-        Logger.debug(e, "Incompatible character encoding");
+      } catch (IOException e) {
+        Logger.debug(e, "Writing buffer data");
       }
     }
 

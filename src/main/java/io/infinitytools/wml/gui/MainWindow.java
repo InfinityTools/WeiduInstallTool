@@ -21,6 +21,7 @@ import io.infinitytools.wml.icons.Icons;
 import io.infinitytools.wml.mod.ModInfo;
 import io.infinitytools.wml.mod.ini.ModIni;
 import io.infinitytools.wml.mod.log.WeiduLog;
+import io.infinitytools.wml.process.BufferConvert;
 import io.infinitytools.wml.process.SysProc;
 import io.infinitytools.wml.process.SysProcChangeEvent;
 import io.infinitytools.wml.process.SysProcOutputEvent;
@@ -46,11 +47,8 @@ import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.tinylog.Logger;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.*;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -119,9 +117,9 @@ public class MainWindow extends Application {
   }
 
   /**
-   * Total output of the WeiDU process as charset-agnostic byte array. Required for a hot-switch of the charset.
+   * Manages conversion of raw process output to text.
    */
-  private final ByteArrayOutputStream outputData = new ByteArrayOutputStream(65536);
+  private final BufferConvert outputBuffer = new BufferConvert();
 
   private MainWindowController controller;
   private Stage stage;
@@ -133,16 +131,6 @@ public class MainWindow extends Application {
    * Storage for the exit code of the WeiDU operation.
    */
   private Future<Integer> processResult;
-
-  /**
-   * Decoder of the current character set for process output text conversion.
-   */
-  private CharsetDecoder outputDecoder;
-
-  /**
-   * Remaining bytes from the last bytes-to-text conversion operation to be available for the next conversion pass.
-   */
-  private byte[] outputRemaining;
 
   public MainWindow() {
     super();
@@ -535,7 +523,7 @@ public class MainWindow extends Application {
    * Returns the current {@link Charset} for converting process output text.
    */
   public Charset getOutputCharset() {
-    return outputDecoder.charset();
+    return outputBuffer.getCharset();
   }
 
   /**
@@ -549,23 +537,12 @@ public class MainWindow extends Application {
       newCharset = StandardCharsets.UTF_8;
     }
 
-    if (outputDecoder == null || newCharset != outputDecoder.charset()) {
-      outputDecoder = newCharset.newDecoder();
-      outputDecoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
-      outputDecoder.onMalformedInput(CodingErrorAction.REPLACE);
+    if (!newCharset.equals(outputBuffer.getCharset())) {
+      outputBuffer.setCharset(newCharset);
 
       // resetting output text area content
       boolean autoScrollDown = getController().outputArea.getCaretPosition() > 0;
-      String text = "";
-      try {
-        final ByteBuffer bb = ByteBuffer.wrap(outputData.toByteArray());
-        final CharBuffer cb = outputDecoder.decode(bb);
-        text = cb.toString();
-      } catch (CharacterCodingException e) {
-        Logger.warn(e, "Changing charset of output text area");
-      }
-
-      setOutputText(text, autoScrollDown);
+      setOutputText(outputBuffer.getText(), autoScrollDown);
     }
   }
 
@@ -619,15 +596,12 @@ public class MainWindow extends Application {
    */
   private void onProcessOutput(SysProcOutputEvent event) {
     Platform.runLater(() -> {
-      // adding data to internal output data buffer
-      storeOutputData(event.getData());
-
-      // performing data-to-text conversion using current charset
-      final String text = convertOutputData(event.getData(), outputDecoder);
-
-      // adding converted string to output text
-      appendOutputText(text, true);
-//      appendOutputText(event.getText(), true);
+      try {
+        outputBuffer.decode(event.getData());
+        appendOutputText(outputBuffer.getLastText(), true);
+      } catch (IOException e) {
+        Logger.warn(e, "Decoding process output");
+      }
     });
   }
 
@@ -753,58 +727,6 @@ public class MainWindow extends Application {
       }
     }
     return null;
-  }
-
-  /**
-   * Adds the specified data to the global output data buffer.
-   */
-  private void storeOutputData(byte[] data) {
-    if (data != null) {
-      try {
-        outputData.write(data);
-      } catch (IOException e) {
-        Logger.error(e, "Appending process output data");
-      }
-    }
-  }
-
-  private String convertOutputData(byte[] data, CharsetDecoder decoder) {
-    String retVal = "";
-
-    if (data != null) {
-      if (decoder == null) {
-        decoder = StandardCharsets.UTF_8.newDecoder();
-        decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
-        decoder.onMalformedInput(CodingErrorAction.REPLACE);
-      }
-
-      final byte[] outBuf;
-      if (outputRemaining != null) {
-        outBuf = new byte[outputRemaining.length + data.length];
-        System.arraycopy(outputRemaining, 0, outBuf, 0, outputRemaining.length);
-        System.arraycopy(data, 0, outBuf, outputRemaining.length, data.length);
-      } else {
-        outBuf = data;
-      }
-
-      try {
-        final ByteBuffer bb = ByteBuffer.wrap(outBuf);
-        final CharBuffer cb = decoder.decode(bb);
-        if (cb.limit() > 0) {
-          retVal = cb.toString();
-        }
-
-        if (bb.limit() < bb.capacity()) {
-          outputRemaining = Arrays.copyOfRange(bb.array(), bb.limit(), bb.capacity());
-        } else {
-          outputRemaining = null;
-        }
-      } catch (CharacterCodingException e) {
-        Logger.warn(e, "Converting process output data");
-      }
-    }
-
-    return retVal;
   }
 
   /**
@@ -939,6 +861,12 @@ public class MainWindow extends Application {
       process.setInput(inputText);
     }
 
+    try {
+      // adding to output buffer ensures that charset switches won't discard the input text
+      outputBuffer.encode(inputText);
+    } catch (IOException e) {
+      Logger.warn(e, "Encoding input text");
+    }
     appendOutputText(inputText, true);
 
     if (cleanup) {
@@ -1106,9 +1034,24 @@ public class MainWindow extends Application {
       this.process.addOutputEventHandler(this::onProcessOutput);
 
       if (this.process.getWorkingDirectory() != null) {
-        appendOutputText("Working directory: " + this.process.getWorkingDirectory().toString() + "\n", true);
+        final String text = "Working directory: " + this.process.getWorkingDirectory().toString() + "\n";
+        try {
+          // ensures that charset switches won't discard the extra content
+          outputBuffer.encode(text);
+        } catch (IOException e) {
+          Logger.warn(e, "Output working directory");
+        }
+        appendOutputText(text, true);
       }
+
       // display executed command line in output area
+      final String text = this.process.getCommandLine() + "\n";
+      try {
+        // ensures that charset switches won't discard the extra content
+        outputBuffer.encode(text);
+      } catch (IOException e) {
+        Logger.warn(e, "Output command line");
+      }
       appendOutputText(this.process.getCommandLine() + "\n", true);
 
       try {
@@ -1313,8 +1256,13 @@ public class MainWindow extends Application {
             executeGuided();
           } else {
             final String fmt = String.format("*** %s ***\n", R.get("ui.main.execute.message.skip"));
-            appendOutputText(String.format(fmt, getModInfo().getTp2Name()),
-                false);
+            final String msg = String.format(fmt, getModInfo().getTp2Name());
+            try {
+              outputBuffer.encode(msg);
+            } catch (IOException e) {
+              Logger.warn(e, "Output application message");
+            }
+            appendOutputText(msg, false);
           }
         }
         default -> executeCustom();
@@ -1330,6 +1278,12 @@ public class MainWindow extends Application {
       setWeiduRunning();
       final String helpDesc = Weidu.getInstance().getHelp();
       if (helpDesc != null) {
+        try {
+          // ensures that charset switches won't discard the text content
+          outputBuffer.encode(helpDesc);
+        } catch (IOException e) {
+          Logger.warn(e, "Output WeiDU help text");
+        }
         appendOutputText(helpDesc, false);
       } else {
         Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.weiduHelp.message.header"), null);
