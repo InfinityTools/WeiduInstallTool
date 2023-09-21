@@ -128,6 +128,7 @@ public class ModInfo {
   private boolean isEE;
   private boolean weiduConfExists;
   private List<String> gameLanguages;
+  private Charset charsetOverride;
 
   public ModInfo(Path gamePath, Path tp2File) throws Exception {
     // Checking game directory
@@ -308,6 +309,31 @@ public class ModInfo {
     return retVal;
   }
 
+  /**
+   * Returns the current {@link Charset} override for decoding mod information data.
+   *
+   * @return The charset override. Returns {@code null} if no override is defined.
+   */
+  public Charset getCharsetOverride() {
+    return charsetOverride;
+  }
+
+  /**
+   * Specifies a {@link Charset} that is unconditionally used to decode mod information data.
+   *
+   * @param newCharset The new charset to use. Specify {@code null} to remove the override.
+   */
+  public void setCharsetOverride(Charset newCharset) {
+    charsetOverride = newCharset;
+  }
+
+  /**
+   * Removes all cached mod information.
+   */
+  public void clearCache() {
+    components.replaceAll(ignored -> null);
+  }
+
   private void ensureComponentExists(int languageIndex) throws Exception {
     if (languageIndex >= 0 && languageIndex < components.size()) {
       if (components.get(languageIndex) == null) {
@@ -337,7 +363,12 @@ public class ModInfo {
       retVal = components.get(languageIndex);
       if (retVal == null) {
         try {
-          final Charset[] charsets = determineCharsets(languages.get(languageIndex));
+          final Charset[] charsets;
+          if (getCharsetOverride() != null) {
+            charsets = new Charset[] { getCharsetOverride() };
+          } else {
+            charsets = determineCharsets(languages.get(languageIndex));
+          }
           final JSONArray json = Weidu.getInstance().getModComponentInfo(getTp2File(), languageIndex, charsets);
           if (json != null) {
             retVal = ComponentRoot.parse(tp2File.getFileName().toString(), json);

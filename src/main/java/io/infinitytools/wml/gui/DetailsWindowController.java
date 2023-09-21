@@ -17,6 +17,7 @@ package io.infinitytools.wml.gui;
 
 import io.infinitytools.wml.mod.info.ComponentBase;
 import io.infinitytools.wml.mod.info.ComponentGroup;
+import io.infinitytools.wml.utils.R;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -35,6 +36,8 @@ public class DetailsWindowController implements Initializable {
   public Label iniLabel;
   public TreeView<Node> iniTree;
 
+  public CharsetMenu componentsCharsetMenu;
+
   public DetailsWindowController() {
   }
 
@@ -46,5 +49,19 @@ public class DetailsWindowController implements Initializable {
     } catch (NullPointerException e) {
       Logger.error(e, "Components are null (componentsTree={}, iniTree={})", componentsTree, iniTree);
     }
+
+    // add context menu with character encoding options
+    // binding is initialized in the DetailsWindow class
+    componentsCharsetMenu = new CharsetMenu();
+
+    // Adapting default menu entry
+    final RadioMenuItem rmi = componentsCharsetMenu.findMenuItem(CharsetMenu.CharsetEntry.DEFAULT);
+    if (rmi != null) {
+      rmi.setText(R.get("ui.charsets.default.autodetect"));
+    }
+
+    final ContextMenu cm = new ContextMenu();
+    cm.getItems().addAll(componentsCharsetMenu.getItems());
+    componentsTree.setContextMenu(cm);
   }
 }

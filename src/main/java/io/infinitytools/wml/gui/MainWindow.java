@@ -33,9 +33,7 @@ import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
@@ -48,14 +46,15 @@ import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.tinylog.Logger;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.*;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -119,12 +118,31 @@ public class MainWindow extends Application {
     return instance;
   }
 
+  /**
+   * Total output of the WeiDU process as charset-agnostic byte array. Required for a hot-switch of the charset.
+   */
+  private final ByteArrayOutputStream outputData = new ByteArrayOutputStream(65536);
+
   private MainWindowController controller;
   private Stage stage;
   private ModInfo modInfo;
   private DetailsWindow detailsWindow;
   private SysProc process;
+
+  /**
+   * Storage for the exit code of the WeiDU operation.
+   */
   private Future<Integer> processResult;
+
+  /**
+   * Decoder of the current character set for process output text conversion.
+   */
+  private CharsetDecoder outputDecoder;
+
+  /**
+   * Remaining bytes from the last bytes-to-text conversion operation to be available for the next conversion pass.
+   */
+  private byte[] outputRemaining;
 
   public MainWindow() {
     super();
@@ -514,6 +532,44 @@ public class MainWindow extends Application {
   }
 
   /**
+   * Returns the current {@link Charset} for converting process output text.
+   */
+  public Charset getOutputCharset() {
+    return outputDecoder.charset();
+  }
+
+  /**
+   * Sets a new {@link Charset} for the process output text.
+   * <p>
+   *   The current content of the output text area is rebuild using the new character set.
+   * </p>
+   */
+  public void setOutputCharset(Charset newCharset) {
+    if (newCharset == null) {
+      newCharset = StandardCharsets.UTF_8;
+    }
+
+    if (outputDecoder == null || newCharset != outputDecoder.charset()) {
+      outputDecoder = newCharset.newDecoder();
+      outputDecoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+      outputDecoder.onMalformedInput(CodingErrorAction.REPLACE);
+
+      // resetting output text area content
+      boolean autoScrollDown = getController().outputArea.getCaretPosition() > 0;
+      String text = "";
+      try {
+        final ByteBuffer bb = ByteBuffer.wrap(outputData.toByteArray());
+        final CharBuffer cb = outputDecoder.decode(bb);
+        text = cb.toString();
+      } catch (CharacterCodingException e) {
+        Logger.warn(e, "Changing charset of output text area");
+      }
+
+      setOutputText(text, autoScrollDown);
+    }
+  }
+
+  /**
    * This method should be called whenever the visibility state of the Details window changes.
    */
   public void updateDetailsButtonSelected() {
@@ -562,7 +618,17 @@ public class MainWindow extends Application {
    * Called by process event handler whenever output data is available.
    */
   private void onProcessOutput(SysProcOutputEvent event) {
-    Platform.runLater(() -> appendOutputText(event.getText(), true));
+    Platform.runLater(() -> {
+      // adding data to internal output data buffer
+      storeOutputData(event.getData());
+
+      // performing data-to-text conversion using current charset
+      final String text = convertOutputData(event.getData(), outputDecoder);
+
+      // adding converted string to output text
+      appendOutputText(text, true);
+//      appendOutputText(event.getText(), true);
+    });
   }
 
   /**
@@ -687,6 +753,58 @@ public class MainWindow extends Application {
       }
     }
     return null;
+  }
+
+  /**
+   * Adds the specified data to the global output data buffer.
+   */
+  private void storeOutputData(byte[] data) {
+    if (data != null) {
+      try {
+        outputData.write(data);
+      } catch (IOException e) {
+        Logger.error(e, "Appending process output data");
+      }
+    }
+  }
+
+  private String convertOutputData(byte[] data, CharsetDecoder decoder) {
+    String retVal = "";
+
+    if (data != null) {
+      if (decoder == null) {
+        decoder = StandardCharsets.UTF_8.newDecoder();
+        decoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
+        decoder.onMalformedInput(CodingErrorAction.REPLACE);
+      }
+
+      final byte[] outBuf;
+      if (outputRemaining != null) {
+        outBuf = new byte[outputRemaining.length + data.length];
+        System.arraycopy(outputRemaining, 0, outBuf, 0, outputRemaining.length);
+        System.arraycopy(data, 0, outBuf, outputRemaining.length, data.length);
+      } else {
+        outBuf = data;
+      }
+
+      try {
+        final ByteBuffer bb = ByteBuffer.wrap(outBuf);
+        final CharBuffer cb = decoder.decode(bb);
+        if (cb.limit() > 0) {
+          retVal = cb.toString();
+        }
+
+        if (bb.limit() < bb.capacity()) {
+          outputRemaining = Arrays.copyOfRange(bb.array(), bb.limit(), bb.capacity());
+        } else {
+          outputRemaining = null;
+        }
+      } catch (CharacterCodingException e) {
+        Logger.warn(e, "Converting process output data");
+      }
+    }
+
+    return retVal;
   }
 
   /**
@@ -863,6 +981,15 @@ public class MainWindow extends Application {
 
     // add invisible border; required to reserve border space for a consistent look when border is enabled
     setVisualizedResult(false, 0);
+
+    // initialize charset switch options for the output text area
+    setOutputCharset(StandardCharsets.UTF_8);
+    getController().outputCharsetMenu.selectedProperty().addListener((ob, ov, nv) -> {
+      if (nv.getUserData() instanceof CharsetMenu.CharsetInfo ci) {
+        setOutputCharset(ci.charset());
+        setInputFocus();
+      }
+    });
 
     getController().autoQuitCheckItem.setOnAction(event -> Configuration.getInstance()
         .setOption(Configuration.Key.QUIT_ON_ENTER, isAutoQuitEnabled()));

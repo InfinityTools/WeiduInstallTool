@@ -21,6 +21,8 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.MenuItem?>
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="io.infinitytools.wml.gui.MainWindowController"
@@ -166,7 +168,20 @@
             GridPane.columnIndex="0"
             GridPane.rowIndex="1"
             GridPane.hgrow="ALWAYS"
-            GridPane.vgrow="ALWAYS"/>
+            GridPane.vgrow="ALWAYS">
+    <contextMenu>
+      <ContextMenu fx:id="outputContextMenu">
+        <items>
+          <MenuItem fx:id="outputCopyMenuItem" text="%ui.main.outputArea.contextMenu.copy"/>
+          <SeparatorMenuItem/>
+          <MenuItem fx:id="outputSelectAllMenuItem" text="%ui.main.outputArea.contextMenu.selectAll"/>
+          <SeparatorMenuItem/>
+          <MenuItem fx:id="outputScrollTopMenuItem" text="%ui.main.outputArea.contextMenu.scrollTop"/>
+          <MenuItem fx:id="outputScrollBottomMenuItem" text="%ui.main.outputArea.contextMenu.scrollBottom"/>
+        </items>
+      </ContextMenu>
+    </contextMenu>
+  </TextArea>
 
   <!-- Grid(0, 2): User input (label, input field, button) -->
   <HBox alignment="CENTER_LEFT"

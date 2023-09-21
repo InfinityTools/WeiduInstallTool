@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.*;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -214,10 +215,7 @@ public class InputStreamConsumer implements Runnable {
 
         // remaining undecodable bytes (if any) are stored for the next pass
         if (bb.limit() < bb.capacity()) {
-          bb.position(bb.limit());
-          bb.limit(bb.capacity());
-          remaining = new byte[bb.remaining()];
-          bb.get(remaining, 0, remaining.length);
+          remaining = Arrays.copyOfRange(bb.array(), bb.limit(), bb.capacity());
         } else {
           remaining = null;
         }

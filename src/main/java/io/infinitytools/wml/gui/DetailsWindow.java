@@ -35,6 +35,7 @@ import javafx.stage.WindowEvent;
 import org.tinylog.Logger;
 
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -149,6 +150,19 @@ public class DetailsWindow extends Stage {
     controller.componentsTree.setRoot(rootItem);
   }
 
+  /**
+   * Reloads mod component information with the specified character set.
+   *
+   * @param charset The new character set to decode mod component information.
+   */
+  private void refreshModInfoCharset(Charset charset) {
+    if (modInfo != null) {
+      modInfo.clearCache();
+      modInfo.setCharsetOverride(charset);
+      onLanguageItemSelected(controller.languageComboBox.getSelectionModel().getSelectedIndex());
+    }
+  }
+
   private void init() throws Exception {
     final FXMLLoader loader = new FXMLLoader(FXML_FILE, R.getBundle());
     final SplitPane splitter = loader.load();
@@ -170,6 +184,11 @@ public class DetailsWindow extends Stage {
         event -> onLanguageItemSelected(controller.languageComboBox.getSelectionModel().getSelectedIndex()));
     controller.groupComboBox.setOnAction(
         event -> onGroupItemSelected(controller.groupComboBox.getSelectionModel().getSelectedItem()));
+    controller.componentsCharsetMenu.selectedProperty().addListener((ob, ov, nv) -> {
+      if (nv.getUserData() instanceof CharsetMenu.CharsetInfo ci) {
+        refreshModInfoCharset(ci.charset());
+      }
+    });
 
     if (modInfo != null && modInfo.getModIni() != null) {
       // initializing mod information tree
