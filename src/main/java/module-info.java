@@ -1,4 +1,5 @@
 module io.infinitytools.wml {
+  requires jdk.charsets;
   requires transitive javafx.controls;
   requires transitive javafx.graphics;
   requires javafx.fxml;
