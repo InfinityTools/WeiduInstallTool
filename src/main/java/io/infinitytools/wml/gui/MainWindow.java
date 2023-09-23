@@ -34,7 +34,9 @@ import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
@@ -49,10 +51,14 @@ import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -529,7 +535,7 @@ public class MainWindow extends Application {
   /**
    * Sets a new {@link Charset} for the process output text.
    * <p>
-   *   The current content of the output text area is rebuild using the new character set.
+   * The current content of the output text area is rebuild using the new character set.
    * </p>
    */
   public void setOutputCharset(Charset newCharset) {
@@ -608,19 +614,19 @@ public class MainWindow extends Application {
   /**
    * Performs post-initializations when the window is about to become visible.
    */
-  private void onShowing(WindowEvent event) {
+  private void onShowing(WindowEvent _event) {
   }
 
   /**
    * Performs post-initializations that are only possible when the window is visible.
    */
-  private void onShown(WindowEvent event) {
+  private void onShown(WindowEvent _event) {
   }
 
   /**
    * Performs clean up operations when the window is about to be hidden/closed.
    */
-  private void onHiding(WindowEvent event) {
+  private void onHiding(WindowEvent _event) {
   }
 
   /**
@@ -935,14 +941,12 @@ public class MainWindow extends Application {
     getController().sendButton.setOnAction(event -> sendInput(getController().inputField.getText(), true));
 
     // initializing input shortcut buttons
-    getController().inputButtons.forEach(button -> {
-      button.setOnAction(event -> {
-        if (button.getUserData() instanceof String s) {
-          sendInput(s, false);
-          event.consume();
-        }
-      });
-    });
+    getController().inputButtons.forEach(button -> button.setOnAction(event -> {
+      if (button.getUserData() instanceof String s) {
+        sendInput(s, false);
+        event.consume();
+      }
+    }));
 
     // setting initial window title
     updateWindowTitle(false);
