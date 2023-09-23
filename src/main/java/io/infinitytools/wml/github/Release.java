@@ -49,10 +49,9 @@ public class Release implements Comparable<Release> {
    * @param readTimeOut    Timeout value, in milliseconds, for reading data from the connection.
    * @return {@link List} of available releases.
    * @throws NullPointerException if {@code owner} or {@code repo} are {@code null}.
-   * @throws IOException          if the method failed to retrieve data from the GitHub server.
    */
   public static List<Release> getReleases(String owner, String repo, int connectTimeOut, int readTimeOut)
-      throws IOException, JSONException {
+      throws JSONException {
     List<Release> retVal = new ArrayList<>();
 
     try {

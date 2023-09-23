@@ -26,15 +26,13 @@ import java.util.Map;
  */
 public enum Fonts {
   LiberationMonoRegular("fonts/liberation-mono/LiberationMono-Regular.ttf"),
-  LiberationMonoItalic("fonts/liberation-mono/LiberationMono-Italic.ttf"),
-  LiberationMonoBold("fonts/liberation-mono/LiberationMono-Bold.ttf"),
-  LiberationMonoBoldItalic("fonts/liberation-mono/LiberationMono-BoldItalic.ttf"),
+  DejaVuSansMononRegular("fonts/dejavu-sans-mono/DejaVuSansMono.ttf"),
   ;
 
   private final Map<Double, Font> fontMap = new HashMap<>();
   private final String relPath;
 
-  private Fonts(String relPath) {
+  Fonts(String relPath) {
     this.relPath = relPath;
   }
 

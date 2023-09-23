@@ -1,12 +1,18 @@
-/* Custom monospaced font for input and output text areas */
+/* Custom monospaced fonts for input and output text areas */
 @font-face {
   font-style: normal;
   font-weight: normal;
   src: url('../fonts/liberation-mono/LiberationMono-Regular.ttf') format('truetype');
 }
 
+@font-face {
+  font-style: normal;
+  font-weight: normal;
+  src: url('../fonts/dejavu-sans-mono/DejaVuSansMono.ttf') format('truetype');
+}
+
 #outputArea, #inputField {
-  -fx-font-family: "Liberation Mono", monospace;
+  -fx-font-family: "Liberation Mono", "DejaVu Sans Mono", monospace;
 }
 
 #sendButton {
