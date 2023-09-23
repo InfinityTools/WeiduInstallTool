@@ -31,6 +31,44 @@ import java.util.*;
  */
 public class CharsetMenu {
   /**
+   * Storage of a character set definition.
+   *
+   * @param label   The menu item label for display.
+   * @param charset {@link Charset} instance associated with the label. {@code null} indicates to use default values.
+   */
+  public record CharsetInfo(String label, Charset charset) {
+    /**
+     * Convenience function for creating a new {@link CharsetInfo} record from a label and a character set name.
+     *
+     * @param label       Menu item label.
+     * @param charsetName Name of the {@link Charset}.
+     * @return Initialized {@link CharsetInfo} instance.
+     * @throws IllegalArgumentException if a charset of the given name could not be created.
+     */
+    public static CharsetInfo of(String label, String charsetName) throws IllegalArgumentException {
+      return new CharsetInfo(label, Charset.forName(charsetName));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      CharsetInfo that = (CharsetInfo) o;
+      return Objects.equals(charset, that.charset);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(charset);
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
+  }
+
+  /**
    * Available language regions.
    */
   public enum Region {
@@ -41,23 +79,23 @@ public class CharsetMenu {
     /**
      * Character sets primarily used in western or central europe.
      */
-    WESTERN_EUROPE(R.get("ui.charsets.region.westernEuropean")),
+    WESTERN_EUROPE(R.get("ui.charsets.westernEuropean")),
     /**
      * Character sets primarily used in eastern europe.
      */
-    EASTERN_EUROPE(R.get("ui.charsets.region.easternEuropean")),
+    CENTRAL_EUROPE(R.get("ui.charsets.centralEuropean")),
     /**
      * Character sets used in countries with cyrillic alphabets.
      */
-    CYRILLIC(R.get("ui.charsets.region.cyrillic")),
+    CYRILLIC(R.get("ui.charsets.cyrillic")),
     /**
      * Character sets used throughout various regions in Asia.
      */
-    ASIAN(R.get("ui.charsets.region.asian")),
+    ASIAN(R.get("ui.charsets.asian")),
     /**
      * Turkish character sets.
      */
-    TURKISH(R.get("ui.charsets.region.turkish")),
+    TURKISH(R.get("ui.charsets.turkish")),
     ;
 
     private final String label;
@@ -79,33 +117,38 @@ public class CharsetMenu {
     }
   }
 
+  /**
+   * Available character set definitions.
+   */
   public enum CharsetEntry {
     /**
      * Indicates to perform default character decoding.
      */
     DEFAULT(new CharsetInfo(R.get("ui.charsets.default"), null), Region.DEFAULT),
-    CP850(CharsetInfo.of("CP850", "CP850"), Region.WESTERN_EUROPE),
-    CP858(CharsetInfo.of("CP858", "CP858"), Region.WESTERN_EUROPE),
-    ISO_8859_1(CharsetInfo.of("ISO-8859-1", "ISO-8859-1"), Region.WESTERN_EUROPE),
-    WINDOWS_1252(CharsetInfo.of("Windows-1252", "windows-1252"), Region.WESTERN_EUROPE),
-    CP852(CharsetInfo.of("CP852", "CP852"), Region.EASTERN_EUROPE),
-    ISO_8859_2(CharsetInfo.of("ISO-8859-2", "ISO-8859-2"), Region.EASTERN_EUROPE),
-    WINDOWS_1250(CharsetInfo.of("Windows-1250", "windows-1250"), Region.EASTERN_EUROPE),
-    CP855(CharsetInfo.of("CP855", "IBM855"), Region.CYRILLIC),
-    CP866(CharsetInfo.of("CP866", "IBM866"), Region.CYRILLIC),
-    KOI8_R(CharsetInfo.of("KOI8-R", "KOI8-R"), Region.CYRILLIC),
-    ISO_8859_5(CharsetInfo.of("ISO-8859-5", "ISO-8859-5"), Region.CYRILLIC),
-    WINDOWS_1251(CharsetInfo.of("Windows-1251", "windows-1251"), Region.CYRILLIC),
+    CP850(CharsetInfo.of(String.format("CP850 (DOS, %s)", R.get("ui.charsets.westernEuropean")), "IBM850"), Region.WESTERN_EUROPE),
+    CP860(CharsetInfo.of(String.format("CP850 (DOS, %s)", R.get("ui.charsets.portuguese")), "IBM850"), Region.WESTERN_EUROPE),
+    CP437(CharsetInfo.of(String.format("CP437 (DOS, %s)", R.get("ui.charsets.english")), "IBM437"), Region.WESTERN_EUROPE),
+    WINDOWS_1252(CharsetInfo.of(String.format("Windows-1252 (Windows, %s)", R.get("ui.charsets.westernEuropean")), "windows-1252"), Region.WESTERN_EUROPE),
+    CP852(CharsetInfo.of(String.format("CP852 (DOS, %s)", R.get("ui.charsets.centralEuropean")), "IBM852"), Region.CENTRAL_EUROPE),
+    ISO_8859_2(CharsetInfo.of(String.format("ISO-8859-2 (ISO, %s)", R.get("ui.charsets.centralEuropean")), "ISO-8859-2"), Region.CENTRAL_EUROPE),
+    WINDOWS_1250(CharsetInfo.of(String.format("Windows-1250 (Windows, %s)", R.get("ui.charsets.centralEuropean")), "windows-1250"), Region.CENTRAL_EUROPE),
+    CP855(CharsetInfo.of(String.format("CP855 (DOS, %s)", R.get("ui.charsets.cyrillic")), "IBM855"), Region.CYRILLIC),
+    CP866(CharsetInfo.of(String.format("CP866 (DOS, %s)", R.get("ui.charsets.russian")), "IBM866"), Region.CYRILLIC),
+    KOI8_R(CharsetInfo.of(String.format("KOI8-R (%s)", R.get("ui.charsets.russian")), "KOI8-R"), Region.CYRILLIC),
+    ISO_8859_5(CharsetInfo.of(String.format("ISO-8859-5 (ISO, %s)", R.get("ui.charsets.cyrillic")), "ISO-8859-5"), Region.CYRILLIC),
+    WINDOWS_1251(CharsetInfo.of(String.format("Windows-1251 (Windows, %s)", R.get("ui.charsets.cyrillic")), "windows-1251"), Region.CYRILLIC),
+    WINDOWS_936(CharsetInfo.of(String.format("Windows-936 (Windows, %s)", R.get("ui.charsets.simplifiedChinese")), "GBK"), Region.ASIAN),
     GB2312(CharsetInfo.of(String.format("GB2312 (%s)", R.get("ui.charsets.simplifiedChinese")), "GB2312"), Region.ASIAN),
     BIG5(CharsetInfo.of(String.format("Big5 (%s)", R.get("ui.charsets.traditionalChinese")), "Big5"), Region.ASIAN),
     Big5_HKSCS(CharsetInfo.of(String.format("Big5-HKSCS (%s)", R.get("ui.charsets.hongkongChinese")), "Big5-HKSCS"), Region.ASIAN),
     Shift_JIS(CharsetInfo.of(String.format("Shift-JIS (%s)", R.get("ui.charsets.japanese")), "Shift_JIS"), Region.ASIAN),
+    EUC_JP(CharsetInfo.of(String.format("EUC-JP (%s)", R.get("ui.charsets.japanese")), "EUC-JP"), Region.ASIAN),
     EUC_KR(CharsetInfo.of(String.format("EUC-KR (%s)", R.get("ui.charsets.korean")), "EUC-KR"), Region.ASIAN),
-    WINDOWS_949(CharsetInfo.of(String.format("Windows 949 (%s)", R.get("ui.charsets.korean")), "x-windows-949"), Region.ASIAN),
-    CP857(CharsetInfo.of("CP857", "x-windows-949"), Region.TURKISH),
-    ISO_8859_3(CharsetInfo.of("ISO-8859-3", "ISO-8859-3"), Region.TURKISH),
-    ISO_8859_9(CharsetInfo.of("ISO-8859-9", "ISO-8859-9"), Region.TURKISH),
-    WINDOWS_1254(CharsetInfo.of("Windows-1254", "windows-1254"), Region.TURKISH),
+    WINDOWS_949(CharsetInfo.of(String.format("Windows-949 (Windows, %s)", R.get("ui.charsets.korean")), "x-windows-949"), Region.ASIAN),
+    CP857(CharsetInfo.of(String.format("CP857 (DOS, %s)", R.get("ui.charsets.turkish")), "IBM857"), Region.TURKISH),
+    ISO_8859_3(CharsetInfo.of(String.format("ISO-8859-3 (ISO, %s)", R.get("ui.charsets.southernEuropean")), "ISO-8859-3"), Region.TURKISH),
+    ISO_8859_9(CharsetInfo.of(String.format("ISO-8859-9 (ISO, %s)", R.get("ui.charsets.turkish")), "ISO-8859-9"), Region.TURKISH),
+    WINDOWS_1254(CharsetInfo.of(String.format("Windows-1254 (Windows, %s)", R.get("ui.charsets.turkish")), "windows-1254"), Region.TURKISH),
     ;
 
     private final Region region;
@@ -295,43 +338,5 @@ public class CharsetMenu {
 
     // selected by default
     findMenuItem(CharsetEntry.DEFAULT.getInfo()).setSelected(true);
-  }
-
-  /**
-   * Storage of a character set definition.
-   *
-   * @param label   The menu item label for display.
-   * @param charset {@link Charset} instance associated with the label. {@code null} indicates to use default values.
-   */
-  public static record CharsetInfo(String label, Charset charset) {
-    /**
-     * Convenience function for creating a new {@link CharsetInfo} record from a label and a character set name.
-     *
-     * @param label       Menu item label.
-     * @param charsetName Name of the {@link Charset}.
-     * @return Initialized {@link CharsetInfo} instance.
-     * @throws IllegalArgumentException if a charset of the given name could not be created.
-     */
-    public static CharsetInfo of(String label, String charsetName) throws IllegalArgumentException {
-      return new CharsetInfo(label, Charset.forName(charsetName));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      CharsetInfo that = (CharsetInfo) o;
-      return Objects.equals(charset, that.charset);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(charset);
-    }
-
-    @Override
-    public String toString() {
-      return label;
-    }
   }
 }

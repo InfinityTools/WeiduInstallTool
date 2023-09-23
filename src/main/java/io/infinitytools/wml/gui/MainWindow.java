@@ -654,12 +654,18 @@ public class MainWindow extends Application {
    * Called whenever a key is pressed
    */
   private void onGlobalKeyPressed(KeyEvent event) {
+    final boolean isShortcut = event.isShortcutDown();
+    final boolean isShortcutOnly = isShortcut && !event.isAltDown() && !event.isShiftDown();
+
     switch (event.getCode()) {
-      case ENTER ->
-        // send input text to WeiDU process
+      case ENTER -> {
+        if (!isShortcut) {
+          // send input text to WeiDU process
           sendInput(getController().inputField.getText(), true);
+        }
+      }
       case Q -> {
-        if (event.isControlDown()) {
+        if (isShortcutOnly) {
           // signal to quit the app
           onCloseApplication(event);
         }
@@ -857,17 +863,24 @@ public class MainWindow extends Application {
    */
   private void sendInput(String text, boolean cleanup) {
     final String inputText = text + SystemInfo.NEWLINE;
-    if (isProcessRunning()) {
-      process.setInput(inputText);
-    }
 
+    String encodedText = null;
     try {
       // adding to output buffer ensures that charset switches won't discard the input text
-      outputBuffer.encode(inputText);
+      final byte[] data = outputBuffer.encode(inputText);
+
+      if (isProcessRunning()) {
+        process.setInput(data);
+      }
+
+      encodedText = BufferConvert.decodeBytes(data, outputBuffer.getCharset()).decoded();
     } catch (IOException e) {
       Logger.warn(e, "Encoding input text");
     }
-    appendOutputText(inputText, true);
+
+    if (encodedText != null) {
+      appendOutputText(encodedText, true);
+    }
 
     if (cleanup) {
       getController().inputField.setText("");

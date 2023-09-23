@@ -19,18 +19,13 @@ import org.tinylog.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -41,12 +36,12 @@ public class SysProc {
   /**
    * Storage for the total output of raw byte data since the start of the process.
    */
-  private final ByteArrayOutputStream outputRaw = new ByteArrayOutputStream(65536);
+  private final ByteArrayOutputStream output = new ByteArrayOutputStream(65536);
 
   /**
    * Temporary buffer for input text that is sent to the process.
    */
-  private final List<String> input = new ArrayList<>();
+  private final ConcurrentLinkedQueue<byte[]> input = new ConcurrentLinkedQueue<>();
 
   /**
    * Stores all SysProcOutputEvent handlers registered for this instance.
@@ -73,16 +68,10 @@ public class SysProc {
    */
   private final ReentrantLock outputLock = new ReentrantLock();
 
-  /**
-   * Used internally to synchronize handling input data.
-   */
-  private final ReentrantLock inputLock = new ReentrantLock();
-
   private final List<String> commands = new ArrayList<>();
 
   private Path workingDir;
   private boolean includeError;
-  private Charset charset;
 
   /**
    * Internally used to prevent executing the process multiple times.
@@ -96,19 +85,19 @@ public class SysProc {
 
   /**
    * Initializes a new process that can be executed by the {@link #execute()} method. Error stream is redirected to the
-   * output stream. Output data is treated as UTF-8 encoded text.
+   * output stream.
    *
    * @param command Array of strings containing the program and optional arguments.
    * @throws NullPointerException      if the program string is {@code null}.
    * @throws IndexOutOfBoundsException if the command array is empty.
    */
   public SysProc(String... command) {
-    this(null, true, null, command);
+    this(null, true, command);
   }
 
   /**
    * Initializes a new process that can be executed by the {@link #execute()} method. Error stream is redirected to the
-   * output stream. Output data is treated as UTF-8 encoded text.
+   * output stream.
    *
    * @param workingDir The working directory where the process should be invoked. Specify {@code null} to ignore.
    * @param command    Array of strings containing the program and optional arguments.
@@ -116,12 +105,11 @@ public class SysProc {
    * @throws IndexOutOfBoundsException if the command array is empty.
    */
   public SysProc(Path workingDir, String... command) {
-    this(workingDir, true, null, command);
+    this(workingDir, true, command);
   }
 
   /**
-   * Initializes a new process that can be executed by the {@link #execute()} method. Output data is treated as
-   * UTF-8 encoded text.
+   * Initializes a new process that can be executed by the {@link #execute()} method.
    *
    * @param workingDir   The working directory where the process should be invoked. Specify {@code null} to ignore.
    * @param includeError Whether to include the error stream in the output stream.
@@ -130,20 +118,6 @@ public class SysProc {
    * @throws IndexOutOfBoundsException if the command array is empty.
    */
   public SysProc(Path workingDir, boolean includeError, String... command) {
-    this(workingDir, includeError, null, command);
-  }
-
-  /**
-   * Initializes a new process that can be executed by the {@link #execute()} method.
-   *
-   * @param workingDir   The working directory where the process should be invoked. Specify {@code null} to ignore.
-   * @param includeError Whether to include the error stream in the output stream.
-   * @param cs           Character set for converting output data into text.
-   * @param command      Array of strings containing the program and optional arguments.
-   * @throws NullPointerException      if the program string is {@code null}.
-   * @throws IndexOutOfBoundsException if the command array is empty.
-   */
-  public SysProc(Path workingDir, boolean includeError, Charset cs, String... command) {
     if (command.length == 0 || command[0] == null) {
       throw new NullPointerException();
     }
@@ -151,7 +125,6 @@ public class SysProc {
     this.commands.addAll(Arrays.asList(command));
     setWorkingDirectory(workingDir);
     setIncludeError(includeError);
-    setCharset(cs);
   }
 
   /**
@@ -239,25 +212,6 @@ public class SysProc {
         }
       }
       this.workingDir = workingDir;
-    }
-  }
-
-  /**
-   * Returns the character set for converting input and output data from or to textual content.
-   */
-  public Charset getCharset() {
-    return charset;
-  }
-
-  /**
-   * Defines the character set for converting input and output data from or to textual content.
-   * Does nothing if the process is already being executed.
-   *
-   * @param charset {@link Charset} used by the external process.
-   */
-  public void setCharset(Charset charset) {
-    if (!isExecuted()) {
-      this.charset = (charset != null) ? charset : StandardCharsets.UTF_8;
     }
   }
 
@@ -373,16 +327,11 @@ public class SysProc {
   }
 
   /**
-   * Specifies input text that is sent to the process at the next occasion.
+   * Specifies input data as raw byte array that is sent to the process at the next occasion.
    */
-  public void setInput(String text) {
-    if (text != null) {
-      try {
-        inputLock.lock();
-        input.add(text);
-      } finally {
-        inputLock.unlock();
-      }
+  public void setInput(byte[] data) {
+    if (data != null) {
+      input.add(data);
     }
   }
 
@@ -392,7 +341,7 @@ public class SysProc {
   public byte[] getOutput() {
     try {
       outputLock.lock();
-      return outputRaw.toByteArray();
+      return output.toByteArray();
     } finally {
       outputLock.unlock();
     }
@@ -405,7 +354,7 @@ public class SysProc {
     if (processOutput != null) {
       try {
         outputLock.lock();
-        outputRaw.write(processOutput);
+        output.write(processOutput);
       } catch (IOException e) {
         Logger.error(e, "Writing process data to output buffer");
       } finally {
@@ -439,20 +388,12 @@ public class SysProc {
    * @return Whether input data was available.
    */
   private boolean sendUserInput(OutputStreamProducer producer) {
-    boolean retVal = false;
-    if (!input.isEmpty()) {
-      try {
-        inputLock.lock();
-        while (!input.isEmpty()) {
-          final String text = input.remove(0);
-          if (text != null) {
-            producer.sendInput(text);
-          }
-        }
-      } finally {
-        inputLock.unlock();
+    boolean retVal = !input.isEmpty();
+    while (!input.isEmpty()) {
+      final byte[] data = input.poll();
+      if (data != null) {
+        producer.sendInput(data);
       }
-      retVal = true;
     }
     return retVal;
   }
@@ -516,9 +457,10 @@ public class SysProc {
         pb.directory(workingDir.toFile());
       }
 
+
       process = pb.start();
       final InputStreamConsumer consumer = new InputStreamConsumer(process);
-      final OutputStreamProducer producer = new OutputStreamProducer(process, getCharset());
+      final OutputStreamProducer producer = new OutputStreamProducer(process);
 
       // process execution has started
       runAsync(() -> fireChangeEvent(SysProcChangeEvent.Type.Started));

@@ -17,51 +17,34 @@ package io.infinitytools.wml.process;
 
 import org.tinylog.Logger;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.OutputStream;
 import java.util.Objects;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A thread that is responsible for fetching data from the standard input of the main process and write it to the
  * input stream of the child process.
  */
 public class OutputStreamProducer implements Runnable {
-  private final List<String> input = new ArrayList<>();
-  private final ReentrantLock inputLock = new ReentrantLock();
+  private final ConcurrentLinkedQueue<byte[]> input = new ConcurrentLinkedQueue<>();
 
   private final Process process;
-  private final BufferedWriter writer;
   private final Thread runner;
 
   public OutputStreamProducer(Process process) {
-    this(process, StandardCharsets.UTF_8);
-  }
-
-  public OutputStreamProducer(Process process, Charset charset) {
     this.process = Objects.requireNonNull(process);
-    Charset charset1 = (charset != null) ? charset : StandardCharsets.UTF_8;
-    this.writer = this.process.outputWriter(charset1);
     this.runner = Thread.ofVirtual().start(this);
   }
 
   /**
-   * Sends the specified string to the underlying process at the next opportunity.
+   * Sends the specified raw byte data to the underlying process at the next opportunity.
    * Does nothing if the process has already been terminated.
    */
-  public void sendInput(String text) {
-    if (text != null && !text.isEmpty() && runner.isAlive()) {
-      try {
-        inputLock.lock();
-        input.add(text);
-        runner.interrupt();
-      } finally {
-        inputLock.unlock();
-      }
+  public void sendInput(byte[] data) {
+    if (data != null && data.length > 0 && runner.isAlive()) {
+      input.add(data);
+      runner.interrupt();
     }
   }
 
@@ -95,38 +78,29 @@ public class OutputStreamProducer implements Runnable {
    *                   operation. Otherwise, a flush occurs only when a line break is detected.
    */
   private void forward(boolean forceFlush) {
+    final OutputStream os = process.getOutputStream();
     if (!input.isEmpty()) {
-      // fetching input data
-      final String s;
-      try {
-        inputLock.lock();
-        s = String.join("", input);
-        input.clear();
-      } finally {
-        inputLock.unlock();
-      }
-
       // forwarding input to the process
-      if (!s.isEmpty()) {
-        s.chars().forEachOrdered(ch -> {
+      while (!input.isEmpty()) {
+        final byte[] data = input.poll();
+        for (final byte datum : data) {
+          final int value = datum & 0xff;
           try {
-            writer.write(ch);
-
-            // auto-flush at line break
-            if (ch == 0x0a) {
-              writer.flush();
+            os.write(value);
+            if (value == 0x0a) {
+              os.flush();
             }
           } catch (IOException e) {
-            Logger.error(e, "I/O error while writing input content to process stream");
+            Logger.error(e, "I/O error while writing input data to process output stream");
           }
-        });
+        }
       }
     }
 
     // unconditional flush as requested
     if (forceFlush) {
       try {
-        writer.flush();
+        os.flush();
       } catch (IOException ignored) {
       }
     }

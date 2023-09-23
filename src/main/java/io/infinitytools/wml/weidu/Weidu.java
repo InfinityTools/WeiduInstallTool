@@ -155,7 +155,7 @@ public class Weidu {
         long waitTime = 0;
         long waitTimeTotal = 0;
         while (sp.isRunning() && waitTimeTotal < 2000) {
-          sp.setInput(SystemInfo.NEWLINE);
+          sp.setInput(BufferConvert.encodeBytes(SystemInfo.NEWLINE));
           Thread.sleep(waitTime);
           waitTime = Math.min(waitTime + 1, 10L);
           waitTimeTotal += waitTime;

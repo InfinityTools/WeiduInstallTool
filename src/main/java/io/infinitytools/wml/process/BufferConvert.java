@@ -54,9 +54,9 @@ public class BufferConvert {
   /**
    * Decodes the specified raw byte data into a string. The data is assumed to be UTF-8 encoded.
    *
-   * @param data    Raw byte array.
+   * @param data Raw byte array.
    * @return A {@link DecodedData} record consisting of the decoded text data and, optionally, remaining undecoded bytes.
-   * @throws NullPointerException if {@code data} is null.
+   * @throws NullPointerException if {@code data} is {@code null}.
    */
   public static DecodedData decodeBytes(byte[] data) {
     return decodeBytes(data, StandardCharsets.UTF_8);
@@ -69,7 +69,7 @@ public class BufferConvert {
    * @param charset {@link Charset} used to decode bytes into characters. Specify {@code null} to use the default
    *                charset (UTF-8).
    * @return A {@link DecodedData} record consisting of the decoded text data and, optionally, remaining undecoded bytes.
-   * @throws NullPointerException if {@code data} is null.
+   * @throws NullPointerException if {@code data} is {@code null}.
    */
   public static DecodedData decodeBytes(byte[] data, Charset charset) {
     try {
@@ -90,7 +90,7 @@ public class BufferConvert {
    *                    {@code false} to drop the faulty data and add a replacement character instead.
    * @return A {@link DecodedData} record consisting of the decoded text data and, optionally, remaining undecoded bytes.
    * @throws IOException          If {@code failOnError} is {@code true} and a coding error occurs.
-   * @throws NullPointerException if {@code data} is null.
+   * @throws NullPointerException if {@code data} is {@code null}.
    */
   public static DecodedData decodeBytes(byte[] data, Charset charset, boolean failOnError) throws IOException {
     Objects.requireNonNull(data, "data is null");
@@ -104,6 +104,97 @@ public class BufferConvert {
     decoder.onMalformedInput(action);
 
     return decodeData(data, decoder);
+  }
+
+  /**
+   * Encodes the specified text into a raw byte array through the UTF-8 charset encoder.
+   *
+   * @param text        Text to convert.
+   * @return Byte array representation of the text string.
+   * @throws NullPointerException if {@code text} is {@code null}.
+   */
+  public static byte[] encodeBytes(String text) {
+    return encodeBytes(text, StandardCharsets.UTF_8);
+  }
+
+  /**
+   * Encodes the specified text with the given character set into a raw byte array.
+   *
+   * @param text        Text to convert.
+   * @param charset     {@link Charset} used to encode characters into bytes. Specify {@code null} to use the default
+   *                    charset (UTF-8).
+   * @return Byte array representation of the text string.
+   * @throws NullPointerException if {@code text} is {@code null}.
+   */
+  public static byte[] encodeBytes(String text, Charset charset) {
+    try {
+      return encodeBytes(text, charset, false);
+    } catch (IOException e) {
+      Logger.debug(e, "Encoding data (ignored)");
+    }
+    return new byte[0];
+  }
+
+  /**
+   * Encodes the specified text with the given character set into a raw byte array.
+   *
+   * @param text        Text to convert.
+   * @param charset     {@link Charset} used to encode characters into bytes. Specify {@code null} to use the default
+   *                    charset (UTF-8).
+   * @param failOnError Specify {@code true} to throw an exception when undecodable characters are encountered. Specify
+   *                    {@code false} to skip the character instead.
+   * @return Byte array representation of the text string.
+   * @throws IOException          If {@code failOnError} is {@code true}} and a coding error occurs.
+   * @throws NullPointerException if {@code text} is {@code null}.
+   */
+  public static byte[] encodeBytes(String text, Charset charset, boolean failOnError) throws IOException {
+    Objects.requireNonNull(text, "string is null");
+    if (charset == null) {
+      charset = StandardCharsets.UTF_8;
+    }
+
+    final CharsetEncoder encoder = charset.newEncoder();
+    final CodingErrorAction action = failOnError ? CodingErrorAction.REPORT : CodingErrorAction.REPLACE;
+    encoder.onUnmappableCharacter(action);
+    encoder.onMalformedInput(action);
+
+    final CharBuffer cb = CharBuffer.wrap(text);
+    final ByteBuffer bb = encoder.encode(cb);
+
+    final byte[] retVal = new byte[bb.limit()];
+    if (bb.limit() > 0) {
+      bb.get(0, retVal);
+    }
+
+    return retVal;
+  }
+
+  /**
+   * Used internally to decode byte data into text.
+   *
+   * @param data    byte data to convert.
+   * @param decoder {@link CharsetDecoder} instance for decoding byte data to text.
+   * @return A {@link DecodedData} structure that contains both decoded text and remaining undecodable bytes.
+   * @throws IOException If a decoding error occurs.
+   */
+  private static DecodedData decodeData(byte[] data, CharsetDecoder decoder) throws IOException {
+    String text = "";
+    byte[] remaining = null;
+
+    if (data != null) {
+      final ByteBuffer bb = ByteBuffer.wrap(data);
+      final CharBuffer cb = decoder.decode(bb);
+
+      // remaining undecodable bytes are stored for the next pass
+      if (bb.limit() < bb.capacity()) {
+        remaining = Arrays.copyOfRange(data, bb.limit(), bb.capacity());
+      }
+
+      // decoded text can be retrieved until the next call of this method
+      text = cb.toString();
+    }
+
+    return new DecodedData(text, remaining);
   }
 
   public BufferConvert() {
@@ -254,8 +345,8 @@ public class BufferConvert {
    * Encodes the specified string into a byte array, using the current {@link Charset}, and adds it to the
    * accumulated content class of this instance.
    * <p>
-   *   A subsequent call of {@link #getLastText()} will return the text encoded by this method, optionally prepended by
-   *   content from the remaining bytes of the last {@link #decode(byte[])} operation.
+   * A subsequent call of {@link #getLastText()} will return the text encoded by this method, optionally prepended by
+   * content from the remaining bytes of the last {@link #decode(byte[])} operation.
    * </p>
    *
    * @param text Text to convert using the current {@link Charset}.
@@ -263,20 +354,9 @@ public class BufferConvert {
    * @throws IOException if an I/O error occurs.
    */
   public byte[] encode(String text) throws IOException {
-    if (text != null && !text.isEmpty()) {
-      final CharsetEncoder encoder = getCharset().newEncoder();
-      encoder.onMalformedInput(CodingErrorAction.REPLACE);
-      encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
-      final CharBuffer cb = CharBuffer.wrap(text);
-      final ByteBuffer bb = encoder.encode(cb);
-
-      final byte[] data = new byte[bb.limit()];
-      bb.get(0, data);
-      decode(data);
-      return data;
-    } else {
-      return new byte[0];
-    }
+    final byte[] retVal = encodeBytes(text, getCharset(), isFailOnError());
+    decode(retVal);
+    return retVal;
   }
 
   /**
@@ -298,33 +378,5 @@ public class BufferConvert {
     } finally {
       bufferLock.unlock();
     }
-  }
-
-  /**
-   * Used internally to decode byte data into text.
-   *
-   * @param data    byte data to convert.
-   * @param decoder {@link CharsetDecoder} instance for decoding byte data to text.
-   * @return A {@link DecodedData} structure that contains both decoded text and remaining undecodable bytes.
-   * @throws IOException If a decoding error occurs.
-   */
-  private static DecodedData decodeData(byte[] data, CharsetDecoder decoder) throws IOException {
-    String text = "";
-    byte[] remaining = null;
-
-    if (data != null) {
-      final ByteBuffer bb = ByteBuffer.wrap(data);
-      final CharBuffer cb = decoder.decode(bb);
-
-      // remaining undecodable bytes are stored for the next pass
-      if (bb.limit() < bb.capacity()) {
-        remaining = Arrays.copyOfRange(data, bb.limit(), bb.capacity());
-      }
-
-      // decoded text can be retrieved until the next call of this method
-      text = cb.toString();
-    }
-
-    return new DecodedData(text, remaining);
   }
 }
