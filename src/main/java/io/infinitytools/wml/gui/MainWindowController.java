@@ -18,8 +18,12 @@ package io.infinitytools.wml.gui;
 import io.infinitytools.wml.utils.R;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import org.tinylog.Logger;
 
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable {
@@ -32,6 +36,16 @@ public class MainWindowController implements Initializable {
   public TextField inputField;
   public Button sendButton;
   public Button aboutButton;
+  public Button inputDigit0Button;
+  public Button inputDigit1Button;
+  public Button inputDigit2Button;
+  public Button inputDigit3Button;
+  public Button inputDigit4Button;
+  public Button inputDigit5Button;
+  public Button inputDigit6Button;
+  public Button inputDigit7Button;
+  public Button inputDigit8Button;
+  public Button inputDigit9Button;
   public Button inputQuitButton;
   public Button inputAskButton;
   public Button inputSkipButton;
@@ -54,6 +68,12 @@ public class MainWindowController implements Initializable {
   public Slider bufferSizeSlider;
   public Label bufferSizeValueLabel;
 
+  /**
+   * Set of all quick input button instances for automated access.
+   * Initialized in the {@link #initInputButtons()} method.
+   */
+  public final HashSet<Button> inputButtons = new HashSet<>();
+
   public CharsetMenu outputCharsetMenu;
 
   public MainWindowController() {
@@ -62,6 +82,7 @@ public class MainWindowController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     initContextMenu();
+    initInputButtons();
   }
 
   /**
@@ -87,5 +108,42 @@ public class MainWindowController implements Initializable {
 
     outputArea.getContextMenu().getItems().add(new SeparatorMenuItem());
     outputArea.getContextMenu().getItems().addAll(outputCharsetMenu.getItems());
+  }
+
+  /**
+   * Configures quick input buttons.
+   */
+  private void initInputButtons() {
+    // assigning user data to quick input letters
+    final String[] keys = {"Quit", "Ask", "Skip", "Reinstall", "Uninstall", "Install", "No", "Yes"};
+    for (final String key : keys) {
+      try {
+        final Field field = MainWindowController.class.getField("input" + key + "Button");
+        if (field.get(this) instanceof Button b) {
+          inputButtons.add(b);
+          // Shortcut key: first letter of the command string
+          final String letter = Character.toString(key.charAt(0)).toLowerCase(Locale.ROOT);
+          b.setUserData(letter);
+        }
+      } catch (IllegalAccessException | NoSuchFieldException e) {
+        Logger.debug(e, "Setting user data for input letter buttons");
+      }
+    }
+
+    // assigning tooltips and user data to quick input digits
+    final String fmt = R.get("ui.main.inputDigit.button.tooltip");
+    for (int i = 0; i < 10; i++) {
+      try {
+        final Field field = MainWindowController.class.getField("inputDigit" + i + "Button");
+        if (field.get(this) instanceof Button b) {
+          inputButtons.add(b);
+          b.setTooltip(new Tooltip(String.format(fmt, i)));
+          // Shortcut key: digit
+          b.setUserData(Integer.toString(i));
+        }
+      } catch (IllegalAccessException | NoSuchFieldException e) {
+        Logger.debug(e, "Setting tooltip and user data for input digit buttons");
+      }
+    }
   }
 }

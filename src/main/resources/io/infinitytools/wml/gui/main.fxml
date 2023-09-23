@@ -205,27 +205,91 @@
     </Button>
   </HBox>
 
-  <!-- Grid(1, 0): empty placeholder -->
-  <Pane GridPane.columnIndex="1"
-        GridPane.rowIndex="0"/>
+  <!-- Grid(1, 0): Details window toggle button -->
+  <ToggleButton fx:id="detailsButton"
+                text="%ui.main.details.button"
+                maxWidth="Infinity"
+                maxHeight="Infinity"
+                GridPane.columnIndex="1"
+                GridPane.rowIndex="0">
+    <tooltip>
+      <Tooltip text="%ui.main.details.button.tooltip"/>
+    </tooltip>
+  </ToggleButton>
 
   <!-- Grid(1, 1): Toolbar -->
-  <VBox alignment="TOP_CENTER"
+  <VBox alignment="BOTTOM_CENTER"
         spacing="8"
         GridPane.columnIndex="1"
         GridPane.rowIndex="1"
         GridPane.halignment="CENTER">
-    <ToggleButton fx:id="detailsButton"
-                  text="%ui.main.details.button"
-                  maxWidth="Infinity">
-      <tooltip>
-        <Tooltip text="%ui.main.details.button.tooltip"/>
-      </tooltip>
-    </ToggleButton>
-    <Pane VBox.vgrow="ALWAYS"/>
     <Label text="%ui.main.quickInput.label"
            alignment="CENTER"
            styleClass="boldLabel"/>
+    <GridPane hgap="4"
+              vgap="4" alignment="CENTER">
+      <Button fx:id="inputDigit7Button"
+              text="_7"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="0"/>
+      <Button fx:id="inputDigit8Button"
+              text="_8"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="1"
+              GridPane.rowIndex="0"/>
+      <Button fx:id="inputDigit9Button"
+              text="_9"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="2"
+              GridPane.rowIndex="0"/>
+      <Button fx:id="inputDigit4Button"
+              text="_4"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="1"/>
+      <Button fx:id="inputDigit5Button"
+              text="_5"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="1"
+              GridPane.rowIndex="1"/>
+      <Button fx:id="inputDigit6Button"
+              text="_6"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="2"
+              GridPane.rowIndex="1"/>
+      <Button fx:id="inputDigit1Button"
+              text="_1"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="2"/>
+      <Button fx:id="inputDigit2Button"
+              text="_2"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="1"
+              GridPane.rowIndex="2"/>
+      <Button fx:id="inputDigit3Button"
+              text="_3"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="2"
+              GridPane.rowIndex="2"/>
+      <Button fx:id="inputDigit0Button"
+              text="_0"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnSpan="3"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="3"/>
+    </GridPane>
     <Button fx:id="inputQuitButton"
             text="%ui.main.inputQuit.button"
             maxWidth="Infinity">

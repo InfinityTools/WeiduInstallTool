@@ -681,14 +681,7 @@ public class MainWindow extends Application {
   private void setWeiduRunning() {
     updateWindowTitle(true);
     getController().quitButton.setText(R.get("ui.main.terminate.button"));
-    getController().inputQuitButton.setDisable(false);
-    getController().inputAskButton.setDisable(false);
-    getController().inputSkipButton.setDisable(false);
-    getController().inputReinstallButton.setDisable(false);
-    getController().inputUninstallButton.setDisable(false);
-    getController().inputInstallButton.setDisable(false);
-    getController().inputNoButton.setDisable(false);
-    getController().inputYesButton.setDisable(false);
+    getController().inputButtons.forEach(button -> button.setDisable(false));
   }
 
   /**
@@ -697,14 +690,7 @@ public class MainWindow extends Application {
   private void setWeiduTerminated() {
     updateWindowTitle(true);
     getController().quitButton.setText(R.get("ui.main.quit.button"));
-    getController().inputQuitButton.setDisable(true);
-    getController().inputAskButton.setDisable(true);
-    getController().inputSkipButton.setDisable(true);
-    getController().inputReinstallButton.setDisable(true);
-    getController().inputUninstallButton.setDisable(true);
-    getController().inputInstallButton.setDisable(true);
-    getController().inputNoButton.setDisable(true);
-    getController().inputYesButton.setDisable(true);
+    getController().inputButtons.forEach(button -> button.setDisable(true));
   }
 
   /**
@@ -948,38 +934,14 @@ public class MainWindow extends Application {
     getController().aboutButton.setOnAction(event -> showAboutDialog());
     getController().sendButton.setOnAction(event -> sendInput(getController().inputField.getText(), true));
 
-    // shortcut buttons
-    getController().inputQuitButton.setOnAction(event -> {
-      sendInput("q", false);
-      event.consume();
-    });
-    getController().inputAskButton.setOnAction(event -> {
-      sendInput("a", false);
-      event.consume();
-    });
-    getController().inputSkipButton.setOnAction(event -> {
-      sendInput("s", false);
-      event.consume();
-    });
-    getController().inputReinstallButton.setOnAction(event -> {
-      sendInput("r", false);
-      event.consume();
-    });
-    getController().inputUninstallButton.setOnAction(event -> {
-      sendInput("u", false);
-      event.consume();
-    });
-    getController().inputInstallButton.setOnAction(event -> {
-      sendInput("i", false);
-      event.consume();
-    });
-    getController().inputNoButton.setOnAction(event -> {
-      sendInput("n", false);
-      event.consume();
-    });
-    getController().inputYesButton.setOnAction(event -> {
-      sendInput("y", false);
-      event.consume();
+    // initializing input shortcut buttons
+    getController().inputButtons.forEach(button -> {
+      button.setOnAction(event -> {
+        if (button.getUserData() instanceof String s) {
+          sendInput(s, false);
+          event.consume();
+        }
+      });
     });
 
     // setting initial window title
