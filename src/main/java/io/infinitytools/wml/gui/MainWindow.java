@@ -1265,11 +1265,13 @@ public class MainWindow extends Application {
         }
         appendOutputText(helpDesc, false);
       } else {
-        Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.weiduHelp.message.header"), null);
+        Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.weiduHelp.message.header"),
+            R.get("ui.main.weiduHelp.message.content.process"));
       }
     } catch (Exception e) {
       Logger.debug(e, "Error showing WeiDU help");
-      Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.weiduHelp.message.header"), null);
+      Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.weiduHelp.message.header"),
+          String.format(R.get("ui.main.weiduHelp.message.content.exception"), e.getMessage()));
     } finally {
       setWeiduTerminated();
     }
