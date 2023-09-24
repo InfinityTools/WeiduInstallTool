@@ -126,7 +126,7 @@ public class CharsetMenu {
      */
     DEFAULT(new CharsetInfo(R.get("ui.charsets.default"), null), Region.DEFAULT),
     CP850(CharsetInfo.of(String.format("CP850 (DOS, %s)", R.get("ui.charsets.westernEuropean")), "IBM850"), Region.WESTERN_EUROPE),
-    CP860(CharsetInfo.of(String.format("CP850 (DOS, %s)", R.get("ui.charsets.portuguese")), "IBM850"), Region.WESTERN_EUROPE),
+    CP860(CharsetInfo.of(String.format("CP860 (DOS, %s)", R.get("ui.charsets.portuguese")), "IBM860"), Region.WESTERN_EUROPE),
     CP437(CharsetInfo.of(String.format("CP437 (DOS, %s)", R.get("ui.charsets.english")), "IBM437"), Region.WESTERN_EUROPE),
     WINDOWS_1252(CharsetInfo.of(String.format("Windows-1252 (Windows, %s)", R.get("ui.charsets.westernEuropean")), "windows-1252"), Region.WESTERN_EUROPE),
     CP852(CharsetInfo.of(String.format("CP852 (DOS, %s)", R.get("ui.charsets.centralEuropean")), "IBM852"), Region.CENTRAL_EUROPE),
