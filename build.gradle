@@ -1,4 +1,4 @@
-import org.gradle.internal.os.OperatingSystem
+import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
   id 'java'
@@ -15,9 +15,8 @@ repositories {
   mavenCentral()
 }
 
-//def appTitle
-def appName
-def projectUrl
+String appName
+String projectUrl
 
 ext {
   junitVersion = '5.9.2'
@@ -26,9 +25,8 @@ ext {
   Properties _props = new Properties()
   _props.load(file("src/main/resources/globals.properties").newDataInputStream())
   project.version = _props.getProperty("version")
-//  appTitle = _props.getProperty("title", "WeiDU Mod Launcher")
   appName = _props.getProperty("name", "WeiduModLauncher")
-  projectUrl = _props.getProperty("project", "https://github.com/InfinityTools/wml")
+  projectUrl = _props.getProperty("project", "https://github.com/InfinityTools/WeiduModLauncher")
 }
 
 java {
@@ -38,16 +36,16 @@ java {
 }
 
 // remove when switching to JDK 21
-def ENABLE_PREVIEW = "--enable-preview"
+final String ENABLE_PREVIEW = "--enable-preview"
 // Workaround for accessing GitHub API
-def TLS_PROTOCOL = "-Djdk.tls.client.protocols=TLSv1.2"
+final String TLS_PROTOCOL = "-Djdk.tls.client.protocols=TLSv1.2"
 
 tasks.withType(JavaCompile).configureEach {
   options.compilerArgs += ENABLE_PREVIEW
   options.compilerArgs += "-Xlint:preview"
   options.encoding = 'UTF-8'
   options.debugOptions.setDebugLevel("source,lines,vars")
-//  options.debug = true
+  options.debug = false
 }
 
 tasks.withType(Test).configureEach {
@@ -88,6 +86,8 @@ dependencies {
 //  useJUnitPlatform()
 //}
 
+String distFolder = "distribution"
+
 jlink {
   imageZip.fileValue(project.file("${layout.buildDirectory}/distributions/app-${javafx.platform.classifier}.zip"))
   addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
@@ -99,6 +99,8 @@ jlink {
   }
 
   jpackage {
+    outputDir = distFolder
+
     jvmArgs = [
             ENABLE_PREVIEW,
             TLS_PROTOCOL
@@ -106,12 +108,11 @@ jlink {
 
     installerOptions = [
             "--verbose",
-            "--app-version", "${project.version}",
             "--copyright", "Copyright © 2023 Argent77",
             "--description", "A graphical front end for WeiDU.",
     ]
 
-    if (OperatingSystem.current().isWindows()) {
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
       imageOptions = [
               "--icon", "${projectDir}/buildres/windows/wml.ico"
       ]
@@ -127,11 +128,11 @@ jlink {
               "--win-menu",
               "--about-url", "${projectUrl}"
       ])
-    } else if (OperatingSystem.current().isLinux()) {
+    } else if (Os.isFamily(Os.FAMILY_UNIX)) {
       imageOptions = [
               "--icon", "${projectDir}/src/main/resources/io/infinitytools/wml/icons/icon/256x256.png",
       ]
-      // Let jpackage determine output format automatically (for now)
+      // Let jpackage determine output format automatically
       // installerType = "deb"
       installerOptions.addAll([
               "--resource-dir", "${projectDir}/buildres/linux",
@@ -139,7 +140,10 @@ jlink {
               "--linux-rpm-license-type", "Apache-2.0",
               "--linux-shortcut"
       ])
-    } else if (OperatingSystem.current().isMacOsX()) {
+    } else if (Os.isFamily(Os.FAMILY_MAC)) {
+      // macOS installer requires a version number >= 1.0.0
+      appVersion = project.version.toString().startsWith("0.") ? "1.0.0" : project.version
+
       imageOptions = [
               "--icon", "${projectDir}/buildres/macos/wml.icns",
       ]
@@ -151,4 +155,45 @@ jlink {
       ])
     }
   }
+}
+
+// Creates a portable zip archive from the jpackage image resources.
+tasks.register('portableZip', Zip) {
+  dependsOn ':jpackageImage'
+
+  archiveFileName = "${appName}-portable-${getOsName()}-${version}.zip"
+  destinationDirectory = layout.buildDirectory.dir(distFolder)
+
+  from(layout.buildDirectory.dir("${distFolder}/${appName}")) {
+    into appName
+  }
+}
+
+// Creates a portable gzip-compressed tar archive from the jpackage image resources.
+tasks.register('portableTar', Tar) {
+  dependsOn ':jpackageImage'
+
+  archiveFileName = "${appName}-portable-${getOsName()}-${version}.tar.gz"
+  destinationDirectory = layout.buildDirectory.dir(distFolder)
+  compression = Compression.GZIP
+
+  from(layout.buildDirectory.dir("${distFolder}/${appName}")) {
+    into appName
+  }
+}
+
+// Returns a short identifier string for the current operating system.
+static String getOsName() {
+  String platform
+  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    platform = "win"
+  } else if (Os.isFamily(Os.FAMILY_UNIX)) {
+    platform = "linux"
+  } else if (Os.isFamily(Os.FAMILY_MAC)) {
+    platform = "macos"
+  } else {
+    platform = "unknown"
+  }
+
+  return platform
 }
