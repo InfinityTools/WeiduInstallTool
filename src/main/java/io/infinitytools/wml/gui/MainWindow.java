@@ -147,141 +147,6 @@ public class MainWindow extends Application {
     }
   }
 
-  /**
-   * Performs WeiDU binary download with UI feedback.
-   *
-   * @param overwrite Whether an existing binary should be overwritten.
-   * @return Success state of the operation.
-   * @throws IOException                  if the progress dialog could not be initialized.
-   * @throws ProgressDialog.TaskException if the task was prematurely terminated by an error.
-   */
-  private boolean downloadWeidu(boolean overwrite) throws IOException, ProgressDialog.TaskException {
-    return ProgressDialog.performTask(null, R.get("ui.checkWeidu.downloadProgress.title"),
-        R.get("ui.checkWeidu.downloadProgress.message"),
-        dlg -> {
-          final String weiduFileName = Weidu.WEIDU_NAME + SystemInfo.EXE_SUFFIX;
-          final Path targetDir = Globals.APP_DATA_PATH
-              .resolve(Weidu.WEIDU_NAME)
-              .resolve(SystemInfo.getPlatform().toString())
-              .resolve(SystemInfo.getArchitecture().toString());
-          Weidu.installWeidu(weiduFileName, targetDir, overwrite, (note, progress) -> {
-            dlg.setNote(note);
-            dlg.setProgress(progress);
-            return !dlg.isCancelled();
-          });
-
-          if (overwrite) {
-            // prefer new WeiDU executable
-            Configuration.getInstance().setOption(Configuration.Key.WEIDU_PATH, null);
-          }
-        });
-  }
-
-  /**
-   * Performs a WeiDU binary check and may attempt to download the binary or request it from the user if necessary.
-   *
-   * @throws Exception if the WeiDU binary could not be found on the system.
-   */
-  private Weidu checkWeidu() throws Exception {
-    final ButtonType downloadButton = new ButtonType(R.get("ui.checkWeidu.download.button"), ButtonBar.ButtonData.YES);
-    final ButtonType selectButton = new ButtonType(R.get("ui.checkWeidu.choose.button"), ButtonBar.ButtonData.NO);
-    final ButtonType cancelButton = new ButtonType(R.get("ui.checkWeidu.cancel.button"), ButtonBar.ButtonData.CANCEL_CLOSE);
-    final ButtonType keepButton = new ButtonType(R.get("ui.checkWeidu.keep.button"), ButtonBar.ButtonData.CANCEL_CLOSE);
-
-    boolean updateBinary = false;
-    String questionHeader = R.get("ui.checkWeidu.message.notFound.header");
-    String questionContent = R.get("ui.checkWeidu.message.notFound.content");
-    final ButtonType[] questionButtons = {downloadButton, selectButton, cancelButton};
-
-    // 1. check local system
-    final Exception exception; // may be thrown later
-    try {
-      final Weidu.Version versionFound = Weidu.getInstance().getVersion();
-      if (versionFound != null) {
-        final Weidu.Version versionRecommended = Weidu.Version.of(Weidu.getProperty(Weidu.PROP_WEIDU_VERSION));
-        Logger.debug("WeiDU version (found: {}, recommended: {}, cmp value: {})",
-            versionFound, versionRecommended, versionFound.compareTo(versionRecommended));
-
-        if (versionFound.compareTo(versionRecommended) < 0) {
-          // notify about outdated WeiDU version
-          updateBinary = true;
-          questionHeader = String.format(R.get("ui.checkWeidu.message.foundOutdated.header"),
-              versionFound.major(), versionRecommended.major());
-          questionContent = R.get("ui.checkWeidu.message.foundOutdated.content");
-          questionButtons[questionButtons.length - 1] = keepButton;
-          throw new UnsupportedOperationException("Outdated WeiDU version found: " + versionFound);
-        }
-      } else {
-        Logger.debug("Not a valid WeiDU binary: {}", Weidu.getInstance().getWeidu());
-      }
-      return Weidu.getInstance();
-    } catch (UnsupportedOperationException e) {
-      Logger.debug(e, "Local WeiDU binary instance not found");
-      exception = e;
-    }
-
-    // ask user before downloading binary
-    final ButtonType result = Utils.showCustomDialog(null, Alert.AlertType.CONFIRMATION,
-        R.QUESTION(), questionHeader, questionContent, questionButtons);
-
-    if (result == cancelButton) {
-      // Install: cancel install operation
-      throw exception;
-    }
-
-    if (result == keepButton) {
-      // Update: cancel update operation
-      return Weidu.getInstance();
-    }
-
-    // Discard previously cached WeiDU executable
-    Weidu.reset();
-
-    if (result == downloadButton) {
-      // Install/Update: download from WeiDU release page
-      try {
-        boolean retVal = downloadWeidu(updateBinary);
-        Logger.debug("Download WeiDU result: {}", retVal);
-      } catch (ProgressDialog.TaskException e) {
-        Logger.error(e, "Download WeiDU terminated prematurely");
-      } catch (Exception e) {
-        Logger.warn(e, "Download WeiDU internal error: no further actions required");
-      }
-
-      try {
-        return Weidu.getInstance();
-      } catch (UnsupportedOperationException e) {
-        Logger.debug(e, "After download: Local Weidu binary instance not found");
-      }
-
-      final ButtonType confirmType = Utils.showConfirmationDialog(null,
-          R.get("ui.checkWeidu.message.choose.title"),
-          R.get("ui.checkWeidu.message.choose.header"),
-          R.get("ui.checkWeidu.message.choose.content"));
-      if (confirmType != ButtonType.OK) {
-        throw new Exception("WeiDU executable selection cancelled by the user.");
-      }
-    }
-
-    // Install/Update: allow user to choose WeiDU binary path
-    final Path binPath = Utils.chooseOpenFile(null, R.get("ui.checkWeidu.fileDialog.choose.title"),
-        SystemInfo.getUserPath(),
-        new FileChooser.ExtensionFilter(R.get("ui.checkWeidu.fileDialog.choose.filter.weidu"),
-            Weidu.WEIDU_NAME + SystemInfo.EXE_SUFFIX),
-        new FileChooser.ExtensionFilter(R.get("ui.checkWeidu.fileDialog.choose.filter.executable"),
-            "*" + SystemInfo.EXE_SUFFIX));
-    if (binPath != null) {
-      Configuration.getInstance().setOption(Configuration.Key.WEIDU_PATH, binPath.toString());
-      return Weidu.getInstance();
-    } else {
-      try {
-        return Weidu.getInstance();
-      } catch (UnsupportedOperationException e) {
-        throw new Exception("WeiDU executable selection cancelled by the user.");
-      }
-    }
-  }
-
   @Override
   public void start(Stage stage) throws Exception {
     // Loading configuration; must be done before the UI is initialized
@@ -1047,6 +912,141 @@ public class MainWindow extends Application {
   private void handleProcessError(String message) {
     Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.message.process.header"),
         String.format("%s\n%s", R.get("ui.main.message.process.content"), message));
+  }
+
+  /**
+   * Performs WeiDU binary download with UI feedback.
+   *
+   * @param overwrite Whether an existing binary should be overwritten.
+   * @return Success state of the operation.
+   * @throws IOException                  if the progress dialog could not be initialized.
+   * @throws ProgressDialog.TaskException if the task was prematurely terminated by an error.
+   */
+  private boolean downloadWeidu(boolean overwrite) throws IOException, ProgressDialog.TaskException {
+    return ProgressDialog.performTask(null, R.get("ui.checkWeidu.downloadProgress.title"),
+        R.get("ui.checkWeidu.downloadProgress.message"),
+        dlg -> {
+          final String weiduFileName = Weidu.WEIDU_NAME + SystemInfo.EXE_SUFFIX;
+          final Path targetDir = Globals.APP_DATA_PATH
+              .resolve(Weidu.WEIDU_NAME)
+              .resolve(SystemInfo.getPlatform().toString())
+              .resolve(SystemInfo.getArchitecture().toString());
+          Weidu.installWeidu(weiduFileName, targetDir, overwrite, (note, progress) -> {
+            dlg.setNote(note);
+            dlg.setProgress(progress);
+            return !dlg.isCancelled();
+          });
+
+          if (overwrite) {
+            // prefer new WeiDU executable
+            Configuration.getInstance().setOption(Configuration.Key.WEIDU_PATH, null);
+          }
+        });
+  }
+
+  /**
+   * Performs a WeiDU binary check and may attempt to download the binary or request it from the user if necessary.
+   *
+   * @throws Exception if the WeiDU binary could not be found on the system.
+   */
+  private Weidu checkWeidu() throws Exception {
+    final ButtonType downloadButton = new ButtonType(R.get("ui.checkWeidu.download.button"), ButtonBar.ButtonData.YES);
+    final ButtonType chooseButton = new ButtonType(R.get("ui.checkWeidu.choose.button"), ButtonBar.ButtonData.NO);
+    final ButtonType cancelButton = new ButtonType(R.get("ui.checkWeidu.cancel.button"), ButtonBar.ButtonData.CANCEL_CLOSE);
+    final ButtonType keepButton = new ButtonType(R.get("ui.checkWeidu.keep.button"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+    boolean updateBinary = false;
+    String questionHeader = R.get("ui.checkWeidu.message.notFound.header");
+    String questionContent = R.get("ui.checkWeidu.message.notFound.content");
+    final ButtonType[] questionButtons = {downloadButton, chooseButton, cancelButton};
+
+    // 1. check local system
+    final Exception exception; // may be thrown later
+    try {
+      final Weidu.Version versionFound = Weidu.getInstance().getVersion();
+      if (versionFound != null) {
+        final Weidu.Version versionRecommended = Weidu.Version.of(Weidu.getProperty(Weidu.PROP_WEIDU_VERSION));
+        Logger.debug("WeiDU version (found: {}, recommended: {})", versionFound, versionRecommended);
+
+        if (versionFound.compareTo(versionRecommended) < 0) {
+          // notify about outdated WeiDU version
+          updateBinary = true;
+          questionHeader = String.format(R.get("ui.checkWeidu.message.foundOutdated.header"),
+              versionFound.major(), versionRecommended.major());
+          questionContent = R.get("ui.checkWeidu.message.foundOutdated.content");
+          questionButtons[questionButtons.length - 1] = keepButton;
+          throw new UnsupportedOperationException("Outdated WeiDU version found: " + versionFound);
+        }
+      } else {
+        Logger.debug("Not a valid WeiDU binary: {}", Weidu.getInstance().getWeidu());
+        throw new UnsupportedOperationException("Not a WeiDU binary");
+      }
+      return Weidu.getInstance();
+    } catch (UnsupportedOperationException e) {
+      Logger.debug(e, "Local WeiDU binary instance not found");
+      exception = e;
+    }
+
+    // ask user before downloading binary
+    final ButtonType result = Utils.showCustomDialog(null, Alert.AlertType.CONFIRMATION,
+        R.QUESTION(), questionHeader, questionContent, questionButtons);
+
+    if (result == cancelButton) {
+      // Install: cancel install operation
+      throw exception;
+    }
+
+    if (result == keepButton) {
+      // Update: cancel update operation
+      return Weidu.getInstance();
+    }
+
+    // Discard previously cached WeiDU executable
+    Weidu.reset();
+
+    if (result == downloadButton) {
+      // Install/Update: download from WeiDU release page
+      try {
+        boolean retVal = downloadWeidu(updateBinary);
+        Logger.debug("Download WeiDU result: {}", retVal);
+      } catch (ProgressDialog.TaskException e) {
+        Logger.error(e, "Download WeiDU terminated prematurely");
+      } catch (Exception e) {
+        Logger.warn(e, "Download WeiDU internal error: no further actions required");
+      }
+
+      try {
+        return Weidu.getInstance();
+      } catch (UnsupportedOperationException e) {
+        Logger.debug(e, "After download: Local Weidu binary instance not found");
+      }
+
+      final ButtonType confirmType = Utils.showConfirmationDialog(null,
+          R.get("ui.checkWeidu.message.choose.title"),
+          R.get("ui.checkWeidu.message.choose.header"),
+          R.get("ui.checkWeidu.message.choose.content"));
+      if (confirmType != ButtonType.OK) {
+        throw new Exception("WeiDU executable selection cancelled by the user.");
+      }
+    }
+
+    // Install/Update: allow user to choose WeiDU binary path
+    final Path binPath = Utils.chooseOpenFile(null, R.get("ui.checkWeidu.fileDialog.choose.title"),
+        SystemInfo.getUserPath(),
+        new FileChooser.ExtensionFilter(R.get("ui.checkWeidu.fileDialog.choose.filter.weidu"),
+            Weidu.WEIDU_NAME + SystemInfo.EXE_SUFFIX),
+        new FileChooser.ExtensionFilter(R.get("ui.checkWeidu.fileDialog.choose.filter.executable"),
+            "*" + SystemInfo.EXE_SUFFIX));
+    if (binPath != null) {
+      Configuration.getInstance().setOption(Configuration.Key.WEIDU_PATH, binPath.toString());
+      return Weidu.getInstance();
+    } else {
+      try {
+        return Weidu.getInstance();
+      } catch (UnsupportedOperationException e) {
+        throw new Exception("WeiDU executable selection cancelled by the user.");
+      }
+    }
   }
 
   /**
