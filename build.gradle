@@ -5,7 +5,7 @@ plugins {
   id 'application'
   id 'org.javamodularity.moduleplugin' version '1.8.12'
   id 'org.openjfx.javafxplugin' version '0.1.0'
-  id 'org.beryx.jlink' version '2.26.0'
+  id 'org.beryx.jlink' version '3.0.0'
 }
 
 group 'io.infinitytools'
@@ -31,31 +31,25 @@ ext {
 
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(20)
+    languageVersion = JavaLanguageVersion.of(21)
   }
 }
 
-// remove when switching to JDK 21
-final String ENABLE_PREVIEW = "--enable-preview"
 // Workaround for accessing GitHub API
 final String TLS_PROTOCOL = "-Djdk.tls.client.protocols=TLSv1.2"
 
 tasks.withType(JavaCompile).configureEach {
-  options.compilerArgs += ENABLE_PREVIEW
-  options.compilerArgs += "-Xlint:preview"
   options.encoding = 'UTF-8'
   options.debugOptions.setDebugLevel("source,lines,vars")
-  options.debug = false
+  options.debug = true
 }
 
 tasks.withType(Test).configureEach {
   useJUnitPlatform()
-  jvmArgs += ENABLE_PREVIEW
   jvmArgs += TLS_PROTOCOL
 }
 
 tasks.withType(JavaExec).configureEach {
-  jvmArgs += ENABLE_PREVIEW
   jvmArgs += TLS_PROTOCOL
 }
 
@@ -82,15 +76,15 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
 
-//test {
-//  useJUnitPlatform()
-//}
+test {
+  useJUnitPlatform()
+}
 
 String distFolder = "distribution"
 
 jlink {
   imageZip.fileValue(project.file("${layout.buildDirectory}/distributions/app-${javafx.platform.classifier}.zip"))
-  addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
+  addOptions('--strip-debug', '--compress', 'zip-6', '--no-header-files', '--no-man-pages')
   addExtraDependencies("javafx")
 
   launcher {
@@ -102,7 +96,6 @@ jlink {
     outputDir = distFolder
 
     jvmArgs = [
-            ENABLE_PREVIEW,
             TLS_PROTOCOL
     ]
 
