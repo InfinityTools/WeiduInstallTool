@@ -121,18 +121,6 @@ jlink {
               "--win-menu",
               "--about-url", "${projectUrl}"
       ])
-    } else if (Os.isFamily(Os.FAMILY_UNIX)) {
-      imageOptions = [
-              "--icon", "${projectDir}/src/main/resources/io/infinitytools/wml/icons/icon/256x256.png",
-      ]
-      // Let jpackage determine output format automatically
-      // installerType = "deb"
-      installerOptions.addAll([
-              "--resource-dir", "${projectDir}/buildres/linux",
-              "--file-associations", "${projectDir}/buildres/linux/open_with.properties",
-              "--linux-rpm-license-type", "Apache-2.0",
-              "--linux-shortcut"
-      ])
     } else if (Os.isFamily(Os.FAMILY_MAC)) {
       // macOS installer requires a version number >= 1.0.0
       appVersion = project.version.toString().startsWith("0.") ? "1.0.0" : project.version
@@ -145,6 +133,19 @@ jlink {
               "--mac-package-name", "${appName}",
               "--resource-dir", "${projectDir}/buildres/macos",
               "--file-associations", "${projectDir}/buildres/macos/open_with.properties"
+      ])
+    } else if (Os.isFamily(Os.FAMILY_UNIX)) {
+      // Unix check must be performed AFTER macOS check since it includes macOS check as well
+      imageOptions = [
+              "--icon", "${projectDir}/src/main/resources/io/infinitytools/wml/icons/icon/256x256.png",
+      ]
+      // Let jpackage determine output format automatically
+      // installerType = "deb"
+      installerOptions.addAll([
+              "--resource-dir", "${projectDir}/buildres/linux",
+              "--file-associations", "${projectDir}/buildres/linux/open_with.properties",
+              "--linux-rpm-license-type", "Apache-2.0",
+              "--linux-shortcut"
       ])
     }
   }
@@ -180,10 +181,10 @@ static String getOsName() {
   String platform
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
     platform = "win"
-  } else if (Os.isFamily(Os.FAMILY_UNIX)) {
-    platform = "linux"
   } else if (Os.isFamily(Os.FAMILY_MAC)) {
     platform = "macos"
+  } else if (Os.isFamily(Os.FAMILY_UNIX)) {
+    platform = "linux"
   } else {
     platform = "unknown"
   }
