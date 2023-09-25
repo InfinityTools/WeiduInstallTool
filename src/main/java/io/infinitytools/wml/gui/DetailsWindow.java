@@ -361,21 +361,36 @@ public class DetailsWindow extends Stage {
       setHeight(windowRect.getHeight());
       setMaximized(windowMaximized);
     } else {
+      // adjustments should be preferably bound to the screen showing the main window
+      final Stage stageMain = MainWindow.getInstance().getStage();
+      final double mainStageRight = stageMain.getX() + stageMain.getWidth();
+      Screen screen = null;
+      final ObservableList<Screen> screens = Screen.getScreensForRectangle(stageMain.getX(), stageMain.getY(),
+          stageMain.getWidth(), stageMain.getHeight());
+      for (final Screen curScreen : screens) {
+        if (mainStageRight >= curScreen.getBounds().getMinX() && mainStageRight < curScreen.getBounds().getMaxX()) {
+          screen = curScreen;
+          break;
+        }
+      }
+      if (screen == null) {
+        screen = Screen.getPrimary();
+      }
+
       // adjusting initial window size and position
-      double width = Math.max(getWidth(), MainWindow.getInstance().getStage().getMinWidth() * .75);
+      final double height = Math.max(getHeight(), screen.getBounds().getHeight() * 0.8);
+      setHeight(height);
+
+      final double width = Math.max(getWidth(), MainWindow.getInstance().getStage().getMinWidth() * .75);
       setWidth(width);
 
       // try to place window right next to the main window
-      final Stage stageMain = MainWindow.getInstance().getStage();
-      double x = stageMain.getX() + stageMain.getWidth();
-      final ObservableList<Screen> screens = Screen.getScreensForRectangle(stageMain.getX(), stageMain.getY(),
-          stageMain.getWidth(), stageMain.getHeight());
-      if (!screens.isEmpty()) {
-        final Screen screen = screens.get(0);
-        double maxX = screen.getBounds().getMaxX();
-        if (x + getWidth() > maxX) {
-          x = maxX - getWidth();
-        }
+      final double x;
+      if (mainStageRight + getWidth() > screen.getBounds().getMaxX()) {
+        // stay within screen bounds
+        x = screen.getBounds().getMaxX() - getWidth();
+      } else {
+        x = mainStageRight;
       }
       setX(x);
     }
