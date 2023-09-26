@@ -55,7 +55,7 @@
 
       <HBox alignment="CENTER_LEFT"
             styleClass="link">
-        <Label text="WeiDU:"/>
+        <Label text="%ui.about.weidu.label"/>
         <Hyperlink fx:id="weiduLink"
                    text="::weidu-link::">
         </Hyperlink>
