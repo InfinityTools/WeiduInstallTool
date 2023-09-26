@@ -38,7 +38,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -49,18 +52,20 @@ import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.tinylog.Logger;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -547,6 +552,26 @@ public class MainWindow extends Application {
   }
 
   /**
+   * Called when a drag object is moved over the scene.
+   */
+  private void onSceneDragOver(DragEvent event) {
+    if (event.getGestureSource() == null &&
+        event.getDragboard().hasFiles()) {
+      event.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
+    }
+    event.consume();
+  }
+
+  /**
+   * Called when a drag object is dropped on the scene.
+   */
+  private void onSceneDragDropped(DragEvent event) {
+    final Dragboard db = event.getDragboard();
+    final boolean success = handleDroppedFiles(db.getFiles().toArray(new File[0]));
+    event.setDropCompleted(success);
+  }
+
+  /**
    * Sets the window into the running state.
    */
   private void setWeiduRunning() {
@@ -774,8 +799,13 @@ public class MainWindow extends Application {
     stage.setOnShown(this::onShown);
     stage.setOnHiding(this::onHiding);
     stage.setOnHidden(this::onHidden);
+
     // global detection of pressing keys requires an explicit event filter
     stage.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::onGlobalKeyPressed);
+
+    // handling drag and drop feature
+    stage.getScene().setOnDragOver(this::onSceneDragOver);
+    stage.getScene().setOnDragDropped(this::onSceneDragDropped);
 
     // add invisible border; required to reserve border space for a consistent look when border is enabled
     setVisualizedResult(false, 0);
@@ -1180,7 +1210,7 @@ public class MainWindow extends Application {
         Set<String> mods = null;
         try {
           WeiduLog log = WeiduLog.load(gamePath.resolve(WeiduLog.WEIDU_FILENAME));
-          mods = log.getEntries().stream().map(e -> e.getTp2Name().toLowerCase()).collect(Collectors.toSet());
+          mods = log.getEntries().stream().map(e -> e.getTp2Name().toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
         } catch (Exception e) {
           // WeiDU.log may not exist
           Logger.debug(e, "WeiDU.log not available or could not be parsed");
@@ -1189,7 +1219,7 @@ public class MainWindow extends Application {
         if (mods != null) {
           final List<String> conflicts = new ArrayList<>();
           for (final String modName : modList) {
-            if (mods.contains(modName.toLowerCase())) {
+            if (mods.contains(modName.toLowerCase(Locale.ROOT))) {
               conflicts.add(modName);
             }
           }
@@ -1349,6 +1379,136 @@ public class MainWindow extends Application {
     command.add(0, Weidu.getInstance().getWeidu().toString());
 
     return command.toArray(new String[0]);
+  }
+
+  /**
+   * Handles files dropped by a Drag&Drop operation or similar action.
+   *
+   * @param files Dropped files as {@link File} instances.
+   * @return {@code true} if the operation performed successfully, {@code false} otherwise.
+   */
+  private boolean handleDroppedFiles(File... files) {
+    boolean retVal = false;
+    if (isProcessRunning()) {
+      Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.openFile.header"),
+          R.get("ui.main.dragdrop.openFile.processRunning.content"));
+    } else if (files.length > 0) {
+      if (files.length == 1) {
+        final File rawFile = files[0];
+        final File tp2File = resolveTp2File(rawFile);
+        Logger.debug("Resolved TP2 file: {}", tp2File);
+        if (tp2File != null) {
+          try {
+            openTp2File(tp2File.toPath());
+            retVal = true;
+          } catch (Exception e) {
+            final String msg = e.getMessage().isEmpty() ? R.get("ui.main.dragdrop.openFile.error.unspecified") : e.getMessage();
+            Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.openFile.header"),
+                R.get("ui.main.dragdrop.openFile.loadError.content") + "\n" + msg);
+          }
+        } else {
+          Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.openFile.header"),
+              String.format("%s\n%s", R.get("ui.main.dragdrop.openFile.unsupported.content"), rawFile.getName()));
+        }
+      } else {
+        Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.openFile.header"),
+            String.format(R.get("ui.main.dragdrop.openFile.tooMany.content"), files.length));
+      }
+    }
+
+    return retVal;
+  }
+
+  /**
+   * Performs a validation check on the given file path. If the file argument points to a directory the method attempts
+   * to find and return a compatible .tp2 file inside the directory.
+   *
+   * @param file {@link File} path to file or directory. {@code null} is interpreted as the current working directory.
+   * @return {@link File} path to a .tp2 file. Returns {@code null} if .tp2 file could not be determined.
+   */
+  private static File resolveTp2File(File file) {
+    if (file == null) {
+      file = new File(".");
+    }
+
+    File retVal = null;
+    if (file.isDirectory()) {
+      final String pattern = "(setup-)?" + Pattern.quote(file.getName() + ".tp2");
+      final Path path = SystemInfo.findFile(file.toPath(), pattern, false, false);
+      if (path != null && Files.isRegularFile(path)) {
+        retVal = path.toFile();
+      }
+    } else if (file.isFile() && file.getName().toLowerCase(Locale.ROOT).endsWith(".tp2")) {
+      retVal = file;
+    }
+
+    return retVal;
+  }
+
+  /**
+   * Loads the specified TP2 file for execution.
+   *
+   * @param tp2File {@link Path} to the TP2 file.
+   */
+  private void openTp2File(Path tp2File)
+      throws FileNotFoundException, UnsupportedOperationException, NullPointerException, IllegalArgumentException {
+    if (isProcessRunning()) {
+      throw new UnsupportedOperationException("WeiDU process is still running");
+    }
+
+    if (tp2File == null) {
+      throw new NullPointerException("Path argument is null");
+    }
+
+    if (!Files.isRegularFile(tp2File)) {
+      throw new FileNotFoundException("Path is not a regular file");
+    }
+
+    if (!tp2File.getFileName().toString().toLowerCase().endsWith(".tp2")) {
+      throw new IllegalArgumentException("Not a TP2 file");
+    }
+
+    final List<String> args = new ArrayList<>();
+    args.add(tp2File.toString());
+    Configuration.getInstance().loadArguments(args);
+
+    // Setup mode: ModInfo initialization
+    try {
+      modInfo = loadModInfo(Configuration.getInstance().getMode(), true);
+    } catch (Exception e) {
+      Logger.error(e, "Loading mod information in setup mode");
+      throw new UnsupportedOperationException("Mod information could not be loaded");
+    }
+
+    // resetting current launcher state
+    process = null;
+    processResult = null;
+    outputBuffer.discardAll();
+    setOutputCharset(null);
+    getController().outputArea.positionCaret(0);
+    getController().outputArea.clear();
+    getController().inputField.clear();
+    updateWindowTitle(false);
+    setVisualizedResult(false, 0);
+    if (detailsWindow != null) {
+      detailsWindow.hide();
+      detailsWindow = null;
+    }
+
+    // preparing execution mode
+    getController().detailsButton.setDisable(Configuration.getInstance().getMode() != Configuration.Mode.WEIDU_GUIDED);
+    if (modInfo != null) {
+      try {
+        detailsWindow = new DetailsWindow(modInfo);
+      } catch (Exception e) {
+        Logger.error(e, "Could not create DetailsWindow instance");
+        getController().detailsButton.setDisable(true);
+      }
+    }
+    onDetailsButtonSelected(Configuration.getInstance().getOption(Configuration.Key.SHOW_DETAILS));
+
+    setInputFocus();
+    execute();
   }
 
   /**
