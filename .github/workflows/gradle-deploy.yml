@@ -29,6 +29,8 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
+          # TODO: switch to 'temurin' as soon as it's available
+          distribution: 'zulu'
       - name: Echo JAVA_HOME (windows)
         if: (matrix.os == 'windows-latest')
         run: echo %JAVA_HOME%
