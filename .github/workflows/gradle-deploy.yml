@@ -42,28 +42,28 @@ jobs:
         shell: bash
         run: chmod +x gradlew
       # Building
-      - name: Task: build (windows)
+      - name: Build task (windows)
         if: (matrix.os == 'windows-latest')
         run: gradlew.bat --info --stacktrace build
-      - name: Task: build (unix)
+      - name: Build task (unix)
         if: (matrix.os != 'windows-latest')
         run: ./gradlew --info --stacktrace build
-      - name: Task: jlink (windows)
+      - name: Jlink task (windows)
         if: (matrix.os == 'windows-latest')
         run: gradlew.bat --info --stacktrace jlink
-      - name: Task: jlink (unix)
+      - name: Jlink task (unix)
         if: (matrix.os != 'windows-latest')
         run: ./gradlew --info --stacktrace jlink
-      - name: Task: portableZip (windows)
+      - name: PortableZip task (windows)
         if: (matrix.os == 'windows-latest')
         run: gradlew.bat --info --stacktrace portableZip
-      - name: Task: portableTar (unix)
+      - name: PortableTar task (unix)
         if: (matrix.os != 'windows-latest')
         run: ./gradlew --info --stacktrace portableTar
-      - name: Task: jpackage (windows)
+      - name: Jpackage task (windows)
         if: (matrix.os == 'windows-latest')
         run: gradlew.bat --info --stacktrace jpackage
-      - name: Task: jpackage (unix)
+      - name: Jpackage task (unix)
         if: (matrix.os != 'windows-latest')
         run: ./gradlew --info --stacktrace jpackage
       # Uploading
