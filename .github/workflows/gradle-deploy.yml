@@ -5,7 +5,7 @@ name: Java CD with Gradle
 
 on:
   push:
-    branches: [ "master", "devel" ]
+    branches: [ "master" ]
   workflow_dispatch:
     branches: [ "master", "devel" ]
 
