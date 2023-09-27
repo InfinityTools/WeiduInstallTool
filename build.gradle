@@ -89,11 +89,15 @@ jlink {
 
   launcher {
     name = "${appName}"
-    noConsole = false
+
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+      noConsole = true
+    }
   }
 
   jpackage {
     outputDir = distFolder
+    resourceDir = file("${projectDir}/buildres/${getOsName()}")
 
     jvmArgs = [
             TLS_PROTOCOL
@@ -107,11 +111,10 @@ jlink {
 
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
       installerType = "exe"
-      resourceDir = file("${projectDir}/buildres/windows")
-      icon = "${projectDir}/buildres/windows/WeiduModLauncher.ico"
+      icon = "${resourceDir}/WeiduModLauncher.ico"
 
       installerOptions.addAll([
-              "--file-associations", "${projectDir}/buildres/windows/open_with.properties",
+              "--file-associations", "${resourceDir}/open_with.properties",
               "--win-dir-chooser",
               "--win-per-user-install",
               "--win-shortcut",
@@ -123,21 +126,19 @@ jlink {
       // macOS installer requires a version number >= 1.0.0
       appVersion = project.version.toString().startsWith("0.") ? "1.0.0" : project.version
       installerType = "pkg"
-      resourceDir = file("${projectDir}/buildres/macos")
-      icon = "${projectDir}/buildres/macos/wml.icns"
+      icon = "${resourceDir}/wml.icns"
 
       installerOptions.addAll([
               "--mac-package-name", "${appName}",
-              "--file-associations", "${projectDir}/buildres/macos/open_with.properties"
+              "--file-associations", "${resourceDir}/open_with.properties"
       ])
     } else if (Os.isFamily(Os.FAMILY_UNIX)) {
       // Unix check must be performed AFTER macOS check since it includes macOS check as well
-      resourceDir = file("${projectDir}/buildres/linux")
       icon = "${projectDir}/src/main/resources/io/infinitytools/wml/icons/icon/256x256.png"
       // Build both deb and rpm packages
       // installerType = "rpm"
       installerOptions.addAll([
-              "--file-associations", "${projectDir}/buildres/linux/open_with.properties",
+              "--file-associations", "${resourceDir}/open_with.properties",
               "--linux-rpm-license-type", "Apache-2.0",
               "--linux-menu-group", "Games",
               "--linux-app-category", "games",
@@ -151,7 +152,7 @@ jlink {
 tasks.register('portableZip', Zip) {
   dependsOn ':jpackageImage'
 
-  archiveFileName = "${appName}-portable-${getOsName()}-${version}.zip"
+  archiveFileName = "${appName}-${version}-portable-${getOsName()}.zip"
   destinationDirectory = layout.buildDirectory.dir(distFolder)
 
   from(layout.buildDirectory.dir("${distFolder}/${appName}")) {
@@ -163,7 +164,7 @@ tasks.register('portableZip', Zip) {
 tasks.register('portableTar', Tar) {
   dependsOn ':jpackageImage'
 
-  archiveFileName = "${appName}-portable-${getOsName()}-${version}.tar.gz"
+  archiveFileName = "${appName}-${version}-portable-${getOsName()}.tar.gz"
   destinationDirectory = layout.buildDirectory.dir(distFolder)
   compression = Compression.GZIP
 
@@ -172,11 +173,11 @@ tasks.register('portableTar', Tar) {
   }
 }
 
-// Returns a short identifier string for the current operating system.
+// Returns a short identifier string for the current operating system that is used throughout the project.
 static String getOsName() {
   String platform
   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    platform = "win"
+    platform = "windows"
   } else if (Os.isFamily(Os.FAMILY_MAC)) {
     platform = "macos"
   } else if (Os.isFamily(Os.FAMILY_UNIX)) {
