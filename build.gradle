@@ -155,8 +155,12 @@ tasks.register('portableZip', Zip) {
   archiveFileName = "${appName}-${version}-portable-${getOsName()}.zip"
   destinationDirectory = layout.buildDirectory.dir(distFolder)
 
+  String appFolderName = appName
+  if (Os.isFamily(Os.FAMILY_MAC)) {
+    appFolderName += ".app"
+  }
   from(layout.buildDirectory.dir("${distFolder}/${appName}")) {
-    into appName
+    into appFolderName
   }
 }
 
@@ -168,8 +172,12 @@ tasks.register('portableTar', Tar) {
   destinationDirectory = layout.buildDirectory.dir(distFolder)
   compression = Compression.GZIP
 
-  from(layout.buildDirectory.dir("${distFolder}/${appName}")) {
-    into appName
+  String appFolderName = appName
+  if (Os.isFamily(Os.FAMILY_MAC)) {
+    appFolderName += ".app"
+  }
+  from(layout.buildDirectory.dir("${distFolder}/${appFolderName}")) {
+    into appFolderName
   }
 }
 
