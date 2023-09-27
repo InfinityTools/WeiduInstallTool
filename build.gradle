@@ -106,13 +106,11 @@ jlink {
     ]
 
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-      imageOptions = [
-              "--icon", "${projectDir}/buildres/windows/wml.ico"
-      ]
       installerType = "exe"
+      resourceDir = file("${projectDir}/buildres/windows")
+      icon = "${projectDir}/buildres/windows/WeiduModLauncher.ico"
+
       installerOptions.addAll([
-              "--icon", "${projectDir}/buildres/windows/wml.ico",
-              "--resource-dir", "${projectDir}/buildres/windows",
               "--file-associations", "${projectDir}/buildres/windows/open_with.properties",
               "--win-dir-chooser",
               "--win-per-user-install",
@@ -124,28 +122,26 @@ jlink {
     } else if (Os.isFamily(Os.FAMILY_MAC)) {
       // macOS installer requires a version number >= 1.0.0
       appVersion = project.version.toString().startsWith("0.") ? "1.0.0" : project.version
-
-      imageOptions = [
-              "--icon", "${projectDir}/buildres/macos/wml.icns",
-      ]
       installerType = "pkg"
+      resourceDir = file("${projectDir}/buildres/macos")
+      icon = "${projectDir}/buildres/macos/wml.icns"
+
       installerOptions.addAll([
               "--mac-package-name", "${appName}",
-              "--resource-dir", "${projectDir}/buildres/macos",
               "--file-associations", "${projectDir}/buildres/macos/open_with.properties"
       ])
     } else if (Os.isFamily(Os.FAMILY_UNIX)) {
       // Unix check must be performed AFTER macOS check since it includes macOS check as well
-      imageOptions = [
-              "--icon", "${projectDir}/src/main/resources/io/infinitytools/wml/icons/icon/256x256.png",
-      ]
-      // Let jpackage determine output format automatically
-      // installerType = "deb"
+      resourceDir = file("${projectDir}/buildres/linux")
+      icon = "${projectDir}/src/main/resources/io/infinitytools/wml/icons/icon/256x256.png"
+      // Build both deb and rpm packages
+      // installerType = "rpm"
       installerOptions.addAll([
-              "--resource-dir", "${projectDir}/buildres/linux",
               "--file-associations", "${projectDir}/buildres/linux/open_with.properties",
               "--linux-rpm-license-type", "Apache-2.0",
-              "--linux-shortcut"
+              "--linux-menu-group", "Games",
+              "--linux-app-category", "games",
+              "--linux-shortcut",
       ])
     }
   }

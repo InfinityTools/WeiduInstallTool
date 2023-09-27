@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=WeiDU Mod Launcher
+Comment=A graphical front end for WeiDU Mods
+Categories=Game;Java;
+
+Icon=/opt/weidumodlauncher/lib/WeiduModLauncher.png
+Exec=/opt/weidumodlauncher/bin/WeiduModLauncher %f
+MimeType=application/x-tp2
+Terminal=false
