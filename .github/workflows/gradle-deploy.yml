@@ -25,50 +25,57 @@ jobs:
       # Initializations
       - name: Git checkout
         uses: actions/checkout@v4
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
           # TODO: switch to 'temurin' as soon as it's available
           distribution: 'zulu'
+
       - name: Echo JAVA_HOME (windows)
         if: (matrix.os == 'windows-latest')
-        run: echo %JAVA_HOME%
+        run: echo $env:JAVA_HOME
+
       - name: Echo JAVA_HOME (unix)
         if: (matrix.os != 'windows-latest')
         run: echo $JAVA_HOME
+
       # Preparations
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
+
       - name: Preparations (unix)
         if: (matrix.os != 'windows-latest')
         shell: bash
         run: chmod +x gradlew
+
       # Building
-      - name: Build task (windows)
-        if: (matrix.os == 'windows-latest')
-        run: gradlew.bat --info --stacktrace build
-      - name: Build task (unix)
-        if: (matrix.os != 'windows-latest')
-        run: ./gradlew --info --stacktrace build
-      - name: Jlink task (windows)
-        if: (matrix.os == 'windows-latest')
-        run: gradlew.bat --info --stacktrace jlink
-      - name: Jlink task (unix)
-        if: (matrix.os != 'windows-latest')
-        run: ./gradlew --info --stacktrace jlink
+      - name: Build task
+        run: ./gradlew build --info --stacktrace
+
+      - name: Jlink task
+        run: ./gradlew jlink --info --stacktrace
+
       - name: PortableZip task (windows)
         if: (matrix.os == 'windows-latest')
-        run: gradlew.bat --info --stacktrace portableZip
+        run: ./gradlew portableZip --info --stacktrace
+
       - name: PortableTar task (unix)
         if: (matrix.os != 'windows-latest')
-        run: ./gradlew --info --stacktrace portableTar
-      - name: Jpackage task (windows)
+        run: ./gradlew portableTar --info --stacktrace
+
+      - name: Jpackage task
+        run: ./gradlew jpackage --info --stacktrace
+
+      # Validation
+      - name: List built files (windows)
         if: (matrix.os == 'windows-latest')
-        run: gradlew.bat --info --stacktrace jpackage
-      - name: Jpackage task (unix)
+        run: dir .\build\distribution
+      - name: List built files (unix)
         if: (matrix.os != 'windows-latest')
-        run: ./gradlew --info --stacktrace jpackage
+        run: ls -l ./build/distribution
+
       # Uploading
       - name: Upload artifacts (windows)
         if: (matrix.os == 'windows-latest')
@@ -77,7 +84,8 @@ jobs:
           name: artifacts-windows
           path: |
             build/distribution/WeiduModLauncher-*.exe
-            build/distribution/WeiduModLauncher-*-portable-windows.zip
+            build/distribution/WeiduModLauncher-*.zip
+
       - name: Upload artifacts (linux)
         if: (matrix.os == 'ubuntu-latest')
         uses: actions/upload-artifact@v3
@@ -86,7 +94,8 @@ jobs:
           path: |
             build/distribution/WeiduModLauncher-*.deb
             build/distribution/WeiduModLauncher-*.rpm
-            build/distribution/WeiduModLauncher-*-portable-linux.tar.gz
+            build/distribution/WeiduModLauncher-*.tar.gz
+
       - name: Upload artifacts (macos)
         if: (matrix.os == 'macos-latest')
         uses: actions/upload-artifact@v3
@@ -94,4 +103,4 @@ jobs:
           name: artifacts-macos
           path: |
             build/distribution/WeiduModLauncher-*.pkg
-            build/distribution/WeiduModLauncher-*-portable-macos.tar.gz
+            build/distribution/WeiduModLauncher-*.tar.gz
