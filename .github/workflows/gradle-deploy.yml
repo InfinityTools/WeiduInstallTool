@@ -1,0 +1,94 @@
+# This workflow will build a Java project with Gradle for all supported platforms
+# and upload the created artifacts on pushes to the master branch.
+
+name: Java CD with Gradle
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: [ '21' ]
+    runs-on: ${{ matrix.os }}
+    name: Create installer and portable version for ${{ matrix.os }}, JDK ${{ matrix.java }}
+    steps:
+      # Initializations
+      - name: Git checkout
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Echo JAVA_HOME (windows)
+        if: (matrix.os == 'windows-latest')
+        run: echo %JAVA_HOME%
+      - name: Echo JAVA_HOME (unix)
+        if: (matrix.os != 'windows-latest')
+        run: echo $JAVA_HOME
+      # Preparations
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Preparations (unix)
+        if: (matrix.os != 'windows-latest')
+        shell: bash
+        run: chmod +x gradlew
+      # Building
+      - name: Task: build (windows)
+        if: (matrix.os == 'windows-latest')
+        run: gradlew.bat --info --stacktrace build
+      - name: Task: build (unix)
+        if: (matrix.os != 'windows-latest')
+        run: ./gradlew --info --stacktrace build
+      - name: Task: jlink (windows)
+        if: (matrix.os == 'windows-latest')
+        run: gradlew.bat --info --stacktrace jlink
+      - name: Task: jlink (unix)
+        if: (matrix.os != 'windows-latest')
+        run: ./gradlew --info --stacktrace jlink
+      - name: Task: portableZip (windows)
+        if: (matrix.os == 'windows-latest')
+        run: gradlew.bat --info --stacktrace portableZip
+      - name: Task: portableTar (unix)
+        if: (matrix.os != 'windows-latest')
+        run: ./gradlew --info --stacktrace portableTar
+      - name: Task: jpackage (windows)
+        if: (matrix.os == 'windows-latest')
+        run: gradlew.bat --info --stacktrace jpackage
+      - name: Task: jpackage (unix)
+        if: (matrix.os != 'windows-latest')
+        run: ./gradlew --info --stacktrace jpackage
+      # Uploading
+      - name: Upload artifacts (windows)
+        if: (matrix.os == 'windows-latest')
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts-windows
+          path: |
+            build/distribution/WeiduModLauncher-*.exe
+            build/distribution/WeiduModLauncher-*-portable-windows.zip
+      - name: Upload artifacts (linux)
+        if: (matrix.os == 'ubuntu-latest')
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts-linux
+          path: |
+            build/distribution/WeiduModLauncher-*.deb
+            build/distribution/WeiduModLauncher-*.rpm
+            build/distribution/WeiduModLauncher-*-portable-linux.tar.gz
+      - name: Upload artifacts (macos)
+        if: (matrix.os == 'macos-latest')
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts-macos
+          path: |
+            build/distribution/WeiduModLauncher-*.pkg
+            build/distribution/WeiduModLauncher-*-portable-macos.tar.gz
