@@ -1399,7 +1399,16 @@ public class MainWindow extends Application {
         Logger.debug("Resolved TP2 file: {}", tp2File);
         if (tp2File != null) {
           try {
-            openTp2File(tp2File.toPath());
+            final Path tp2Path = tp2File.toPath();
+            if (!Files.isRegularFile(tp2Path)) {
+              throw new FileNotFoundException("Path is not a regular file");
+            }
+
+            if (!tp2Path.getFileName().toString().toLowerCase().endsWith(".tp2")) {
+              throw new IllegalArgumentException("Not a TP2 file");
+            }
+
+            restart(tp2Path.toString());
             retVal = true;
           } catch (Exception e) {
             final String msg = e.getMessage().isEmpty() ? R.get("ui.main.dragdrop.openFile.error.unspecified") : e.getMessage();
@@ -1446,31 +1455,18 @@ public class MainWindow extends Application {
   }
 
   /**
-   * Loads the specified TP2 file for execution.
+   * Starts a new WeiDU process with the specified arguments.
    *
-   * @param tp2File {@link Path} to the TP2 file.
+   * @param args Variable number of command line arguments that are evaluated and passed to the WeiDU process.
+   * @throws UnsupportedOperationException if the WeiDU process could not be restarted.
    */
-  private void openTp2File(Path tp2File)
-      throws FileNotFoundException, UnsupportedOperationException, NullPointerException, IllegalArgumentException {
+  private void restart(String... args) throws UnsupportedOperationException {
     if (isProcessRunning()) {
       throw new UnsupportedOperationException("WeiDU process is still running");
     }
 
-    if (tp2File == null) {
-      throw new NullPointerException("Path argument is null");
-    }
-
-    if (!Files.isRegularFile(tp2File)) {
-      throw new FileNotFoundException("Path is not a regular file");
-    }
-
-    if (!tp2File.getFileName().toString().toLowerCase().endsWith(".tp2")) {
-      throw new IllegalArgumentException("Not a TP2 file");
-    }
-
-    final List<String> args = new ArrayList<>();
-    args.add(tp2File.toString());
-    Configuration.getInstance().loadArguments(args);
+    final List<String> arguments = new ArrayList<>(Arrays.asList(args));
+    Configuration.getInstance().loadArguments(arguments);
 
     // Setup mode: ModInfo initialization
     try {
@@ -1490,6 +1486,7 @@ public class MainWindow extends Application {
     getController().inputField.clear();
     updateWindowTitle(false);
     setVisualizedResult(false, 0);
+    final boolean showDetails = isDetailsWindowVisible();
     if (detailsWindow != null) {
       detailsWindow.hide();
       detailsWindow = null;
@@ -1505,7 +1502,7 @@ public class MainWindow extends Application {
         getController().detailsButton.setDisable(true);
       }
     }
-    onDetailsButtonSelected(Configuration.getInstance().getOption(Configuration.Key.SHOW_DETAILS));
+    onDetailsButtonSelected(showDetails);
 
     setInputFocus();
     execute();
