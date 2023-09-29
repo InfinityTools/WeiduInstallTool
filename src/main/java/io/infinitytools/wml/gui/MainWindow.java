@@ -21,6 +21,7 @@ import io.infinitytools.wml.icons.Icons;
 import io.infinitytools.wml.mod.ModInfo;
 import io.infinitytools.wml.mod.ini.ModIni;
 import io.infinitytools.wml.mod.log.WeiduLog;
+import io.infinitytools.wml.net.AppServer;
 import io.infinitytools.wml.process.BufferConvert;
 import io.infinitytools.wml.process.SysProc;
 import io.infinitytools.wml.process.SysProcChangeEvent;
@@ -165,6 +166,16 @@ public class MainWindow extends Application {
       Logger.error(e, "Loading configuration");
     }
 
+    // Setting up single instance mode
+    final boolean isSingleInstance = Configuration.getInstance().getOption(Configuration.Key.SINGLE_INSTANCE);
+    if (isSingleInstance) {
+      try {
+        AppServer.getInstance().start();
+      } catch (IOException e) {
+        Logger.debug(e, "Starting application server");
+      }
+    }
+
     // Applying application language override (if available)
     final String languageOverride = Configuration.getInstance().getOption(Configuration.Key.UI_LANGUAGE_OVERRIDE);
     if (languageOverride != null) {
@@ -287,6 +298,31 @@ public class MainWindow extends Application {
    */
   public void setDarkModeEnabled(boolean newValue) {
     getController().darkModeUiCheckItem.setSelected(newValue);
+  }
+
+  /**
+   * Returns whether single application instance mode is enabled.
+   */
+  public boolean isSingleInstanceEnabled() {
+    return getController().singleInstanceCheckItem.isSelected();
+  }
+
+  /**
+   * Enables or disables single application instance mode.
+   *
+   * @param newValue Enabled state of the option.
+   * @param feedback Whether to show a message dialog for the user when single instance mode changes.
+   */
+  private void setSingleInstanceEnabled(boolean newValue, boolean feedback) {
+    getController().singleInstanceCheckItem.setSelected(newValue);
+
+    if (feedback) {
+      boolean configValue = Configuration.getInstance().getOption(Configuration.Key.SINGLE_INSTANCE);
+      if (newValue != configValue) {
+        Utils.showMessageDialog(getStage(), R.INFORMATION(), R.get("ui.main.menu.item.singleInstance"),
+            R.get("ui.main.menu.item.singleInstance.message.content"));
+      }
+    }
   }
 
   /**
@@ -592,7 +628,7 @@ public class MainWindow extends Application {
   /**
    * Returns whether a WeiDU process is currently being executed.
    */
-  private boolean isProcessRunning() {
+  public boolean isProcessRunning() {
     return (process != null && process.isRunning());
   }
 
@@ -826,6 +862,7 @@ public class MainWindow extends Application {
     getController().warnModOrderCheckItem.setOnAction(event -> Configuration.getInstance()
         .setOption(Configuration.Key.WARN_MOD_ORDER, isWarnModOrderEnabled()));
     getController().darkModeUiCheckItem.setOnAction(event -> applyDarkModeUi(isDarkModeEnabled()));
+    getController().singleInstanceCheckItem.setOnAction(event -> setSingleInstanceEnabled(isSingleInstanceEnabled(), true));
     getController().bufferSizeSlider.valueProperty().addListener((ob, ov, nv) -> setOutputBufferSizeLabel(nv.doubleValue()));
     getController().outputFontSizeValueFactory.valueProperty().addListener((ob, ov, nv) -> setOutputAreaFontSize(nv));
 
@@ -888,6 +925,7 @@ public class MainWindow extends Application {
     setVisualizeResultsEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.VISUALIZE_RESULT));
     setWarnModOrderEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.WARN_MOD_ORDER));
     setDarkModeEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.DARK_UI_MODE));
+    setSingleInstanceEnabled(Configuration.getInstance().getOption(Configuration.Key.SINGLE_INSTANCE), false);
     setOutputBufferSize(Configuration.getInstance().<Integer>getOption(Configuration.Key.BUFFER_LIMIT));
 
     applyOutputFontSize(Configuration.getInstance().getOption(Configuration.Key.OUTPUT_FONT_SIZE,
@@ -1091,6 +1129,9 @@ public class MainWindow extends Application {
     cfg.setOption(Configuration.Key.WINDOW_MAXIMIZED, getStage().isMaximized());
     cfg.setOption(Configuration.Key.SHOW_DETAILS, isDetailsWindowVisible());
     cfg.setOption(Configuration.Key.WARN_MOD_ORDER, isWarnModOrderEnabled());
+    if (getController().singleInstanceCheckItem.isVisible()) {
+      cfg.setOption(Configuration.Key.SINGLE_INSTANCE, isSingleInstanceEnabled());
+    }
     cfg.setOption(Configuration.Key.QUIT_ON_ENTER, isAutoQuitEnabled());
     cfg.setOption(Configuration.Key.VISUALIZE_RESULT, isVisualizeResultsEnabled());
     cfg.setOption(Configuration.Key.BUFFER_LIMIT, getOutputBufferSize());
@@ -1460,7 +1501,7 @@ public class MainWindow extends Application {
    * @param args Variable number of command line arguments that are evaluated and passed to the WeiDU process.
    * @throws UnsupportedOperationException if the WeiDU process could not be restarted.
    */
-  private void restart(String... args) throws UnsupportedOperationException {
+  public void restart(String... args) throws UnsupportedOperationException {
     if (isProcessRunning()) {
       throw new UnsupportedOperationException("WeiDU process is still running");
     }
@@ -1506,6 +1547,20 @@ public class MainWindow extends Application {
 
     setInputFocus();
     execute();
+  }
+
+  /**
+   * Shows the window, places it on top of the windows stacking order and sets the focus.
+   */
+  public void restoreWindow() {
+    if (!getStage().isShowing()) {
+      getStage().show();
+    }
+    if (getStage().isIconified()) {
+      getStage().setIconified(false);
+    }
+    getStage().toFront();
+    getStage().requestFocus();
   }
 
   /**

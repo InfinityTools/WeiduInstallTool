@@ -16,13 +16,27 @@
 package io.infinitytools.wml;
 
 import io.infinitytools.wml.gui.MainWindow;
+import io.infinitytools.wml.net.AppClient;
+import io.infinitytools.wml.net.AppServer;
+import org.tinylog.Logger;
 
 /**
  * Container class for the {@code main(String[]} method. Launches the main window of the application.
  */
 public class WeiduModLauncher {
   public static void main(String[] args) {
+    // checking single instance mode
+    if (AppClient.executeArguments(args)) {
+      Logger.debug("Application is already running.");
+      Runtime.getRuntime().exit(0);
+    }
+
     MainWindow.launch(MainWindow.class, args);
+
+    // shutting down single instance server
+    if (!AppServer.getInstance().stop()) {
+      Logger.warn("Could not shut down application server");
+    }
 
     // Terminate JVM without delay: workaround for macOS which keeps the app available for reuse, otherwise.
     Runtime.getRuntime().exit(0);

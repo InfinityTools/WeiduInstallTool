@@ -86,6 +86,10 @@ public class Configuration {
      */
     BUFFER_LIMIT("Output Buffer Limit", Integer.class, 500_000),
     /**
+     * Indicates whether the application is running in single instance mode.
+     */
+    SINGLE_INSTANCE("Single Instance Mode", Boolean.class, false),
+    /**
      * Specifies a custom path to the WeiDU binary.
      */
     WEIDU_PATH("Weidu Path", String.class, null),

@@ -16,6 +16,7 @@
 package io.infinitytools.wml.gui;
 
 import io.infinitytools.wml.utils.R;
+import io.infinitytools.wml.utils.SystemInfo;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import org.tinylog.Logger;
@@ -61,6 +62,7 @@ public class MainWindowController implements Initializable {
   public CheckMenuItem visualizeResultCheckItem;
   public CheckMenuItem warnModOrderCheckItem;
   public CheckMenuItem darkModeUiCheckItem;
+  public CheckMenuItem singleInstanceCheckItem;
   public CustomMenuItem bufferSizeMenuItem;
   public CustomMenuItem outputFontSizeMenuItem;
   public Spinner<Double> outputFontSizeSpinner;
@@ -95,6 +97,10 @@ public class MainWindowController implements Initializable {
     outputScrollTopMenuItem.setOnAction(event -> outputArea.setScrollTop(0.0));
     outputScrollBottomMenuItem.setOnAction(event -> outputArea.setScrollTop(Double.MAX_VALUE));
     outputContextMenu.setOnShowing(event -> outputCopyMenuItem.setDisable(outputArea.getSelection().getLength() == 0));
+
+    // single instance mode is already the default behavior on macOS
+    singleInstanceCheckItem.setDisable(SystemInfo.IS_MACOS);
+    singleInstanceCheckItem.setVisible(!SystemInfo.IS_MACOS);
 
     // extending context menu by character encoding options
     // binding is initialized in the MainWindow class

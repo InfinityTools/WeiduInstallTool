@@ -102,6 +102,14 @@
             </Tooltip>
           </tooltip>-->
         </CheckMenuItem>
+        <CheckMenuItem fx:id="singleInstanceCheckItem"
+                       text="%ui.main.menu.item.singleInstance">
+          <!--<tooltip>
+            <Tooltip fx:id="singleInstanceTooltip"
+                     text="Enable to allow only a single application instance running at the same time.">
+            </Tooltip>
+          </tooltip>-->
+        </CheckMenuItem>
 
         <SeparatorMenuItem />
 
