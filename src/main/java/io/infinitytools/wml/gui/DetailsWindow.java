@@ -378,7 +378,7 @@ public class DetailsWindow extends Stage {
       }
 
       // adjusting initial window size and position
-      final double height = Math.max(getHeight(), screen.getBounds().getHeight() * 0.8);
+      final double height = Math.max(getMinHeight(), screen.getBounds().getHeight() * 0.8);
       setHeight(height);
 
       final double width = Math.max(getWidth(), MainWindow.getInstance().getStage().getMinWidth() * .75);

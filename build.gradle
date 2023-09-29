@@ -90,9 +90,9 @@ jlink {
   launcher {
     name = "${appName}"
 
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-      noConsole = true
-    }
+//    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+//      noConsole = true
+//    }
   }
 
   jpackage {
