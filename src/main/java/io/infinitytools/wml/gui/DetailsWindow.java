@@ -384,12 +384,23 @@ public class DetailsWindow extends Stage {
       final double width = Math.max(getWidth(), MainWindow.getInstance().getStage().getMinWidth() * .75);
       setWidth(width);
 
+      // keep window inside vertical screen boundary
+      double y = Math.max(0.0, stageMain.getY() - (getHeight() - stageMain.getHeight()) / 2.0);
+      y = Math.min(screen.getBounds().getMaxY() - getHeight(), y);
+      setY(y);
+
       // try to place window right next to the main window
       final double x;
       if (mainStageRight + getWidth() > screen.getBounds().getMaxX()) {
-        // stay within screen bounds
-        x = screen.getBounds().getMaxX() - getWidth();
+        if (stageMain.getX() - getWidth() >= screen.getBounds().getMinX()) {
+          // place window on the left side instead
+          x = stageMain.getX() - getWidth();
+        } else {
+          // stay within screen bounds
+          x = screen.getBounds().getMaxX() - getWidth();
+        }
       } else {
+        // place window on the right side
         x = mainStageRight;
       }
       setX(x);
