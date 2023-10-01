@@ -15,6 +15,7 @@
  */
 package io.infinitytools.wml.process;
 
+import io.infinitytools.wml.utils.Debugging;
 import org.tinylog.Logger;
 
 import java.io.IOException;
@@ -30,9 +31,14 @@ import java.util.concurrent.TimeoutException;
  */
 public class ProcessUtils {
   /**
+   * Default timeout value to wait for process output.
+   */
+  public static final long DEFAULT_TIMEOUT_MS = 8_000L;
+
+  /**
    * Returns the output as string from the specified command.
    * <p>
-   * The method waits 1000 ms for the program to complete before it is forcefully terminated.
+   * The method waits {@link #DEFAULT_TIMEOUT_MS} ms for the program to complete before it is forcefully terminated.
    * </p>
    *
    * @param command A string array containing the program and arguments.
@@ -40,13 +46,13 @@ public class ProcessUtils {
    * Returns {@code null} if the program did not execute successfully.
    */
   public static byte[] getProcessOutput(String... command) {
-    return getProcessOutput(null, true, 1000L, command);
+    return getProcessOutput(null, true, DEFAULT_TIMEOUT_MS, command);
   }
 
   /**
    * Returns the output as string from the specified command.
    * <p>
-   * The method waits 1000 ms for the program to complete before it is forcefully terminated.
+   * The method waits {@link #DEFAULT_TIMEOUT_MS} ms for the program to complete before it is forcefully terminated.
    * </p>
    *
    * @param workingDir The working directory where the process should be invoked. Specify {@code null} to ignore.
@@ -55,7 +61,7 @@ public class ProcessUtils {
    * Returns {@code null} if the program did not execute successfully.
    */
   public static byte[] getProcessOutput(Path workingDir, String... command) {
-    return getProcessOutput(workingDir, true, 1000L, command);
+    return getProcessOutput(workingDir, true, DEFAULT_TIMEOUT_MS, command);
   }
 
   /**
@@ -83,7 +89,10 @@ public class ProcessUtils {
     try {
       final Future<Integer> result = sp.execute();
 
+      Debugging.timerReset();
       int exitCode = result.get(maxWaitMs, TimeUnit.MILLISECONDS);
+      long delay = Debugging.timerGet(Debugging.TimeFormat.MILLISECONDS);
+      Logger.debug("Timeout: {} ms", delay);
       if (exitCode == 0) {
         retVal = sp.getOutput();
       }

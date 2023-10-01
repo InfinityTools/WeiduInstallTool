@@ -488,9 +488,9 @@ public class SysProc {
       }
 
       producer.getRunner().interrupt();
-      producer.getRunner().join(200);
+      producer.getRunner().join(500);
       consumer.getRunner().interrupt();
-      consumer.getRunner().join(200);
+      consumer.getRunner().join(500);
 
       // fetch remaining output data, if any
       pollProcessOutput(consumer);
