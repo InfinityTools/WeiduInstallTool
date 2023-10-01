@@ -60,6 +60,36 @@ public enum Icons {
       Icon16.getFileName()),
 
   /**
+   * Application icon (Dark Mode UI version)
+   */
+  IconDark256("icon-dark/256x256.png"),
+  /**
+   * Application icon (Dark Mode UI version)
+   */
+  IconDark128("icon-dark/128x128.png"),
+  /**
+   * Application icon (Dark Mode UI version)
+   */
+  IconDark64("icon-dark/64x64.png"),
+  /**
+   * Application icon (Dark Mode UI version)
+   */
+  IconDark32("icon-dark/32x32.png"),
+  /**
+   * Application icon (Dark Mode UI version)
+   */
+  IconDark22("icon-dark/22x22.png"),
+  /**
+   * Application icon (Dark Mode UI version)
+   */
+  IconDark16("icon-dark/16x16.png"),
+  /**
+   * Collection of application icons in all available dimensions. (Dark Mode UI version)
+   */
+  IconDark(IconDark256.getFileName(), IconDark128.getFileName(), IconDark64.getFileName(), IconDark32.getFileName(),
+      IconDark22.getFileName(), IconDark16.getFileName()),
+
+  /**
    * Transparent application logo
    */
   Logo256("logo/256x256.png"),
@@ -76,9 +106,13 @@ public enum Icons {
    */
   Logo32("logo/32x32.png"),
   /**
+   * Transparent application logo
+   */
+  Logo16("logo/16x16.png"),
+  /**
    * Collection of application logos in all available dimensions.
    */
-  Logo(Logo256.getFileName(), Logo128.getFileName(), Logo64.getFileName(), Logo32.getFileName()),
+  Logo(Logo256.getFileName(), Logo128.getFileName(), Logo64.getFileName(), Logo32.getFileName(), Logo16.getFileName()),
 
   /**
    * Icon for Options menu

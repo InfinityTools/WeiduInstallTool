@@ -79,7 +79,7 @@ chmod +x gradlew
 The resulting package(s) can be found in the `./build/distribution` folder.
 
 The `jpackage` task requires the following software to be installed on the system:
-- Windows: WiX 3.0 or later is required.
+- Windows: [WiX 3.0](https://wixtoolset.org) or later is required.
 - macOS: Xcode command line tools are required when the `--mac-sign` option is used to request that the package be signed.
 - Linux:
   - For Red Hat Linux, the `rpm-build` package is required.

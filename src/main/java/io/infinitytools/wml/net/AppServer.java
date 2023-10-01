@@ -180,8 +180,8 @@ public class AppServer implements Runnable {
                   if (!nd2.getContent().isEmpty()) {
                     if (isRunning) {
                       Utils.showErrorDialog(MainWindow.getInstance().getStage(), R.ERROR(),
-                          R.get("ui.main.dragdrop.openFile.header"),
-                          R.get("ui.main.dragdrop.openFile.processRunning.content"));
+                          R.get("ui.main.dragdrop.message.openFile.header"),
+                          R.get("ui.main.dragdrop.message.openFile.processRunning.content"));
                     } else {
                       try {
                         MainWindow.getInstance().restart(nd2.getContent().toArray(new String[0]));

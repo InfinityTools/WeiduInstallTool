@@ -74,8 +74,11 @@ public class Configuration {
     WARN_MOD_ORDER("Warn Mod Order", Boolean.class, true),
     /**
      * Indicates whether pressing the Enter key closes the application when the WeiDU process is completed.
+     * <p>
+     * Enabled by default, except on Linux because of incomplete single app instance functionality.
+     * </p>
      */
-    QUIT_ON_ENTER("Quit On Enter", Boolean.class, true),
+    QUIT_ON_ENTER("Quit On Enter", Boolean.class, !SystemInfo.IS_LINUX),
     /**
      * Indicates whether the output area should display a colored frame to visualize whether the WeiDU
      * process terminated successfully or as error.
@@ -87,8 +90,15 @@ public class Configuration {
     BUFFER_LIMIT("Output Buffer Limit", Integer.class, 500_000),
     /**
      * Indicates whether the application is running in single instance mode.
+     * <p>
+     * Enabled by default except for macOS (which already provides a similar behavior).
+     * </p>
      */
-    SINGLE_INSTANCE("Single Instance Mode", Boolean.class, false),
+    SINGLE_INSTANCE("Single Instance Mode", Boolean.class, !SystemInfo.IS_MACOS),
+    /**
+     * Indicates whether the system tray notification about hiding the main window was shown to the user.
+     */
+    TRAY_HINT_SHOWN("Tray Hint Shown", Boolean.class, false),
     /**
      * Specifies a custom path to the WeiDU binary.
      */

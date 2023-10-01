@@ -85,6 +85,10 @@ public class MainWindowController implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     initContextMenu();
     initInputButtons();
+
+    // single instance mode is already the default behavior on macOS
+    singleInstanceCheckItem.setDisable(SystemInfo.IS_MACOS);
+    singleInstanceCheckItem.setVisible(!SystemInfo.IS_MACOS);
   }
 
   /**
@@ -97,10 +101,6 @@ public class MainWindowController implements Initializable {
     outputScrollTopMenuItem.setOnAction(event -> outputArea.setScrollTop(0.0));
     outputScrollBottomMenuItem.setOnAction(event -> outputArea.setScrollTop(Double.MAX_VALUE));
     outputContextMenu.setOnShowing(event -> outputCopyMenuItem.setDisable(outputArea.getSelection().getLength() == 0));
-
-    // single instance mode is already the default behavior on macOS
-    singleInstanceCheckItem.setDisable(SystemInfo.IS_MACOS);
-    singleInstanceCheckItem.setVisible(!SystemInfo.IS_MACOS);
 
     // extending context menu by character encoding options
     // binding is initialized in the MainWindow class

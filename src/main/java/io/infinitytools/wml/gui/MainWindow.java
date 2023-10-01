@@ -53,17 +53,21 @@ import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.tinylog.Logger;
 
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
@@ -112,6 +116,280 @@ public class MainWindow extends Application {
   }
 
   /**
+   * Handles the system tray if supported by the OS or app.
+   */
+  public class Tray {
+    /**
+     * Indicates whether tray icons are supported on the current machine.
+     */
+    private static final boolean IS_SUPPORTED = SystemTray.isSupported() && SystemInfo.IS_WINDOWS;
+
+    private SystemTray tray;
+    private TrayIcon trayIcon;
+    private PopupMenu popupMenu;
+    private MenuItem showHideItem;
+    private MenuItem aboutItem;
+    private MenuItem quitItem;
+
+    /**
+     * Constructs a system tray.
+     *
+     * @param enabled Indicates whether the system tray should be initialized. {@link #isAvailable()} can be used to
+     *                query whether a working system tray has been constructed.
+     */
+    public Tray(boolean enabled) {
+      init(enabled);
+    }
+
+    /**
+     * Returns whether a system tray is available and has been successfully initialized for this application.
+     *
+     * @return {@code true} if a working system tray has been set up, {@code false} otherwise.
+     */
+    public boolean isAvailable() {
+      return tray != null;
+    }
+
+    /**
+     * Returns the {@link SystemTray} instance for this application instance.
+     * Returns {@code null} if system tray is not supported.
+     */
+    public SystemTray getSystemTray() {
+      return isAvailable() ? tray : null;
+    }
+
+    /**
+     * Returns the {@link TrayIcon} instance associated with the {@link SystemTray}.
+     * Returns {@code null} if system tray is not supported.
+     */
+    public TrayIcon getTrayIcon() {
+      return isAvailable() ? trayIcon : null;
+    }
+
+    /**
+     * Returns the {@link PopupMenu} instance attached to the tray icon.
+     * Returns {@code null} if system tray is not supported.
+     */
+    public PopupMenu getPopupMenu() {
+      return isAvailable() ? popupMenu : null;
+    }
+
+    /**
+     * Returns the {@link MenuItem} instance for "Show/Hide".
+     * Returns {@code null} if system tray is not supported.
+     */
+    public MenuItem getShowHideItem() {
+      return isAvailable() ? showHideItem : null;
+    }
+
+    /**
+     * Returns the {@link MenuItem} instance for "About...".
+     * Returns {@code null} if system tray is not supported.
+     */
+    public MenuItem getAboutItem() {
+      return isAvailable() ? aboutItem : null;
+    }
+
+    /**
+     * Returns the {@link MenuItem} instance for "Terminate/Quit".
+     * Returns {@code null} if system tray is not supported.
+     */
+    public MenuItem getQuitItem() {
+      return isAvailable() ? quitItem : null;
+    }
+
+    /**
+     * Displays a popup message near the tray icon. The message will disappear after a time or if the user clicks on it.
+     * Clicking the message may trigger an {@link java.awt.event.ActionEvent}.
+     *
+     * @param caption     Caption displayed above the text, usually in bold. May be {@code null}.
+     * @param text        Text displayed for this particular message. May be {@code null}.
+     * @param messageType An enum that indicates the message type.
+     * @return {@code true} if the notification message is displayed, {@code false} if the system tray is not available.
+     */
+    public boolean displayMessage(String caption, String text, TrayIcon.MessageType messageType) {
+      if (!isAvailable()) {
+        return false;
+      }
+
+      getTrayIcon().displayMessage(caption, text, messageType);
+      return true;
+    }
+
+    /**
+     * Called when the "Show/Hide" menu item is selected.
+     */
+    public void onShowHide() {
+      Platform.runLater(() -> {
+        if (MainWindow.this.getStage().isShowing()) {
+          MainWindow.this.hideWindow();
+        } else {
+          MainWindow.this.restoreWindow();
+        }
+      });
+    }
+
+    /**
+     * Called when the "About..." menu item is selected.
+     */
+    public void onAbout() {
+      Platform.runLater(MainWindow.this::showAboutDialog);
+    }
+
+    /**
+     * Called when the "Terminate/Quit" menu item is selected.
+     */
+    public void onQuit() {
+      Platform.runLater(() -> {
+        MainWindow.this.restoreWindow();
+        MainWindow.this.quit(false);
+      });
+    }
+
+    /**
+     * Called when the user double-clicks on the system tray icon.
+     */
+    public void onRestoreWindow() {
+      Platform.runLater(MainWindow.this::restoreWindow);
+    }
+
+    /**
+     * Returns the {@link Image} object for the tray icon depending on the specified UI mode.
+     *
+     * @param darkMode Specify {@code true} to return the icon for the Dark Mode UI, {@code false} to return
+     *                 the icon for the Light Mode UI.
+     * @return {@link Image} object.
+     */
+    public static Image getIcon(boolean darkMode) {
+      final Icons ic = darkMode ? Icons.IconDark32 : Icons.Icon32;
+      try (final InputStream is = Icons.class.getResourceAsStream(ic.getFileName())) {
+        assert is != null;
+        return javax.imageio.ImageIO.read(is);
+      } catch (IOException e) {
+        Logger.error(e, "Could not load tray icon");
+      }
+      return null;
+    }
+
+    /**
+     * Returns the "Quit" menu item label based on the current process state.
+     */
+    public String getQuitLabel() {
+      return isProcessRunning() ? R.get("ui.tray.menu.item.terminate") : R.get("ui.tray.menu.item.quit");
+    }
+
+    private void init(boolean enabled) {
+      if (!IS_SUPPORTED || !enabled) {
+        return;
+      }
+
+      final Image icon = getIcon(isDarkModeEnabled());
+      if (icon == null) {
+        // should never happen
+        return;
+      }
+
+      // Prevents auto-closing of the application when the last window is hidden.
+      // Requires an explicit call of Platform.exit() to quit the application.
+      Platform.setImplicitExit(false);
+
+      popupMenu = new PopupMenu();
+
+      showHideItem = new MenuItem(R.get("ui.tray.menu.item.showHide"));
+      popupMenu.add(showHideItem);
+      showHideItem.addActionListener(event -> onShowHide());
+
+      aboutItem = new MenuItem(R.get("ui.tray.menu.item.about"));
+      popupMenu.add(aboutItem);
+      aboutItem.addActionListener(event -> onAbout());
+
+      quitItem = new MenuItem(getQuitLabel());
+      popupMenu.add(quitItem);
+      quitItem.addActionListener(event -> onQuit());
+
+      trayIcon = new TrayIcon(icon, Globals.APP_TITLE, popupMenu);
+      trayIcon.setImageAutoSize(true);
+      // Double-click restores window
+//      trayIcon.addActionListener(event -> onRestoreWindow());
+      // Single click restores window
+      trayIcon.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+          if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 1) {
+            // triggered on single left mouse button click
+            onRestoreWindow();
+          }
+        }
+      });
+
+      tray = SystemTray.getSystemTray();
+      try {
+        tray.add(trayIcon);
+      } catch (AWTException e) {
+        tray = null;
+        trayIcon = null;
+        Logger.debug(e, "Adding system tray icon");
+      }
+    }
+  }
+
+  /**
+   * A record for storing the current state of the app window.
+   *
+   * @param x            X position of the main window.
+   * @param y            Y position of the main window.
+   * @param width        Width of the main window.
+   * @param height       Height of the main window.
+   * @param detailsShown Whether the Details window is shown.
+   */
+  private record WindowState(double x, double y, double width, double height, boolean isMaximized, boolean detailsShown) {
+    /**
+     * Initializes a new {@link WindowState} instance from the specified {@link MainWindow} instance.
+     *
+     * @param window {@link MainWindow} instance to retrieve state information from.
+     * @return An initialized {@link WindowState} instance.
+     * @throws NullPointerException if the {@code window} argument is {@code null}.
+     */
+    public static WindowState store(MainWindow window) {
+      if (window == null) {
+        throw new NullPointerException("Window argument is null");
+      }
+
+      final Stage stage = window.getStage();
+      return new WindowState(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight(), stage.isMaximized(),
+          window.isDetailsWindowVisible());
+    }
+
+    /**
+     * Restores the state of the specified {@link MainWindow} instance. The window is made visible and restored
+     * from an iconified state if needed.
+     *
+     * @param window {@link MainWindow} instance to restore.
+     */
+    public void restore(MainWindow window) {
+      if (window == null) {
+        throw new NullPointerException("Window argument is null");
+      }
+
+      final Stage stage = window.getStage();
+      if (!stage.isShowing()) {
+        stage.show();
+      }
+
+      if (stage.isIconified()) {
+        stage.setIconified(false);
+      }
+
+      stage.setX(x);
+      stage.setY(y);
+      stage.setWidth(width);
+      stage.setHeight(height);
+      stage.setMaximized(isMaximized);
+      window.setDetailsWindowVisible(detailsShown);
+    }
+  }
+
+  /**
    * Path to the FXML definition file for this window.
    */
   private final static URL FXML_FILE = Objects.requireNonNull(MainWindow.class.getResource("main.fxml"));
@@ -138,6 +416,8 @@ public class MainWindow extends Application {
   private ModInfo modInfo;
   private DetailsWindow detailsWindow;
   private SysProc process;
+  private WindowState windowState;
+  private Tray tray;
 
   /**
    * Storage for the exit code of the WeiDU operation.
@@ -242,6 +522,15 @@ public class MainWindow extends Application {
    */
   public MainWindowController getController() {
     return controller;
+  }
+
+  /**
+   * Provides access to the system tray if available.
+   *
+   * @return {@link Tray} instance associated with this application.
+   */
+  public Tray getTray() {
+    return tray;
   }
 
   /**
@@ -549,16 +838,63 @@ public class MainWindow extends Application {
   }
 
   /**
+   * Called when the user clicked on the Quit button.
+   */
+  private void onQuitClicked() {
+    if (isProcessRunning()) {
+      terminate(false);
+    } else {
+      onCloseApplication(null);
+    }
+  }
+
+  /**
    * Called if the user wants to close the launcher application.
    *
    * @param event Forwarded event that triggered the close action. Can be {@code null}.
    */
   private void onCloseApplication(Event event) {
-    if (!quit(false)) {
-      if (event != null) {
-        // discard close request
-        event.consume();
+    boolean success = true;
+    if (getTray().isAvailable()) {
+      // single instance mode with system tray enabled
+      boolean result = Configuration.getInstance().getOption(Configuration.Key.TRAY_HINT_SHOWN);
+      if (!result) {
+        getTray().displayMessage(R.get("ui.main.tray.message.quitHint.caption"),
+            R.get("ui.main.tray.message.quitHint.text"), TrayIcon.MessageType.INFO);
+        Configuration.getInstance().setOption(Configuration.Key.TRAY_HINT_SHOWN, true);
       }
+      // getStage().hide();
+      hideWindow();
+    } else {
+      success = quit(false);
+    }
+
+    if (!success && event != null) {
+      // discard close request
+      event.consume();
+    }
+  }
+
+  /**
+   * Hides the window with the intention to restore it later by {@link #showWindow()}.
+   */
+  private void hideWindow() {
+    if (getStage().isShowing()) {
+      windowState = WindowState.store(this);
+      getStage().hide();
+    }
+  }
+
+  /**
+   * Restores a window that was previously hidden by {@link #hideWindow()}.
+   */
+  private void showWindow() {
+    if (windowState != null) {
+      windowState.restore(this);
+      windowState = null;
+    } else {
+      getStage().show();
+      getStage().setIconified(false);
     }
   }
 
@@ -614,6 +950,9 @@ public class MainWindow extends Application {
     updateWindowTitle(true);
     getController().quitButton.setText(R.get("ui.main.terminate.button"));
     getController().inputButtons.forEach(button -> button.setDisable(false));
+    if (getTray().isAvailable()) {
+      getTray().getQuitItem().setLabel(getTray().getQuitLabel());
+    }
   }
 
   /**
@@ -621,8 +960,20 @@ public class MainWindow extends Application {
    */
   private void setWeiduTerminated() {
     updateWindowTitle(true);
-    getController().quitButton.setText(R.get("ui.main.quit.button"));
+
+    final String labelKey = getTray().isAvailable() ? "ui.main.close.button" : "ui.main.quit.button";
+    getController().quitButton.setText(R.get(labelKey));
+    if (getTray().isAvailable()) {
+      getTray().getQuitItem().setLabel(getTray().getQuitLabel());
+    }
+
     getController().inputButtons.forEach(button -> button.setDisable(true));
+
+    // Triggering tray notification if main window is not active
+    if (!getStage().isShowing() || !getStage().isFocused()) {
+      getTray().displayMessage(R.INFORMATION(), R.get("ui.main.tray.message.terminatedHint.text"),
+          TrayIcon.MessageType.INFO);
+    }
   }
 
   /**
@@ -745,6 +1096,11 @@ public class MainWindow extends Application {
       final Icons icon = enable ? Icons.OptionsDark32 : Icons.Options32;
       iv.setImage(icon.getImage());
     }
+
+    // updating tray icon if available
+    if (getTray() != null) {
+      getTray().getTrayIcon().setImage(Tray.getIcon(enable));
+    }
   }
 
   /**
@@ -805,7 +1161,7 @@ public class MainWindow extends Application {
     }
 
     if (isAutoQuitEnabled() && !isProcessRunning()) {
-      quit(false);
+      onCloseApplication(null);
     }
 
     setInputFocus();
@@ -866,7 +1222,7 @@ public class MainWindow extends Application {
     getController().bufferSizeSlider.valueProperty().addListener((ob, ov, nv) -> setOutputBufferSizeLabel(nv.doubleValue()));
     getController().outputFontSizeValueFactory.valueProperty().addListener((ob, ov, nv) -> setOutputAreaFontSize(nv));
 
-    getController().quitButton.setOnAction(this::onCloseApplication);
+    getController().quitButton.setOnAction(event -> onQuitClicked());
     getController().detailsButton.selectedProperty().addListener((ob, ov, nv) -> onDetailsButtonSelected(nv));
     getController().detailsButton.setOnAction(event -> setInputFocus());
     getController().aboutButton.setOnAction(event -> showAboutDialog());
@@ -932,6 +1288,10 @@ public class MainWindow extends Application {
         getController().outputArea.getFont().getSize()), true);
 
     applyDarkModeUi(isDarkModeEnabled());
+
+    // Constructing system tray
+    // Functionality is only available on selected platforms and when single instance mode is active.
+    tray = new Tray(isSingleInstanceEnabled());
 
     onDetailsButtonSelected(Configuration.getInstance().getOption(Configuration.Key.SHOW_DETAILS));
 
@@ -1431,8 +1791,8 @@ public class MainWindow extends Application {
   private boolean handleDroppedFiles(File... files) {
     boolean retVal = false;
     if (isProcessRunning()) {
-      Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.openFile.header"),
-          R.get("ui.main.dragdrop.openFile.processRunning.content"));
+      Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.message.openFile.header"),
+          R.get("ui.main.dragdrop.message.openFile.processRunning.content"));
     } else if (files.length > 0) {
       if (files.length == 1) {
         final File rawFile = files[0];
@@ -1452,17 +1812,17 @@ public class MainWindow extends Application {
             restart(tp2Path.toString());
             retVal = true;
           } catch (Exception e) {
-            final String msg = e.getMessage().isEmpty() ? R.get("ui.main.dragdrop.openFile.error.unspecified") : e.getMessage();
-            Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.openFile.header"),
-                R.get("ui.main.dragdrop.openFile.loadError.content") + "\n" + msg);
+            final String msg = e.getMessage().isEmpty() ? R.get("ui.main.dragdrop.message.openFile.error.unspecified") : e.getMessage();
+            Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.message.openFile.header"),
+                R.get("ui.main.dragdrop.message.openFile.loadError.content") + "\n" + msg);
           }
         } else {
-          Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.openFile.header"),
-              String.format("%s\n%s", R.get("ui.main.dragdrop.openFile.unsupported.content"), rawFile.getName()));
+          Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.message.openFile.header"),
+              String.format("%s\n%s", R.get("ui.main.dragdrop.message.openFile.unsupported.content"), rawFile.getName()));
         }
       } else {
-        Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.openFile.header"),
-            String.format(R.get("ui.main.dragdrop.openFile.tooMany.content"), files.length));
+        Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.message.openFile.header"),
+            String.format(R.get("ui.main.dragdrop.message.openFile.tooMany.content"), files.length));
       }
     }
 
@@ -1553,9 +1913,7 @@ public class MainWindow extends Application {
    * Shows the window, places it on top of the windows stacking order and sets the focus.
    */
   public void restoreWindow() {
-    if (!getStage().isShowing()) {
-      getStage().show();
-    }
+    showWindow();
     if (getStage().isIconified()) {
       getStage().setIconified(false);
     }
@@ -1568,12 +1926,37 @@ public class MainWindow extends Application {
    */
   private void showAboutDialog() {
     try {
-      AboutDialog.showAboutDialog(getStage());
+      final Window owner = getStage().isShowing() ? getStage() : null;
+      AboutDialog.showAboutDialog(owner);
     } catch (Exception e) {
       Logger.error(e, "Error creating About dialog");
       // Fall-back option
       Utils.showMessageDialog(stage, "About", Globals.APP_TITLE, "Version " + Globals.APP_VERSION);
     }
+  }
+
+  /**
+   * Terminates a running process.
+   *
+   * @param forced Specify {@code false} to request user confirmation before terminating a process. Specify {@code true}
+   *               to terminate the process unconditionally.
+   * @return {@code true} if a process was running and has been terminated, {@code false} otherwise.
+   */
+  private boolean terminate(boolean forced) {
+    if (process != null && process.isRunning()) {
+      ButtonType result = ButtonType.OK;
+      if (!forced) {
+        result = Utils.showConfirmationDialog(getStage(), R.get("ui.main.terminate.message.title"),
+            R.get("ui.main.terminate.message.header"), R.get("ui.main.terminate.message.content"));
+      }
+
+      if (result == ButtonType.OK) {
+        process.killProcess();
+        appendOutputText(String.format("\n*** %s ***", R.get("ui.main.terminate.output")), true);
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -1586,15 +1969,13 @@ public class MainWindow extends Application {
   private boolean quit(boolean forced) {
     ButtonType result = ButtonType.OK;
     if (!forced && isProcessRunning()) {
-      result = Utils.showConfirmationDialog(stage, R.get("ui.main.quit.message.title"),
+      result = Utils.showConfirmationDialog(getStage(), R.get("ui.main.quit.message.title"),
           R.get("ui.main.quit.message.header"), R.get("ui.main.quit.message.content"));
     }
 
     if (result == ButtonType.OK) {
       // continue with closing the application
-      if (process != null && process.isRunning()) {
-        process.killProcess();
-      }
+      terminate(true);
       updateConfiguration();
       try {
         Configuration.getInstance().save();
@@ -1602,6 +1983,7 @@ public class MainWindow extends Application {
         Logger.warn(e, "Error saving configuration");
       }
       stage.close();
+      Platform.exit();
       return true;
     }
     return false;
