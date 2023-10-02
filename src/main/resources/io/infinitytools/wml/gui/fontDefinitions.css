@@ -1,0 +1,13 @@
+/* "Liberation Mono" */
+@font-face {
+  font-style: normal;
+  font-weight: normal;
+  src: url('../fonts/liberation-mono/LiberationMono-Regular.ttf') format('truetype');
+}
+
+/* "DejaVu Sans Mono" */
+@font-face {
+  font-style: normal;
+  font-weight: normal;
+  src: url('../fonts/dejavu-sans-mono/DejaVuSansMono.ttf') format('truetype');
+}

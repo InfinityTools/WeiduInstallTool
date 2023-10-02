@@ -26,6 +26,7 @@ import io.infinitytools.wml.process.BufferConvert;
 import io.infinitytools.wml.process.SysProc;
 import io.infinitytools.wml.process.SysProcChangeEvent;
 import io.infinitytools.wml.process.SysProcOutputEvent;
+import io.infinitytools.wml.utils.CustomLogWriter;
 import io.infinitytools.wml.utils.R;
 import io.infinitytools.wml.utils.SystemInfo;
 import io.infinitytools.wml.utils.Utils;
@@ -1098,7 +1099,7 @@ public class MainWindow extends Application {
     }
 
     // updating tray icon if available
-    if (getTray() != null) {
+    if (getTray() != null && getTray().getTrayIcon() != null) {
       getTray().getTrayIcon().setImage(Tray.getIcon(enable));
     }
   }
@@ -1221,6 +1222,19 @@ public class MainWindow extends Application {
     getController().singleInstanceCheckItem.setOnAction(event -> setSingleInstanceEnabled(isSingleInstanceEnabled(), true));
     getController().bufferSizeSlider.valueProperty().addListener((ob, ov, nv) -> setOutputBufferSizeLabel(nv.doubleValue()));
     getController().outputFontSizeValueFactory.valueProperty().addListener((ob, ov, nv) -> setOutputAreaFontSize(nv));
+
+    getController().showLogCheckItem.setOnAction(event -> {
+      final boolean selected = getController().showLogCheckItem.isSelected();
+      try {
+        if (selected) {
+          LogWindow.open();
+        } else {
+          LogWindow.getInstance().hide();
+        }
+      } catch (Exception e) {
+        Logger.warn(e, "Could not access the log window");
+      }
+    });
 
     getController().quitButton.setOnAction(event -> onQuitClicked());
     getController().detailsButton.selectedProperty().addListener((ob, ov, nv) -> onDetailsButtonSelected(nv));
@@ -1885,6 +1899,7 @@ public class MainWindow extends Application {
     getController().outputArea.positionCaret(0);
     getController().outputArea.clear();
     getController().inputField.clear();
+    CustomLogWriter.getInstance().reset();
     updateWindowTitle(false);
     setVisualizedResult(false, 0);
     final boolean showDetails = isDetailsWindowVisible();

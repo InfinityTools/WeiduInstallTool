@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module io.infinitytools.wml {
-  requires jdk.charsets;
-  requires java.desktop;
-  requires transitive javafx.controls;
-  requires transitive javafx.graphics;
-  requires javafx.fxml;
-  requires org.apache.commons.text;
-  requires org.json;
-  requires org.tinylog.impl;
-  requires org.tinylog.api;
+package io.infinitytools.wml.utils;
 
-  opens io.infinitytools.wml.gui to javafx.fxml;
-  exports io.infinitytools.wml.gui;
-  exports io.infinitytools.wml.mod;
-  exports io.infinitytools.wml.mod.info;
-  exports io.infinitytools.wml.mod.ini;
-  exports io.infinitytools.wml.utils;
+/**
+ * Handler for events produced by the {@link CustomLogWriter} class.
+ */
+@FunctionalInterface
+public interface LogEventHandler {
+  /**
+   * Invoked when a new log entry is emitted by the logger.
+   */
+  void handle(LogEvent event);
 }

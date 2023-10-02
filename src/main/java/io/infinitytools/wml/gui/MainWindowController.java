@@ -63,6 +63,7 @@ public class MainWindowController implements Initializable {
   public CheckMenuItem warnModOrderCheckItem;
   public CheckMenuItem darkModeUiCheckItem;
   public CheckMenuItem singleInstanceCheckItem;
+  public CheckMenuItem showLogCheckItem;
   public CustomMenuItem bufferSizeMenuItem;
   public CustomMenuItem outputFontSizeMenuItem;
   public Spinner<Double> outputFontSizeSpinner;

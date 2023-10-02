@@ -1,0 +1,18 @@
+/* Custom monospaced fonts for text areas */
+@import "fontDefinitions.css";
+
+#logArea {
+  -fx-font-family: "Liberation Mono", "DejaVu Sans Mono", monospace;
+}
+
+.root {
+  -fx-padding: 12px;
+}
+
+.boldLabel {
+  -fx-font-weight: bold;
+}
+
+.bigLabel {
+  -fx-font-size: 125%;
+}

@@ -429,7 +429,7 @@ public class Configuration {
       final Path initialPath = (path != null) ? Path.of(path) : null;
       tp2File = Utils.chooseOpenFile(null, R.get("ui.configuration.fileDialog.tp2.title"), initialPath,
           new FileChooser.ExtensionFilter(R.get("ui.configuration.fileDialog.tp2.filter.tp2"), "*.tp2"),
-          new FileChooser.ExtensionFilter(R.get("ui.configuration.fileDialog.tp2.filter.all"), "*.*"));
+          new FileChooser.ExtensionFilter(R.get("ui.fileDialog.filter.allFiles"), "*.*"));
       if (tp2File != null) {
         mode = Mode.WEIDU_GUIDED;
       } else {
