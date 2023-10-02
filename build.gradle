@@ -18,6 +18,9 @@ repositories {
 String appName
 String projectUrl
 
+// Defines whether the resulting binary should include debugging symbols
+boolean debugBuild = true
+
 ext {
   junitVersion = '5.9.2'
 
@@ -41,7 +44,7 @@ final String TLS_PROTOCOL = "-Djdk.tls.client.protocols=TLSv1.2"
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
   options.debugOptions.setDebugLevel("source,lines,vars")
-  options.debug = true
+  options.debug = debugBuild
 }
 
 tasks.withType(Test).configureEach {
@@ -84,15 +87,18 @@ String distFolder = "distribution"
 
 jlink {
   imageZip.fileValue(project.file("${layout.buildDirectory}/distributions/app-${javafx.platform.classifier}.zip"))
-  addOptions('--strip-debug', '--compress', 'zip-6', '--no-header-files', '--no-man-pages')
+  addOptions('--compress', 'zip-6', '--no-header-files', '--no-man-pages')
+  if (!debugBuild) {
+    addOptions('--strip-debug')
+  }
   addExtraDependencies("javafx")
 
   launcher {
     name = "${appName}"
 
-//    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-//      noConsole = true
-//    }
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+      noConsole = true
+    }
   }
 
   jpackage {
