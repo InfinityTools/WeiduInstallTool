@@ -471,6 +471,9 @@ public class Utils {
       if (Files.isDirectory(initialPath)) {
         directory = initialPath;
         fileName = null;
+      } else if (initialPath.getParent() == null) {
+        directory = Path.of(".");
+        fileName = initialPath.getFileName().toString();
       } else if (Files.isDirectory(initialPath.getParent())) {
         directory = initialPath.getParent();
         fileName = initialPath.getFileName().toString();
@@ -501,7 +504,7 @@ public class Utils {
     }
 
     if (saveDialog) {
-      final File selectedFile = fc.showOpenDialog(owner);
+      final File selectedFile = fc.showSaveDialog(owner);
       if (selectedFile != null) {
         retVal.add(selectedFile.toPath());
       }
