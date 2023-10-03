@@ -40,7 +40,8 @@ public class AppClient implements AutoCloseable {
     boolean retVal = false;
     try (final AppClient client = new AppClient()) {
       retVal = client.ping(bringToFront);
-    } catch (IllegalArgumentException | IOException ignored) {
+    } catch (IllegalArgumentException | IOException e) {
+      Logger.debug("Server not available: {}", e.getMessage());
     } catch (Exception e) {
       Logger.debug(e, "Client connecting to server");
     }
@@ -61,7 +62,8 @@ public class AppClient implements AutoCloseable {
 
     try (final AppClient client = new AppClient()) {
       retVal = client.execute(args);
-    } catch (IllegalArgumentException | IOException ignored) {
+    } catch (IllegalArgumentException | IOException e) {
+      Logger.debug("Server not available: {}", e.getMessage());
     } catch (Exception e) {
       Logger.debug(e, "Client connecting to server");
     }
@@ -80,7 +82,8 @@ public class AppClient implements AutoCloseable {
 
     try (final AppClient client = new AppClient()) {
       retVal = client.terminate();
-    } catch (IllegalArgumentException | IOException ignored) {
+    } catch (IllegalArgumentException | IOException e) {
+      Logger.debug("Server not available: {}", e.getMessage());
     } catch (Exception e) {
       Logger.debug(e, "Client connecting to server");
     }
@@ -133,7 +136,8 @@ public class AppClient implements AutoCloseable {
     try {
       final NetData ack = sendMessage(new NetData(NetData.Type.REQ_PING, Boolean.toString(bringToFront)));
       retVal = ack.getType() == NetData.Type.ACK_PING;
-    } catch (IllegalArgumentException | IOException ignored) {
+    } catch (IllegalArgumentException | IOException e) {
+      Logger.debug(e, "Error sending message");
     }
 
     return retVal;
@@ -152,7 +156,8 @@ public class AppClient implements AutoCloseable {
     try {
       final NetData ack = sendMessage(new NetData(NetData.Type.REQ_EXEC, args));
       retVal = ack.getType() == NetData.Type.ACK_EXEC;
-    } catch (IllegalArgumentException | IOException ignored) {
+    } catch (IllegalArgumentException | IOException e) {
+      Logger.debug(e, "Error sending message");
     }
 
     return retVal;
@@ -170,7 +175,8 @@ public class AppClient implements AutoCloseable {
     try {
       final NetData ack = sendMessage(new NetData(NetData.Type.REQ_TERM));
       retVal = ack.getType() == NetData.Type.ACK_TERM;
-    } catch (IllegalArgumentException | IOException ignored) {
+    } catch (IllegalArgumentException | IOException e) {
+      Logger.debug(e, "Error sending message");
     }
 
     return retVal;

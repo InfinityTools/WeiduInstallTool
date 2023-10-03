@@ -46,7 +46,7 @@ Installation builds are available as installers and portable packages for Window
 - [Gradle Build Tool](https://gradle.org/)
 - [Oracle's JDK 21 or later](https://www.oracle.com/de/java/technologies/downloads/), or [OpenJDK 21 or later](https://adoptium.net/temurin/releases/?version=21)
 
-*Note: JDK 21 will be automatically provided if an older Java installation is found on the system.*
+*Note: JDK 21 is automatically provided if an older Java installation is found on the system.*
 
 The following commands will build the application and create packages in the format native to the current platform.
 

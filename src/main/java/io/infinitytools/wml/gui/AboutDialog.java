@@ -24,6 +24,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+import org.tinylog.Logger;
 
 import java.net.URL;
 
@@ -34,7 +35,7 @@ public class AboutDialog extends Stage {
   /**
    * Path to the FXML definition file for this window.
    */
-  private final static URL FXML_FILE = AboutDialog.class.getResource("about.fxml");
+  private static final URL FXML_FILE = AboutDialog.class.getResource("about.fxml");
 
   private static AboutDialog instance;
 
@@ -84,6 +85,7 @@ public class AboutDialog extends Stage {
       final double y = getOwner().getY() + (getOwner().getHeight() - instance.getHeight()) / 2.0;
       setX(x);
       setY(y);
+      Logger.debug("About window position: {}, {}", x, y);
     } else {
       centerOnScreen();
     }

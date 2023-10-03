@@ -15,6 +15,8 @@
  */
 package io.infinitytools.wml.ini;
 
+import org.tinylog.Logger;
+
 import java.util.Objects;
 
 /**
@@ -80,7 +82,8 @@ public class IniEntry extends IniBaseNode {
       } else {
         return Long.parseLong(value);
       }
-    } catch (NumberFormatException ignored) {
+    } catch (NumberFormatException e) {
+      Logger.debug(e, "Not a number: {}", value);
     }
     return defValue;
   }

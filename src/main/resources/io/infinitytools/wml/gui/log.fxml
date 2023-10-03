@@ -55,15 +55,11 @@
                   text="%ui.log.level.info"
                   selected="true"/>
 
-        <!-- TODO: remove or hide later -->
         <CheckBox fx:id="debugLevelCheckBox"
-                  text="%ui.log.level.debug"
-                  selected="true"/>
+                  text="%ui.log.level.debug"/>
 
-        <!-- TODO: remove or hide later -->
         <CheckBox fx:id="traceLevelCheckBox"
-                  text="%ui.log.level.trace"
-                  selected="true"/>
+                  text="%ui.log.level.trace"/>
 
         <Pane HBox.hgrow="ALWAYS" />
 

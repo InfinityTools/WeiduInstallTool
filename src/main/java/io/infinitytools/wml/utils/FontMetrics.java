@@ -18,6 +18,7 @@ package io.infinitytools.wml.utils;
 import javafx.geometry.Bounds;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import org.tinylog.Logger;
 
 /**
  * A helper class for calculating text sizes based on a specific font.
@@ -66,6 +67,7 @@ public class FontMetrics {
       retVal = internal.getLayoutBounds().getWidth();
     }
 
+    Logger.debug("String width: {}", retVal);
     return retVal;
   }
 }

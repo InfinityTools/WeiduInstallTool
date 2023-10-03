@@ -68,6 +68,7 @@ public class Release implements Comparable<Release> {
     } catch (IllegalArgumentException e) {
       Logger.error(e, "Retrieving GitHub Release data");
     }
+    Logger.debug("Releases found: {}", retVal.size());
 
     return retVal;
   }
@@ -92,6 +93,7 @@ public class Release implements Comparable<Release> {
     } else {
       path = String.format("/repos/%s/%s", owner, repo);
     }
+    Logger.debug("GitHub API path: {}", path);
     return GITHUB_API.resolve(path);
   }
 
@@ -349,5 +351,6 @@ public class Release implements Comparable<Release> {
         }
       }
     }
+    Logger.debug("Release initialized: {}", toString());
   }
 }

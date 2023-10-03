@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -191,6 +192,7 @@ public class SystemInfo {
     Path retVal = null;
     try {
       retVal = Path.of(System.getProperty("user.home"));
+      Logger.debug("user.home: {}", retVal);
     } catch (InvalidPathException e) {
       Logger.debug(e, "User path not found");
     }
@@ -236,6 +238,7 @@ public class SystemInfo {
       retVal = dataRoot;
     }
 
+    Logger.debug("Local data path: {}", retVal);
     return retVal;
   }
 
@@ -246,6 +249,7 @@ public class SystemInfo {
     int retVal = 8;
 
     String[] versionString = System.getProperty("java.specification.version").split("\\.");
+    Logger.debug("java.specification.version: {}", Arrays.toString(versionString));
     try {
       int major = Integer.parseInt(versionString[0]);
       if (major <= 1 && versionString.length > 1) {
@@ -347,6 +351,7 @@ public class SystemInfo {
       }
       regex = Pattern.compile(pattern, flags);
     } catch (PatternSyntaxException e) {
+      Logger.debug(e, "Pattern syntax error: {}", pattern);
       regex = Pattern.compile(Pattern.quote(pattern));
     }
 

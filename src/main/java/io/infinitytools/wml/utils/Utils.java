@@ -204,7 +204,8 @@ public class Utils {
     if (op != null) {
       try {
         return op.produce();
-      } catch (Throwable ignored) {
+      } catch (Throwable t) {
+        Logger.debug(t);
       }
     }
     return defValue;
@@ -484,6 +485,7 @@ public class Utils {
         directory = null;
         fileName = null;
       }
+      Logger.debug("Directory: {}, filename: {}", directory, fileName);
 
       if (directory != null) {
         fc.setInitialDirectory(directory.toFile());

@@ -58,6 +58,7 @@ public class LogWindow extends Stage {
    */
   public static LogWindow getInstance() throws Exception {
     if (instance == null) {
+      Logger.debug("Creating new LogWindow instance");
       instance = new LogWindow();
     }
     return instance;
@@ -70,9 +71,11 @@ public class LogWindow extends Stage {
    */
   public static void open() throws Exception {
     if (!getInstance().isShowing()) {
+      Logger.debug("Showing log window");
       getInstance().show();
     }
     if (getInstance().isIconified()) {
+      Logger.debug("Restoring iconified state of log window");
       getInstance().setIconified(false);
     }
     getInstance().requestFocus();
@@ -118,8 +121,10 @@ public class LogWindow extends Stage {
   }
 
   private void onAddLog(CustomLogWriter writer, LogEntry logEntry) {
-    String s = writer.render(logEntry);
-    appendText(s);
+    if (getSelectedLevels().contains(logEntry.getLevel())) {
+      String s = writer.render(logEntry);
+      appendText(s);
+    }
   }
 
   private void onClearLog() {
@@ -187,6 +192,7 @@ public class LogWindow extends Stage {
       initialFolder = Path.of(".");
     }
 
+    Logger.debug("Saving log: initial path={}", initialFolder);
     final Path saveFile = Utils.chooseSaveFile(this, R.get("ui.log.fileDialog.txt.title"),
         initialFolder.resolve(LOG_FILENAME),
         new FileChooser.ExtensionFilter(R.get("ui.log.fileDialog.txt.filter.txt"), "*.txt"),
@@ -194,7 +200,8 @@ public class LogWindow extends Stage {
 
     if (saveFile != null) {
       try {
-        Files.writeString(saveFile, getLogOutput(), StandardOpenOption.CREATE);
+        final Path path = Files.writeString(saveFile, getLogOutput(), StandardOpenOption.CREATE);
+        Logger.debug("Log save to: {}", path);
         Utils.showMessageDialog(this, R.INFORMATION(), R.get("ui.log.save.message.success.header"), null);
       } catch (IOException e) {
         Logger.warn(e, "Could not save log file");

@@ -238,7 +238,7 @@ public enum Icons {
       assert is != null;
       retVal = new Image(is);
     } catch (IOException e) {
-      Logger.error(e, "Image not accessible");
+      Logger.error(e, "Image not accessible: {}", fileName);
     }
 
     return retVal;

@@ -16,6 +16,7 @@
 package io.infinitytools.wml.fonts;
 
 import javafx.scene.text.Font;
+import org.tinylog.Logger;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -61,6 +62,7 @@ public enum Fonts {
     if (url != null) {
       retVal = Font.loadFont(url.toExternalForm(), size);
     }
+    Logger.debug("Font for size {} loaded: {}", size, retVal);
     return retVal;
   }
 }

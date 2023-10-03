@@ -17,6 +17,7 @@ package io.infinitytools.wml.github;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.net.URI;
@@ -48,6 +49,7 @@ public class User implements Comparable<User> {
     } else {
       path = String.format("/users/%s", user);
     }
+    Logger.debug("GitHub API path: {}", path);
     return Release.GITHUB_API.resolve(path);
   }
 
@@ -284,6 +286,7 @@ public class User implements Comparable<User> {
         default -> {
         }
       }
+      Logger.debug("User initialized: {}", toString());
     }
   }
 }

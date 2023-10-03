@@ -215,6 +215,7 @@ public class ModInfo {
       ensureComponentExists(languageIndex);
     } catch (Exception e) {
       // component information could not be retrieved
+      Logger.debug(e, "Could not retrieve component info");
       return null;
     }
 
@@ -274,7 +275,8 @@ public class ModInfo {
         if (m.find()) {
           retVal = m.group(1);
         }
-      } catch (IOException ignored) {
+      } catch (IOException e) {
+        Logger.debug(e, "Could not read from weidu.conf");
       }
     }
 
@@ -301,7 +303,7 @@ public class ModInfo {
               StandardOpenOption.WRITE);
           retVal = true;
         } catch (IOException e) {
-          Logger.debug(e, "Error writing weidu.conf");
+          Logger.debug(e, "Could not write to weidu.conf");
         }
       }
     }

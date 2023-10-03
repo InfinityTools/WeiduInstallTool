@@ -279,7 +279,7 @@ public class IniMap implements Iterable<IniMapSection> {
               // no change
             } else {
               state = State.Unknown;
-              Logger.debug(String.format("Skipping invalid characters at line:%d, pos:%d\n", i + 1, pos + 1));
+              Logger.debug("Skipping invalid characters at line:{}, pos:{}\n", i + 1, pos + 1);
             }
             break;
           case Section:
@@ -344,7 +344,7 @@ public class IniMap implements Iterable<IniMapSection> {
           final String name = cb.flip().toString();
           cb.clear();
           curSection = curMap.addSection(name);
-          Logger.debug(String.format("Expected closing bracket (]) at line:%d, pos:%d\n", i + 1, pos + 1));
+          Logger.debug("Expected closing bracket (]) at line:{}, pos:{}\n", i + 1, pos + 1);
           break;
         }
         case Key: {
@@ -352,7 +352,7 @@ public class IniMap implements Iterable<IniMapSection> {
           final String key = cb.flip().toString();
           cb.clear();
           curEntry = curSection.addEntry(key, "");
-          Logger.debug(String.format("Expected equals sign (=) at line:%d, pos:%d\n", i + 1, pos + 1));
+          Logger.debug("Expected equals sign (=) at line:{}, pos:{}\n", i + 1, pos + 1);
           break;
         }
         case Value: {

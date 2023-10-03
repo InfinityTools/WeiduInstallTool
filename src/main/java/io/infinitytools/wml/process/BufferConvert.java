@@ -260,7 +260,7 @@ public class BufferConvert {
           text.delete(0, text.length());
           text.append(lastText);
         } catch (IOException e) {
-          Logger.warn(e, "Setting charset");
+          Logger.warn(e, "Setting charset: {}", charset);
         }
       }
     } finally {

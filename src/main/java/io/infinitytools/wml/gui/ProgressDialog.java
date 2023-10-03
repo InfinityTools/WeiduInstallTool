@@ -44,7 +44,7 @@ public class ProgressDialog extends Stage implements AutoCloseable {
   /**
    * Path to the FXML definition file for this window.
    */
-  private final static URL FXML_FILE = ProgressDialog.class.getResource("progress.fxml");
+  private static final URL FXML_FILE = ProgressDialog.class.getResource("progress.fxml");
 
   /**
    * Executes a given task and shows a modal dialog that informs about the progress.
@@ -83,7 +83,7 @@ public class ProgressDialog extends Stage implements AutoCloseable {
         Logger.error(e, "Performed task was aborted");
         throw new TaskException(e.getCause());
       } catch (CancellationException | InterruptedException e) {
-        Logger.debug(e, "Performed task cancelled by user");
+        Logger.info(e, "Performed task cancelled by user");
         return false;
       } finally {
         if (owner != null) {

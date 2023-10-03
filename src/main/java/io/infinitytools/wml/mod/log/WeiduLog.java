@@ -58,7 +58,7 @@ public class WeiduLog implements Iterable<WeiduLogEntry> {
           content = Files.readString(log, cs);
           break;
         } catch (CharacterCodingException e) {
-          Logger.debug(e, "Incompatible character encoding");
+          Logger.debug(e, "Incompatible character encoding: {}", cs);
         }
       }
       if (content != null) {
@@ -94,7 +94,7 @@ public class WeiduLog implements Iterable<WeiduLogEntry> {
             content = decoder.decode(ByteBuffer.wrap(buf)).toString();
             break;
           } catch (CharacterCodingException e) {
-            Logger.debug(e, "Incompatible character encoding");
+            Logger.debug(e, "Incompatible character encoding: {}", cs);
           }
         }
 

@@ -45,7 +45,7 @@ public class DetailsWindow extends Stage {
   /**
    * Path to the FXML definition file for this window.
    */
-  private final static URL FXML_FILE = MainWindow.class.getResource("details.fxml");
+  private static final URL FXML_FILE = MainWindow.class.getResource("details.fxml");
 
   private final ModInfo modInfo;
 
@@ -89,7 +89,7 @@ public class DetailsWindow extends Stage {
    * Called whenever the content of the mod components tree should be reinitialized.
    *
    * @param newLanguageIndex Language index to use
-   * @param newGroup Component Group to use
+   * @param newGroup         Component Group to use
    */
   private void onComponentsTreeChanged(int newLanguageIndex, ComponentGroup newGroup) {
     Logger.debug("Components Tree changes (languageIndex={}, group={})", newLanguageIndex, newGroup);
@@ -110,7 +110,7 @@ public class DetailsWindow extends Stage {
    * Rebuilds the mod components tree based on the given parameters.
    *
    * @param components {@link ComponentRoot} instance of the mod.
-   * @param group {@link ComponentGroup} filter.
+   * @param group      {@link ComponentGroup} filter.
    */
   private void initComponentsTree(final ComponentRoot components, final ComponentGroup group) {
     controller.componentsTree.setRoot(null);
@@ -157,6 +157,7 @@ public class DetailsWindow extends Stage {
    */
   private void refreshModInfoCharset(Charset charset) {
     if (modInfo != null) {
+      Logger.debug("New charset: {}", charset);
       modInfo.clearCache();
       modInfo.setCharsetOverride(charset);
       onLanguageItemSelected(controller.languageComboBox.getSelectionModel().getSelectedIndex());
@@ -191,6 +192,7 @@ public class DetailsWindow extends Stage {
     });
 
     if (modInfo != null && modInfo.getModIni() != null) {
+      Logger.debug("Initializing mod information");
       // initializing mod information tree
       final ModIni ini = modInfo.getModIni();
       final TreeItem<Node> root = new TreeItem<>(new Label(R.get("ui.details.modInfo.root")));
@@ -271,6 +273,7 @@ public class DetailsWindow extends Stage {
       expandTreeNodes(root);
       controller.iniTree.setRoot(root);
     } else {
+      Logger.debug("Not mod information available");
       // initializing message for non-existing mod information
       final String msg = String.format("*** %s ***", R.get("ui.details.modInfo.message.unavailable"));
       final Label label = new Label(msg);
@@ -376,17 +379,21 @@ public class DetailsWindow extends Stage {
       if (screen == null) {
         screen = Screen.getPrimary();
       }
+      Logger.debug("Using screen: {}", screen);
 
       // adjusting initial window size and position
       final double height = Math.max(getMinHeight(), screen.getBounds().getHeight() * 0.8);
+      Logger.debug("New height: {}", height);
       setHeight(height);
 
       final double width = Math.max(getWidth(), MainWindow.getInstance().getStage().getMinWidth() * .75);
+      Logger.debug("New width: {}", width);
       setWidth(width);
 
       // keep window inside vertical screen boundary
       double y = Math.max(0.0, stageMain.getY() - (getHeight() - stageMain.getHeight()) / 2.0);
       y = Math.min(screen.getBounds().getMaxY() - getHeight(), y);
+      Logger.debug("New y position: {}", y);
       setY(y);
 
       // try to place window right next to the main window
@@ -403,6 +410,7 @@ public class DetailsWindow extends Stage {
         // place window on the right side
         x = mainStageRight;
       }
+      Logger.debug("New x position: {}", x);
       setX(x);
     }
     storeSettings();

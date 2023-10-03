@@ -22,6 +22,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
+import org.tinylog.Logger;
 
 import java.nio.charset.Charset;
 import java.util.*;
@@ -214,6 +215,7 @@ public class CharsetMenu {
    */
   public RadioMenuItem getSelectedItem() {
     if (itemGroup.getSelectedToggle() instanceof RadioMenuItem rmi) {
+      Logger.debug("Selected item: {}", rmi.getText());
       return rmi;
     }
     return null;
@@ -273,6 +275,7 @@ public class CharsetMenu {
       if (Objects.equals(info, rmi.getUserData())) {
         return rmi;
       } else {
+        Logger.debug("Menu item not found");
         return null;
       }
     }
@@ -283,6 +286,7 @@ public class CharsetMenu {
     } else if (item instanceof Menu menu) {
       list = menu.getItems();
     } else {
+      Logger.debug("Menu item not found");
       return null;
     }
 
@@ -293,6 +297,7 @@ public class CharsetMenu {
       }
     }
 
+    Logger.debug("Menu item not found");
     return null;
   }
 
@@ -329,6 +334,7 @@ public class CharsetMenu {
         menu.getItems().add(rmi);
       }
     }
+    Logger.debug("Menu items initialized: {}", CharsetEntry.values().length);
 
     itemGroup.selectedToggleProperty().addListener((ob, ov, nv) -> {
       if (nv instanceof RadioMenuItem rmi) {

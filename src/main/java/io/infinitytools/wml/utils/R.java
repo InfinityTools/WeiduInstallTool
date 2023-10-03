@@ -103,7 +103,7 @@ public class R {
     try {
       retVal = getBundle().getString(key);
     } catch (ClassCastException | MissingResourceException | NullPointerException e) {
-      Logger.debug(e, "Get string from resource bundle for key = {}", key);
+      Logger.debug(e, "Could not get string from resource bundle for key: {}", key);
       retVal = defValue;
     }
 

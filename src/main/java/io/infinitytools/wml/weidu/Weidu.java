@@ -478,6 +478,7 @@ public class Weidu {
       }
     }
 
+    Logger.debug("Search paths: {}", searchPaths);
     return searchPaths;
   }
 
@@ -515,6 +516,7 @@ public class Weidu {
       }
     }
 
+    Logger.debug("WeiDU binary: {}", retVal);
     return retVal;
   }
 
@@ -560,7 +562,7 @@ public class Weidu {
           retVal = output.strip().matches(".*\\bWeiDU version [0-9]+");
         }
       } catch (PatternSyntaxException e) {
-        Logger.error(e, "Invalid regular expression. NEEDS FIX!!!");
+        Logger.error(e, "Invalid regular expression");
       } catch (Exception e) {
         Logger.error(e, "Process execution error");
       }
@@ -599,7 +601,7 @@ public class Weidu {
       zipAsset = findWeiduAsset();
     } catch (IOException e) {
       Logger.debug(e, "Unrecoverable findWeiduAsset() error");
-      throw new IOException("Could not determine WeiDU binary URL.", e);
+      throw new IOException("Could not determine WeiDU binary URL", e);
     }
 
     // 2. Download zip file to memory buffer
@@ -625,7 +627,7 @@ public class Weidu {
       }
     } catch (IOException e) {
       Logger.debug(e, "Error downloading WeiDU archive");
-      throw new IOException("Could not download WeiDU binary.", e);
+      throw new IOException("Could not download WeiDU binary", e);
     }
 
     // 3. Extract WeiDU binary to destination
@@ -653,6 +655,9 @@ public class Weidu {
         zipEntry = zis.getNextEntry();
       }
       zis.closeEntry();
+    } catch (Exception e) {
+      Logger.error(e, "Could not unpack zip archive");
+      throw e;
     }
 
     // 3.1. Make binary executable (Linux, macOS)

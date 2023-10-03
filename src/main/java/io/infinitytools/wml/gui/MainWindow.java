@@ -287,6 +287,7 @@ public class MainWindow extends Application {
       final Image icon = getIcon(isDarkModeEnabled());
       if (icon == null) {
         // should never happen
+        Logger.warn("Could not load system tray icon");
         return;
       }
 
@@ -393,7 +394,7 @@ public class MainWindow extends Application {
   /**
    * Path to the FXML definition file for this window.
    */
-  private final static URL FXML_FILE = Objects.requireNonNull(MainWindow.class.getResource("main.fxml"));
+  private static final URL FXML_FILE = Objects.requireNonNull(MainWindow.class.getResource("main.fxml"));
 
   private static MainWindow instance;
 
@@ -453,7 +454,7 @@ public class MainWindow extends Application {
       try {
         AppServer.getInstance().start();
       } catch (IOException e) {
-        Logger.debug(e, "Starting application server");
+        Logger.warn(e, "Starting application server");
       }
     }
 
@@ -777,6 +778,7 @@ public class MainWindow extends Application {
    * Called by process event handler when a process starts or terminates.
    */
   private void onProcessStateChanged(SysProcChangeEvent event) {
+    Logger.debug("Process StateChanged event: {}", event.getType());
     Platform.runLater(() -> {
       switch (event.getType()) {
         case Started -> setWeiduRunning();
@@ -797,6 +799,7 @@ public class MainWindow extends Application {
    * Called by process event handler whenever output data is available.
    */
   private void onProcessOutput(SysProcOutputEvent event) {
+    Logger.trace("Process output event: {} bytes", event.getData().length);
     Platform.runLater(() -> {
       try {
         outputBuffer.decode(event.getData());
@@ -864,7 +867,6 @@ public class MainWindow extends Application {
             R.get("ui.main.tray.message.quitHint.text"), TrayIcon.MessageType.INFO);
         Configuration.getInstance().setOption(Configuration.Key.TRAY_HINT_SHOWN, true);
       }
-      // getStage().hide();
       hideWindow();
     } else {
       success = quit(false);
@@ -903,6 +905,7 @@ public class MainWindow extends Application {
    * Called whenever a key is pressed
    */
   private void onGlobalKeyPressed(KeyEvent event) {
+    Logger.trace("Key pressed: {}", event);
     final boolean isShortcut = event.isShortcutDown();
     final boolean isShortcutOnly = isShortcut && !event.isAltDown() && !event.isShiftDown();
 
@@ -1124,6 +1127,7 @@ public class MainWindow extends Application {
         int numCharsToRemove = textLength - maxLength;
         int pos = Math.max(text.indexOf('\n', numCharsToRemove) + 1, numCharsToRemove);
         retVal = text.substring(pos);
+        Logger.debug("Buffer limit exceeded: removing {} characters from output", numCharsToRemove);
       }
     }
 
@@ -1325,7 +1329,7 @@ public class MainWindow extends Application {
           // ensures that charset switches won't discard the extra content
           outputBuffer.encode(text);
         } catch (IOException e) {
-          Logger.warn(e, "Output working directory");
+          Logger.info(e, "Output working directory");
         }
         appendOutputText(text, true);
       }
@@ -1336,14 +1340,14 @@ public class MainWindow extends Application {
         // ensures that charset switches won't discard the extra content
         outputBuffer.encode(text);
       } catch (IOException e) {
-        Logger.warn(e, "Output command line");
+        Logger.info(e, "Output command line");
       }
       appendOutputText(this.process.getCommandLine() + "\n", true);
 
       try {
         processResult = this.process.execute();
       } catch (IOException e) {
-        Logger.info(e, "WeiDU process execution error");
+        Logger.warn(e, "WeiDU process execution error");
         this.process = null;
         this.processResult = null;
         handleProcessError(e.getMessage());
@@ -1408,7 +1412,11 @@ public class MainWindow extends Application {
       final Weidu.Version versionFound = Weidu.getInstance().getVersion();
       if (versionFound != null) {
         final Weidu.Version versionRecommended = Weidu.Version.of(Weidu.getProperty(Weidu.PROP_WEIDU_VERSION));
-        Logger.debug("WeiDU version (found: {}, recommended: {})", versionFound, versionRecommended);
+        if (versionFound != versionRecommended) {
+          Logger.info("WeiDU version (found: {}, recommended: {})", versionFound, versionRecommended);
+        } else {
+          Logger.debug("WeiDU version (found: {}, recommended: {})", versionFound, versionRecommended);
+        }
 
         if (versionFound.compareTo(versionRecommended) < 0) {
           // notify about outdated WeiDU version
@@ -1420,12 +1428,12 @@ public class MainWindow extends Application {
           throw new UnsupportedOperationException("Outdated WeiDU version found: " + versionFound);
         }
       } else {
-        Logger.debug("Not a valid WeiDU binary: {}", Weidu.getInstance().getWeidu());
+        Logger.warn("Not a valid WeiDU binary: {}", Weidu.getInstance().getWeidu());
         throw new UnsupportedOperationException("Not a WeiDU binary");
       }
       return Weidu.getInstance();
     } catch (UnsupportedOperationException e) {
-      Logger.debug(e, "Local WeiDU binary instance not found");
+      Logger.info(e, "Local WeiDU binary instance not found");
       exception = e;
     }
 
@@ -1460,7 +1468,7 @@ public class MainWindow extends Application {
       try {
         return Weidu.getInstance();
       } catch (UnsupportedOperationException e) {
-        Logger.debug(e, "After download: Local Weidu binary instance not found");
+        Logger.info(e, "After download: Local Weidu binary instance not found");
       }
 
       final ButtonType confirmType = Utils.showConfirmationDialog(null,
@@ -1495,6 +1503,7 @@ public class MainWindow extends Application {
    * Updates the {@link Configuration} instance with the current application state.
    */
   private void updateConfiguration() {
+    Logger.debug("Updating configuration");
     final Configuration cfg = Configuration.getInstance();
     cfg.setOption(Configuration.Key.WINDOW_X, (int) getStage().getX());
     cfg.setOption(Configuration.Key.WINDOW_Y, (int) getStage().getY());
@@ -1548,6 +1557,7 @@ public class MainWindow extends Application {
         if (initialPath == null) {
           initialPath = SystemInfo.getLocalDataPath();
         }
+        Logger.debug("Initial game path: {}", initialPath);
 
         gamePath = Utils.chooseOpenFile(null, R.get("ui.main.modInfo.fileDialog.title"), initialPath,
             new ExtensionFilter(R.get("ui.main.modInfo.fileDialog.filter.key"), "*.key"));
@@ -1588,6 +1598,7 @@ public class MainWindow extends Application {
   private void setVisualizedResult(boolean enabled, int exitCode) {
     final Color color;
     if (enabled) {
+      Logger.debug("WeiDU exit code: {}", exitCode);
       // exit codes according to WeiDU sources:
       // https://github.com/WeiDUorg/weidu/blob/d2441fb71f6e08b22e747684c3c53c0a3fcb123b/src/util.ml#L847
       color = switch (exitCode) {
@@ -1628,7 +1639,7 @@ public class MainWindow extends Application {
           mods = log.getEntries().stream().map(e -> e.getTp2Name().toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
         } catch (Exception e) {
           // WeiDU.log may not exist
-          Logger.debug(e, "WeiDU.log not available or could not be parsed");
+          Logger.info(e, "WeiDU.log not available or could not be parsed");
         }
 
         if (mods != null) {
@@ -1714,7 +1725,7 @@ public class MainWindow extends Application {
             R.get("ui.main.weiduHelp.message.content.process"));
       }
     } catch (Exception e) {
-      Logger.debug(e, "Error showing WeiDU help");
+      Logger.error(e, "Error showing WeiDU help");
       Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.weiduHelp.message.header"),
           String.format(R.get("ui.main.weiduHelp.message.content.exception"), e.getMessage()));
     } finally {
@@ -1793,6 +1804,7 @@ public class MainWindow extends Application {
     command.add(0, Utils.normalizePath(tp2File.toString()));
     command.add(0, Weidu.getInstance().getWeidu().toString());
 
+    Logger.debug("Guided mode, WeiDU command: {}", command);
     return command.toArray(new String[0]);
   }
 
@@ -1826,6 +1838,7 @@ public class MainWindow extends Application {
             restart(tp2Path.toString());
             retVal = true;
           } catch (Exception e) {
+            Logger.warn(e, "Dropped files event");
             final String msg = e.getMessage().isEmpty() ? R.get("ui.main.dragdrop.message.openFile.error.unspecified") : e.getMessage();
             Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.message.openFile.header"),
                 R.get("ui.main.dragdrop.message.openFile.loadError.content") + "\n" + msg);
@@ -1835,6 +1848,7 @@ public class MainWindow extends Application {
               String.format("%s\n%s", R.get("ui.main.dragdrop.message.openFile.unsupported.content"), rawFile.getName()));
         }
       } else {
+        Logger.info("Files dropped: {}", files.length);
         Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.dragdrop.message.openFile.header"),
             String.format(R.get("ui.main.dragdrop.message.openFile.tooMany.content"), files.length));
       }
@@ -1995,7 +2009,7 @@ public class MainWindow extends Application {
       try {
         Configuration.getInstance().save();
       } catch (Exception e) {
-        Logger.warn(e, "Error saving configuration");
+        Logger.error(e, "Error saving configuration");
       }
       stage.close();
       Platform.exit();

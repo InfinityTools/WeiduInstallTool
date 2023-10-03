@@ -72,7 +72,7 @@ public class Helpers {
     try {
       proxy = ProxySelector.getDefault().select(URI.create(url.getProtocol() + "://" + url.getHost())).iterator().next();
     } catch (IllegalArgumentException | NoSuchElementException e) {
-      Logger.error(e, "Error getting system proxy settings");
+      Logger.warn(e, "Could not get system proxy settings");
     }
 
     final HttpURLConnection con;

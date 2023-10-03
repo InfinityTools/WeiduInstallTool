@@ -21,6 +21,7 @@ import org.tinylog.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -84,6 +85,8 @@ public class ProcessUtils {
         workingDir = workingDir.getParent();
       }
     }
+    Logger.debug("Working dir: {}", workingDir);
+    Logger.debug("Command: {}", Arrays.toString(command));
 
     final SysProc sp = new SysProc(workingDir, includeError, command);
     try {

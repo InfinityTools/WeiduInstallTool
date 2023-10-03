@@ -17,6 +17,7 @@ package io.infinitytools.wml.github;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.tinylog.Logger;
 
 import java.io.IOException;
 import java.net.URI;
@@ -248,5 +249,6 @@ public class Asset implements Comparable<Asset> {
         }
       }
     }
+    Logger.debug("Asset initialized: {}", toString());
   }
 }

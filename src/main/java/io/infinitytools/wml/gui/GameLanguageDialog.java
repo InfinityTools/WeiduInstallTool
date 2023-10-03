@@ -40,7 +40,7 @@ public class GameLanguageDialog extends Stage {
   /**
    * Path to the FXML definition file for this window.
    */
-  private final static URL FXML_FILE = GameLanguageDialog.class.getResource("language.fxml");
+  private static final URL FXML_FILE = GameLanguageDialog.class.getResource("language.fxml");
 
   public static String select(Window owner, ModInfo modInfo) {
     String retVal = null;
@@ -88,6 +88,7 @@ public class GameLanguageDialog extends Stage {
     if (getOwner() != null) {
       final double x = getOwner().getX() + (getOwner().getWidth() - this.getWidth()) / 2.0;
       final double y = getOwner().getY() + (getOwner().getHeight() - this.getHeight()) / 2.0;
+      Logger.debug("Dialog position: {}, {}", x, y);
       setX(x);
       setY(y);
     } else {
