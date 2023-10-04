@@ -1,0 +1,276 @@
+[
+  {
+    "version": 241,
+    "os": "linux",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "be21eb2a8c0f993a6118308722b80a3e03d279e01b9156049399a8754646d7dd"
+  },
+  {
+    "version": 241,
+    "os": "linux",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "8fba1a7745c877993c771bacef810d84752030a1e1f8e22fca18a325f0e08e36"
+  },
+  {
+    "version": 241,
+    "os": "macos",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "4ef16ec9b6fb3e678119e3bbe3b2ef666d55516be745896a21d149977e0f95df"
+  },
+  {
+    "version": 241,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "9c191ae36a959a1e663a0d04c84cc1898d7c5454d1988e508aaa83189f502dd9"
+  },
+
+  {
+    "version": 242,
+    "os": "linux",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "eb405e9f6ca17d4120ab7395b7edced9a9faf385911ce3b79207b97562d08e06"
+  },
+  {
+    "version": 242,
+    "os": "linux",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "861c8e5968fab9aa54b058a68e45c14abb97d36828f7928e59f76941f3331d8b"
+  },
+  {
+    "version": 242,
+    "os": "macos",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "e4ce99f6372e6d83c9e7da0421dee61602aee62911ee3e9de2b09a88222089f4"
+  },
+  {
+    "version": 242,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "6a829e416bc1aa4653913b15045a403a85d00cbbb548f706bafd775bf8876889"
+  },
+
+  {
+    "version": 243,
+    "os": "linux",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "4561af73e93671f6bbaa4b7ae94c216fb9dabf824bcdc3299f3b9676174bc57c"
+  },
+  {
+    "version": 243,
+    "os": "linux",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "e857bf88c3b254ba1db18e5bd8c65258829b3dba0134e1ac6948122545b898bb"
+  },
+  {
+    "version": 243,
+    "os": "macos",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "54c80660174a6272318afcde5454c79d1ca4d4332d3d13fbc285d828d6329a97"
+  },
+  {
+    "version": 243,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "c70b178e2f5d323f4d463975569c03e94abb21ec811b01d07e1a306ac2e997d8"
+  },
+
+  {
+    "version": 245,
+    "os": "linux",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "1068b14732712c1cc55b07c2336daf5785e50a07ae95eb5f5c0b6644646a8e35"
+  },
+  {
+    "version": 245,
+    "os": "linux",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "7a887b93aba7147fdc304879ceeeab97efa984226b46cc4d5ac6becc26e383eb"
+  },
+  {
+    "version": 245,
+    "os": "macos",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "f1d9dab0754c6c79271deddd3e994d373fe61bd5e59a6fd5f9fe75b0d554ef93"
+  },
+  {
+    "version": 245,
+    "os": "macos",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "53a362c83094bb33c40cbe6185802299db4c2644d68353d36d5e7043e1b60bb4"
+  },
+  {
+    "version": 245,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "eb2db0beb24abf79e14f144294b31a4848077e490646f28334f125174479718b"
+  },
+  {
+    "version": 245,
+    "os": "windows",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "14a32d039b5da82acea76ecaf2eb18df34ddcd3ec2212227bb2ac511ac34341e"
+  },
+
+  {
+    "version": 246,
+    "os": "linux",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "5d9e09884dd633c8e0cf32028696eef1dfd669f017eec78cbab2e6daa768a318"
+  },
+  {
+    "version": 246,
+    "os": "linux",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "226b31d93a750427bed221fb4e1ac9708f8830c103803ccc21bc99a54ab45db6"
+  },
+  {
+    "version": 246,
+    "os": "macos",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "47f0de2761244d97658391cc943305965abfa9e5dfb8bbbeb6e4be16b94cfce2"
+  },
+  {
+    "version": 246,
+    "os": "macos",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "42d24e889fcedde97319ea81e05f712638e249b29422cb6d2b6d0fa5b362dd44"
+  },
+  {
+    "version": 246,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "100cf796d9e3d6e4366d65bcbd4ebf671632122f045ca58085587706328de85e"
+  },
+  {
+    "version": 246,
+    "os": "windows",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "a6deac06ba7eb15fecb4e482f9e6be1d40b2db909d9fc7df117c50dcc2b90a4d"
+  },
+
+  {
+    "version": 247,
+    "os": "linux",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "8018f14849d413c08b79fbbc734caf63f3fa33c66f1380ff018ad639ef3fbbc5"
+  },
+  {
+    "version": 247,
+    "os": "macos",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "111bb300f964bacb5b1e6994975efd5bf9dc9395d7ff9f29fa18a1963efd5cb8"
+  },
+  {
+    "version": 247,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "1a640e9b09885d910b1061570b44af54b5b5fab3bcbe9c168a63309e4e67566d"
+  },
+  {
+    "version": 247,
+    "os": "windows",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "52a624dcfa70151b6ba7c470e82dfeb99ac7962c179638de76e8fbed0a2e9405"
+  },
+
+  {
+    "version": 248,
+    "os": "linux",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "810b45579091b93d16004ce683a6e05a19e126a7f15819d56e14a64e0c1d0372"
+  },
+  {
+    "version": 248,
+    "os": "macos",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "7292a42ed10b33948452f2f4b30ab3fe1a79b82fd613e8b3628f5adbb9645184"
+  },
+  {
+    "version": 248,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "fb968c80d37d7b653d50562facdd0915d7eb8ed94f2419d8ce21e978eb623a0b"
+  },
+  {
+    "version": 248,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 1,
+    "sha256": "b650630a32fcec91d97da44295d5a608c686a0cdb447c50405e0e29d2fd04a96"
+  },
+  {
+    "version": 248,
+    "os": "windows",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "76f85a204dab5c1f1c408cf84150f3e9b4854b2cffe0b01812b64c6fa9a2090a"
+  },
+
+  {
+    "version": 249,
+    "os": "linux",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "edeb5b8500134f90e48881f639b4bc4c6559fc0bff89681bf065890bfbfb88af"
+  },
+  {
+    "version": 249,
+    "os": "macos",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "370ff69b64f40fe56aa1c30000258c764ee0735780f944be99ba0a512fcd6e02"
+  },
+  {
+    "version": 249,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 0,
+    "sha256": "410680af33ec47a5d1078b20ef66658ac62250b86fecb0a4fbbbfa684ae40794"
+  },
+  {
+    "version": 249,
+    "os": "windows",
+    "arch": "x86",
+    "variant": 1,
+    "sha256": "f6670692465ec8c94b4546619c9d68692cb1b51500a7e41a54ea8104e92a7531"
+  },
+  {
+    "version": 249,
+    "os": "windows",
+    "arch": "x86_64",
+    "variant": 0,
+    "sha256": "ad70f5897a6d0ba4b0d226f845a9b14cf345f56cc9697ca8d05cac9fe4932c1a"
+  }
+
+]

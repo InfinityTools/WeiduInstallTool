@@ -30,7 +30,7 @@ import io.infinitytools.wml.utils.CustomLogWriter;
 import io.infinitytools.wml.utils.R;
 import io.infinitytools.wml.utils.SystemInfo;
 import io.infinitytools.wml.utils.Utils;
-import io.infinitytools.wml.weidu.Weidu;
+import io.infinitytools.wml.weidu.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -344,7 +344,8 @@ public class MainWindow extends Application {
    * @param height       Height of the main window.
    * @param detailsShown Whether the Details window is shown.
    */
-  private record WindowState(double x, double y, double width, double height, boolean isMaximized, boolean detailsShown) {
+  private record WindowState(double x, double y, double width, double height, boolean isMaximized,
+                             boolean detailsShown) {
     /**
      * Initializes a new {@link WindowState} instance from the specified {@link MainWindow} instance.
      *
@@ -400,6 +401,8 @@ public class MainWindow extends Application {
 
   /**
    * Returns the current {@link MainWindow} instance.
+   *
+   * @throws NullPointerException if the instance hasn't been initialized yet.
    */
   public static MainWindow getInstance() {
     if (instance == null) {
@@ -1396,6 +1399,7 @@ public class MainWindow extends Application {
    * @throws Exception if the WeiDU binary could not be found on the system.
    */
   private Weidu checkWeidu() throws Exception {
+    // TODO: unravel and modularize the whole mess
     final ButtonType downloadButton = new ButtonType(R.get("ui.checkWeidu.download.button"), ButtonBar.ButtonData.YES);
     final ButtonType chooseButton = new ButtonType(R.get("ui.checkWeidu.choose.button"), ButtonBar.ButtonData.NO);
     final ButtonType cancelButton = new ButtonType(R.get("ui.checkWeidu.cancel.button"), ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -1407,35 +1411,65 @@ public class MainWindow extends Application {
     final ButtonType[] questionButtons = {downloadButton, chooseButton, cancelButton};
 
     // 1. check local system
-    final Exception exception; // may be thrown later
-    try {
-      final Weidu.Version versionFound = Weidu.getInstance().getVersion();
-      if (versionFound != null) {
-        final Weidu.Version versionRecommended = Weidu.Version.of(Weidu.getProperty(Weidu.PROP_WEIDU_VERSION));
-        if (versionFound != versionRecommended) {
-          Logger.info("WeiDU version (found: {}, recommended: {})", versionFound, versionRecommended);
-        } else {
-          Logger.debug("WeiDU version (found: {}, recommended: {})", versionFound, versionRecommended);
-        }
+    Exception exception = null; // may be thrown later
+    // two passes needed: with and without whitelist check
+    for (int i = 0; i < 2; i++) {
+      try {
+        final Weidu.Version versionFound = Weidu.getInstance().getVersion();
+        if (versionFound != null) {
+          final Weidu.Version versionRecommended = Weidu.Version.of(Weidu.getProperty(Weidu.PROP_WEIDU_VERSION));
+          if (versionFound != versionRecommended) {
+            Logger.info("WeiDU version (found: {}, recommended: {})", versionFound, versionRecommended);
+          } else {
+            Logger.debug("WeiDU version (found: {}, recommended: {})", versionFound, versionRecommended);
+          }
 
-        if (versionFound.compareTo(versionRecommended) < 0) {
-          // notify about outdated WeiDU version
-          updateBinary = true;
-          questionHeader = String.format(R.get("ui.checkWeidu.message.foundOutdated.header"),
-              versionFound.major(), versionRecommended.major());
-          questionContent = R.get("ui.checkWeidu.message.foundOutdated.content");
-          questionButtons[questionButtons.length - 1] = keepButton;
-          throw new UnsupportedOperationException("Outdated WeiDU version found: " + versionFound);
+          if (versionFound.compareTo(versionRecommended) < 0) {
+            // notify about outdated WeiDU version
+            updateBinary = true;
+            questionHeader = String.format(R.get("ui.checkWeidu.message.foundOutdated.header"),
+                versionFound.major(), versionRecommended.major());
+            questionContent = R.get("ui.checkWeidu.message.foundOutdated.content");
+            questionButtons[questionButtons.length - 1] = keepButton;
+            throw new UnsupportedOperationException("Outdated WeiDU version found: " + versionFound);
+          }
+        } else {
+          Logger.warn("Not a valid WeiDU binary: {}", Weidu.getInstance().getWeidu());
+          throw new InvalidBinaryException(Weidu.getInstance().getWeidu(), "Not a WeiDU binary");
         }
-      } else {
-        Logger.warn("Not a valid WeiDU binary: {}", Weidu.getInstance().getWeidu());
-        throw new UnsupportedOperationException("Not a WeiDU binary");
+        return Weidu.getInstance();
+      } catch (BinaryNotAllowedException e) {
+        Logger.info(e, "Unverified WeiDU binary detected: {}", e.getBinPath());
+        // confirming unverified binary
+        final ButtonType result = Utils.showCustomDialog(null, Alert.AlertType.CONFIRMATION,
+            R.QUESTION(), String.format("%s\n%s", R.get("ui.checkWeidu.message.notAllowed.header"), e.getBinPath()),
+            R.get("ui.checkWeidu.message.notAllowed.content"),
+            ButtonType.YES, ButtonType.NO);
+        if (result == ButtonType.YES) {
+          Configuration.getInstance().setOption(Configuration.Key.WEIDU_HASH, WhiteList.generateHash(e.getBinPath()));
+          Weidu.setIgnoreWhitelist(true);
+          Weidu.reset();
+        } else {
+          exception = e;
+          break;
+        }
+      } catch (BinaryNotFoundException e) {
+        Logger.info(e, "WeiDU binary not found on the system");
+        exception = e;
+        break;
+      } catch (InvalidBinaryException e) {
+        Logger.info(e, "Binary is not a WeiDU binary");
+        exception = e;
+        break;
+      } catch (UnsupportedOperationException e) {
+        Logger.info(e, "Unclassified error");
+        exception = e;
+        break;
       }
-      return Weidu.getInstance();
-    } catch (UnsupportedOperationException e) {
-      Logger.info(e, "Local WeiDU binary instance not found");
-      exception = e;
     }
+
+    // not valid anymore
+    Configuration.getInstance().setOption(Configuration.Key.WEIDU_HASH, null);
 
     // ask user before downloading binary
     final ButtonType result = Utils.showCustomDialog(null, Alert.AlertType.CONFIRMATION,
@@ -1443,7 +1477,11 @@ public class MainWindow extends Application {
 
     if (result == cancelButton) {
       // Install: cancel install operation
-      throw exception;
+      if (exception != null) {
+        throw exception;
+      } else {
+        throw new UnsupportedOperationException("Cancelled by the user");
+      }
     }
 
     if (result == keepButton) {

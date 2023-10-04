@@ -81,11 +81,15 @@ public class Weidu {
 
   private static Weidu instance;
   private static Properties properties;
+  private static boolean ignoreWhitelist;
 
   /**
    * Provides access to the WeiDU class.
    *
    * @return Current {@link Weidu} instance.
+   * @throws BinaryNotFoundException       If the WeiDU binary could not be found on the system.
+   * @throws BinaryNotAllowedException     If the WeiDU binary failed the file signature check.
+   * @throws InvalidBinaryException        If the binary is not a WeiDU binary.
    * @throws UnsupportedOperationException if the {@link Weidu} instance could not be initialized.
    */
   public static Weidu getInstance() throws UnsupportedOperationException {
@@ -103,17 +107,39 @@ public class Weidu {
     instance = null;
   }
 
+  /**
+   * Returns whether initialization should skip the whitelist check.
+   *
+   * @return {@code true} if whitelist check should be skipped, {@code false} otherwise.
+   */
+  public static boolean isIgnoreWhitelist() {
+    return ignoreWhitelist;
+  }
+
+  /**
+   * Instructs the class instance to skip the whitelist check at initialization. This flag must be set before the first
+   * call to {@link #getInstance()} to be effective. Alternatively call  {@link #reset()} to force re-initialization.
+   *
+   * @param value {@code true} to instruct the initialization routine to skip the whitelist check, {@code false} otherwise.
+   */
+  public static void setIgnoreWhitelist(boolean value) {
+    ignoreWhitelist = value;
+  }
+
   private final Path weidu;
 
   /**
    * Initializes access to the WeiDU binary for this system.
    *
+   * @throws BinaryNotFoundException       If the WeiDU binary could not be found on the system.
+   * @throws BinaryNotAllowedException     If the WeiDU binary failed the file signature check.
+   * @throws InvalidBinaryException        If the binary is not a WeiDU binary.
    * @throws UnsupportedOperationException If the WeiDU binary could not be determined.
    */
   private Weidu() throws UnsupportedOperationException {
     final Path weiduPath = findWeiduBinary();
     if (weiduPath == null) {
-      throw new UnsupportedOperationException("Could not find the WeiDU binary.");
+      throw new BinaryNotFoundException("Could not find the WeiDU binary");
     }
 
     // ensure that the binary is executable (Linux, macOS)
@@ -121,12 +147,30 @@ public class Weidu {
       makeBinaryExecutable(weiduPath);
     } catch (IOException e) {
       Logger.error(e, "chmod +x failed on WeiDU binary");
-      throw new UnsupportedOperationException("Could not make WeiDU binary executable.");
+      throw new UnsupportedOperationException("Could not make WeiDU binary executable");
+    }
+
+    // compare file signature with known WeiDU binary signatures
+    if (!isIgnoreWhitelist()) {
+      // checking white list
+      boolean check = WhiteList.matches(weiduPath);
+
+      // checking overridden binary
+      if (!check) {
+        final String hash = Configuration.getInstance().getOption(Configuration.Key.WEIDU_HASH);
+        if (hash != null) {
+          check = hash.equals(WhiteList.generateHash(weiduPath));
+        }
+      }
+
+      if (!check) {
+        throw new BinaryNotAllowedException(weiduPath, "Binary does not match any officially released WeiDU binaries");
+      }
     }
 
     // ensure that binary is actually a WeiDU binary
     if (!validateWeidu(weiduPath)) {
-      throw new UnsupportedOperationException("Not a WeiDU binary: " + weiduPath);
+      throw new InvalidBinaryException(weiduPath, "Not a WeiDU binary");
     }
 
     this.weidu = weiduPath;
@@ -204,7 +248,7 @@ public class Weidu {
   public Version getVersion() {
     String retVal = null;
     try {
-      final byte[] data = ProcessUtils.getProcessOutput(weidu.toString(), "--version");
+      final byte[] data = ProcessUtils.getProcessOutput(null, true, 1000, weidu.toString(), "--version");
       String output = BufferConvert.decodeBytes(data).decoded();
       // stripping weidu path portion
       output = output.substring(output.lastIndexOf(']') + 1).strip();

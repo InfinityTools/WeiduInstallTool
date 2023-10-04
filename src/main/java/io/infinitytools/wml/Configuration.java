@@ -104,6 +104,10 @@ public class Configuration {
      */
     WEIDU_PATH("Weidu Path", String.class, null),
     /**
+     * Specifies a SHA256 hash of the selected WeiDU binary.
+     */
+    WEIDU_HASH("Weidu Hash", String.class, null),
+    /**
      * Specifies the path to the last used game directory.
      */
     LAST_GAME_PATH("Last Game Path", String.class, null),

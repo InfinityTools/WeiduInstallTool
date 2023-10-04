@@ -25,6 +25,7 @@ import org.tinylog.writers.AbstractWriter;
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
@@ -116,7 +117,12 @@ public class CustomLogWriter extends AbstractWriter {
    */
   public void reset() {
     entries.clear();
-    Platform.runLater(this::fireClearLogEvent);
+
+    try {
+      Platform.runLater(this::fireClearLogEvent);
+    } catch (IllegalStateException ignored) {
+      // JavaFX not yet initialized
+    }
   }
 
   /**
@@ -154,7 +160,13 @@ public class CustomLogWriter extends AbstractWriter {
   @Override
   public void write(LogEntry logEntry) {
     entries.add(logEntry);
-    Platform.runLater(() -> fireAddLogEvent(logEntry));
+
+    try {
+      Platform.runLater(() -> fireAddLogEvent(logEntry));
+    } catch (IllegalStateException ignored) {
+      // JavaFX not yet initialized
+    }
+
     if (logEntry.getLevel().ordinal() < errorLevel.ordinal()) {
       getPrinter(logEntry.getLevel()).print(render(logEntry));
     }

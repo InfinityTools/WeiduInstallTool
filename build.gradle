@@ -54,6 +54,7 @@ tasks.withType(Test).configureEach {
 
 tasks.withType(JavaExec).configureEach {
   jvmArgs += TLS_PROTOCOL
+  enableAssertions = true
 }
 
 application {
