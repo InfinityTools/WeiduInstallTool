@@ -74,6 +74,10 @@ public class Weidu {
    */
   public static final String PROP_WEIDU_VERSION = "weidu_version";
   /**
+   * Properties key: Minimum WeiDU version
+   */
+  public static final String PROP_WEIDU_VERSION_MIN = "weidu_version_min";
+  /**
    * Properties key: Static download link for native WeiDU zip archive.
    */
   public static String PROP_DOWNLOAD_NATIVE = String.format("download_%s_%s",
@@ -173,6 +177,7 @@ public class Weidu {
       throw new InvalidBinaryException(weiduPath, "Not a WeiDU binary");
     }
 
+    Logger.debug("WeiDU binary architecture: {}", SystemInfo.getBinaryArch(weiduPath));
     this.weidu = weiduPath;
   }
 
@@ -543,24 +548,46 @@ public class Weidu {
   }
 
   /**
-   * Attempts to find the WeiDU binary for this system.
+   * Attempts to find a suitable WeiDU binary for this system.
    *
    * @return Path to the WeiDU binary if found, {@code null} otherwise.
    */
   private static Path findWeiduBinary() {
     Path retVal = null;
 
+    final List<Path> binaries = findWeiduBinaries();
+    if (!binaries.isEmpty()) {
+      retVal = binaries
+          .stream()
+          .filter(bin -> SystemInfo.getBinaryArch(bin) == SystemInfo.getArchitecture())
+          .findAny()
+          .orElse(null);
+      if (retVal == null) {
+        retVal = binaries.getFirst();
+      }
+    }
+
+    Logger.debug("WeiDU binary: {}", retVal);
+    return retVal;
+  }
+
+  /**
+   * Provides a list of potential WeiDU binaries.
+   *
+   * @return {@link List} of WeiDU binary {@link Path}s.
+   */
+  private static List<Path> findWeiduBinaries() {
+    final List<Path> retVal = new ArrayList<>();
+
     final List<Path> searchPaths = getSearchPaths(true);
 
     // finding binary path
     for (final Path path : searchPaths) {
       if (Files.isRegularFile(path)) {
-        retVal = path;
-        break;
+        retVal.add(path);
       }
     }
 
-    Logger.debug("WeiDU binary: {}", retVal);
     return retVal;
   }
 

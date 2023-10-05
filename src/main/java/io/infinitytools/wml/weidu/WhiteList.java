@@ -28,6 +28,7 @@ import java.nio.channels.ByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -100,7 +101,7 @@ public class WhiteList {
    */
   public static Binary find(Path file) {
     if (file != null) {
-      try (final ByteChannel channel = Files.newByteChannel(file)) {
+      try (final ByteChannel channel = Files.newByteChannel(file, StandardOpenOption.READ)) {
         final String hash = generateHash(channel);
         Logger.debug("Hashing file (file: {}, hash: {})", file, hash);
         if (hash != null) {
@@ -151,7 +152,7 @@ public class WhiteList {
    */
   public static String generateHash(Path file) {
     if (file != null) {
-      try (final ByteChannel channel = Files.newByteChannel(file)) {
+      try (final ByteChannel channel = Files.newByteChannel(file, StandardOpenOption.READ)) {
         return generateHash(channel);
       } catch (IOException e) {
         Logger.debug(e, "Not a file: {}", file);
