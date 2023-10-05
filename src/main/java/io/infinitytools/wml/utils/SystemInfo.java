@@ -20,12 +20,17 @@ import io.infinitytools.wml.process.ProcessUtils;
 import org.tinylog.Logger;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Stream;
@@ -260,6 +265,120 @@ public class SystemInfo {
     }
 
     return retVal;
+  }
+
+  /**
+   * Determines the system architecture of the specified binary file.
+   *
+   * @param binFile {@link Path} of binary file.
+   * @return {@link Architecture} of the binary. Returns {@link Architecture#UNKNOWN} if the architecture could not
+   * be determined.
+   * @throws NullPointerException if the argument is {@code null}.
+   */
+  public static Architecture getBinaryArch(Path binFile) {
+    Architecture retVal = Architecture.UNKNOWN;
+
+    Objects.requireNonNull(binFile);
+    try (final SeekableByteChannel channel = Files.newByteChannel(binFile, StandardOpenOption.READ)) {
+      retVal = switch (getPlatform()) {
+        case WINDOWS -> getBinaryArchWindows(channel);
+        case LINUX -> getBinaryArchLinux(channel);
+        case MACOS -> getBinaryArchMacOS(channel);
+        default -> Architecture.UNKNOWN;
+      };
+    } catch (IOException e) {
+      Logger.debug(e, "Getting binary architecture");
+    }
+
+    return retVal;
+  }
+
+  private static Architecture getBinaryArchWindows(SeekableByteChannel channel) throws IOException {
+    final ByteBuffer buf = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
+
+    // DOS header
+    channel.read(buf.slice(buf.position(), 2));
+    int sig = buf.getShort(0) & 0xffff;
+    if (sig != 0x5a4d) {
+      // signature failed
+      throw new IOException();
+    }
+
+    // Pointer to PE header
+    buf.clear();
+    channel.position(0x3c);
+    channel.read(buf.slice(buf.position(), 4));
+    int ofsPE = buf.getInt(0);
+    if (ofsPE < 0x40) {
+      throw new IOException();
+    }
+
+    // PE header
+    buf.clear();
+    channel.position(ofsPE);
+    channel.read(buf.slice(buf.position(), 4));
+    sig = buf.getInt(0);
+    if (sig != 0x00004550) {
+      // signature failed
+      throw new IOException();
+    }
+
+    // PE machine type
+    buf.clear();
+    channel.read(buf.slice(buf.position(), 2));
+    int machine = buf.getShort(0) & 0xffff;
+    return switch (machine) {
+      case 0x014c -> Architecture.X86;
+      case 0x8664 -> Architecture.X86_64;
+      case 0xaa64 -> Architecture.AARCH64;
+      default -> Architecture.UNKNOWN;
+    };
+  }
+
+  private static Architecture getBinaryArchLinux(SeekableByteChannel channel) throws IOException {
+    final ByteBuffer buf = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
+
+    // ELF header
+    channel.read(buf.slice(buf.position(), 4));
+    int sig = buf.getInt(0);
+    if (sig != 0x464c457f) {
+      throw new IOException();
+    }
+
+    buf.clear();
+    channel.position(0x12);
+    channel.read(buf.slice(buf.position(), 2));
+    int abi = buf.getShort(0) & 0xffff;
+    return switch (abi) {
+      case 0x03 -> Architecture.X86;
+      case 0x3e -> Architecture.X86_64;
+      case 0xb7 -> Architecture.AARCH64;
+      default -> Architecture.UNKNOWN;
+    };
+  }
+
+  private static Architecture getBinaryArchMacOS(SeekableByteChannel channel) throws IOException {
+    final ByteBuffer buf = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
+
+    // Mach-O header
+    channel.read(buf.slice(buf.position(), 4));
+    int sig = buf.getInt(0);
+
+    buf.clear();
+    channel.read(buf.slice(buf.position(), 1));
+    int cpu = buf.get(0) & 0xff;
+
+    if (cpu == 0x07) {
+      return switch (sig) {
+        case 0xfeedface -> Architecture.X86;
+        case 0xfeedfacf -> Architecture.X86_64;
+        default -> Architecture.UNKNOWN;
+      };
+    } else if (cpu == 0x0c && sig == 0xfeedfacf) {
+      return Architecture.AARCH64;
+    }
+
+    return Architecture.UNKNOWN;
   }
 
   /**
