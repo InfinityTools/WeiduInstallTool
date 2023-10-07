@@ -695,17 +695,21 @@ public class MainWindow extends Application {
     if (text != null && !text.isEmpty()) {
       int caretPos = getController().outputArea.getCaretPosition();
 
-      getController().outputArea.appendText(text);
-
       final String curText = getController().outputArea.getText();
-      final String newText = ensureOutputTextLimit(curText);
+      final String newText = ensureOutputTextLimit(curText, text.length());
       final int charsToDelete = curText.length() - newText.length();
       if (charsToDelete > 0) {
         Logger.debug("Deleting output characters: {}", charsToDelete);
-        getController().outputArea.deleteText(0, charsToDelete);
+        clearOutputText();
+        getController().outputArea.appendText(newText + text);
+      } else {
+        getController().outputArea.appendText(text);
       }
 
-      if (!autoScrollDown) {
+      if (autoScrollDown) {
+        getController().outputArea.positionCaret(getController().outputArea.getLength());
+        getController().outputArea.setScrollTop(Double.MAX_VALUE);
+      } else {
         getController().outputArea.positionCaret(caretPos);
       }
     }
@@ -722,7 +726,7 @@ public class MainWindow extends Application {
 
     clearOutputText();
     if (text != null) {
-      getController().outputArea.appendText(ensureOutputTextLimit(text));
+      getController().outputArea.appendText(ensureOutputTextLimit(text, 0));
 
       if (!autoScrollDown) {
         getController().outputArea.positionCaret(caretPos);
@@ -1126,10 +1130,11 @@ public class MainWindow extends Application {
    * Ensures that the output text length does not exceed the specified buffer size.
    * Excess characters will be removed from the beginning of the string if needed.
    *
-   * @param text String to check
+   * @param text      String to check
+   * @param extraSize Extra number of characters to consider when checking the string length.
    * @return A string with a length that satisfies the buffer limit.
    */
-  private String ensureOutputTextLimit(String text) {
+  private String ensureOutputTextLimit(String text, int extraSize) {
     String retVal = text;
 
     if (text != null) {
@@ -1137,7 +1142,7 @@ public class MainWindow extends Application {
       if (maxLength <= 0) {
         maxLength = Configuration.Key.BUFFER_LIMIT.getDefaultValue();
       }
-      final int textLength = text.length();
+      final int textLength = text.length() + extraSize;
       if (textLength > maxLength) {
         int numCharsToRemove = textLength - maxLength;
         int pos = Math.max(text.indexOf('\n', numCharsToRemove) + 1, numCharsToRemove);
