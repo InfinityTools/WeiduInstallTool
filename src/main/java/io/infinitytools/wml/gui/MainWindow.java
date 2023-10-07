@@ -446,7 +446,7 @@ public class MainWindow extends Application {
       Configuration.getInstance().load();
     } catch (NoSuchFileException e) {
       // not an error
-      Logger.debug(e, "Loading configuration: configuration not found (expected)");
+      Logger.debug("Loading configuration: configuration not found ({})", e);
     } catch (Exception e) {
       Logger.error(e, "Loading configuration");
     }
@@ -692,8 +692,22 @@ public class MainWindow extends Application {
    * @param autoScrollDown Whether to scroll the text area down to the last line.
    */
   public void appendOutputText(String text, boolean autoScrollDown) {
-    if (text != null) {
-      setOutputText(getOutputText() + text, autoScrollDown);
+    if (text != null && !text.isEmpty()) {
+      int caretPos = getController().outputArea.getCaretPosition();
+
+      getController().outputArea.appendText(text);
+
+      final String curText = getController().outputArea.getText();
+      final String newText = ensureOutputTextLimit(curText);
+      final int charsToDelete = curText.length() - newText.length();
+      if (charsToDelete > 0) {
+        Logger.debug("Deleting output characters: {}", charsToDelete);
+        getController().outputArea.deleteText(0, charsToDelete);
+      }
+
+      if (!autoScrollDown) {
+        getController().outputArea.positionCaret(caretPos);
+      }
     }
   }
 
