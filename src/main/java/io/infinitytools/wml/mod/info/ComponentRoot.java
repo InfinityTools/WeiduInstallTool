@@ -155,7 +155,7 @@ public class ComponentRoot extends ComponentContainerBase {
             }
           }
         } catch (JSONException e) {
-          Logger.trace(e, "Parsing mod info JSON group (ignored)");
+          Logger.trace(e, "Parsing mod info JSON group");
         }
 
         // handling subgroup
@@ -170,7 +170,7 @@ public class ComponentRoot extends ComponentContainerBase {
             }
           }
         } catch (JSONException e) {
-          Logger.trace(e, "Parsing mod info JSON subgroup (ignored)");
+          Logger.trace(e, "Parsing mod info JSON subgroup");
         }
 
         // handling component
@@ -189,7 +189,7 @@ public class ComponentRoot extends ComponentContainerBase {
             }
           }
         } catch (JSONException e) {
-          Logger.trace(e, "Parsing mod info JSON component (ignored)");
+          Logger.trace(e, "Parsing mod info JSON component");
         }
 
         // handling component groups
@@ -205,7 +205,7 @@ public class ComponentRoot extends ComponentContainerBase {
               }
             }
           } catch (JSONException e) {
-            Logger.trace(e, "Parsing mod info JSON component group (ignored)");
+            Logger.trace(e, "Parsing mod info JSON component group");
           }
         }
 
@@ -219,7 +219,7 @@ public class ComponentRoot extends ComponentContainerBase {
               ci.getLabelList().add(li);
             }
           } catch (JSONException e) {
-            Logger.trace(e, "Parsing mod info JSON component label (ignored)");
+            Logger.trace(e, "Parsing mod info JSON component label");
           }
         }
 
@@ -233,7 +233,7 @@ public class ComponentRoot extends ComponentContainerBase {
               ci.getMetadataList().add(mi);
             }
           } catch (JSONException e) {
-            Logger.trace(e, "Parsing mod info JSON component metadata (ignored)");
+            Logger.trace(e, "Parsing mod info JSON component metadata");
           }
         }
       }

@@ -156,7 +156,7 @@ public class AppServer implements Runnable {
         try {
           nd = NetData.decode(inData);
         } catch (Exception e) {
-          Logger.debug(e, "Invalid data received (ignored)");
+          Logger.debug("Invalid data received: {}", e);
         }
 
         if (nd != null) {

@@ -51,7 +51,7 @@ public class GameLanguageDialog extends Stage {
       retVal = dialog.getSelectedLanguage();
     } catch (IllegalArgumentException e) {
       // ignored; expected exception
-      Logger.debug(e, "Select game language (expected)");
+      Logger.debug("Select game language: {}", e);
     } catch (Exception e) {
       Logger.error(e, "Select game language");
     }

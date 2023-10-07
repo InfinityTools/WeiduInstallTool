@@ -75,7 +75,7 @@ public class BufferConvert {
     try {
       return decodeBytes(data, charset, false);
     } catch (IOException e) {
-      Logger.debug(e, "Decoding data (ignored)");
+      Logger.debug("Decoding data: {}", e);
     }
     return new DecodedData("", null);
   }

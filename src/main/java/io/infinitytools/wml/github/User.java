@@ -286,7 +286,7 @@ public class User implements Comparable<User> {
         default -> {
         }
       }
-      Logger.debug("User initialized: {}", toString());
     }
+    Logger.debug("User initialized: {}", toString());
   }
 }
