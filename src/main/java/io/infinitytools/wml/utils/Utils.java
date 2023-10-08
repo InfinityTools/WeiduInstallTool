@@ -320,7 +320,27 @@ public class Utils {
    * @return {@link ButtonType} of the button clicked by the user.
    */
   public static ButtonType showConfirmationDialog(Window owner, String title, String header, String content) {
-    return showCustomDialog(owner, AlertType.CONFIRMATION, title, header, content);
+    return showConfirmationDialog(owner, title, header, content, false);
+  }
+
+  /**
+   * Displays a modal confirmation dialog with the specified parameters and two buttons: (OK, CANCEL) or (YES, NO).
+   *
+   * @param owner   Owner window for this dialog.
+   * @param title   The dialog title. (Default: Information)
+   * @param header  Text for the header area. Default: {@code title}
+   * @param content Text for the content area. This is where you should add more descriptive text for the message dialog.
+   * @param yesNo   Specify {@code true} to show the buttons "Yes" and "No"in place of "OK" and "Cancel".
+   * @return {@link ButtonType} of the button clicked by the user.
+   */
+  public static ButtonType showConfirmationDialog(Window owner, String title, String header, String content, boolean yesNo) {
+    final ButtonType[] buttons;
+    if (yesNo) {
+      buttons = new ButtonType[] { ButtonType.YES, ButtonType.NO };
+    } else {
+      buttons = new ButtonType[] { ButtonType.OK, ButtonType.CANCEL };
+    }
+    return showCustomDialog(owner, AlertType.CONFIRMATION, title, header, content, buttons);
   }
 
   /**

@@ -1435,17 +1435,17 @@ public class MainWindow extends Application {
       try {
         Weidu.getInstance();
       } catch (BinaryNotAllowedException e) {
-        Logger.info(e, "Unverified WeiDU binary detected: {}", e.getBinPath());
+        Logger.info("{}: {}", e.getMessage(), e.getBinPath());
         if (weiduHandleNotAllowed(e.getBinPath()) == null) {
           continue;
         }
       } catch (BinaryNotFoundException e) {
-        Logger.info(e, "WeiDU binary not found on the system");
+        Logger.info(e.getMessage());
         if (weiduHandleNotFound() == null) {
           continue;
         }
       } catch (InvalidBinaryException e) {
-        Logger.info(e, "Not a WeiDU binary");
+        Logger.info("{}: {}", e.getMessage(), e.getBinPath());
         if (weiduHandleNotFound() == null) {
           continue;
         }
@@ -1807,18 +1807,20 @@ public class MainWindow extends Application {
           if (!conflicts.isEmpty()) {
             retVal = false;
             if (interactive) {
-              final String modSequence = String.join(", ", conflicts);
-              final String title = R.WARNING();
-              final String header = R.get("ui.main.modOrder.message.header");
+              final String title = R.get("ui.main.modOrder.message.title");
+
               final String modName;
               if (modInfo.getModIni() != null && !modInfo.getModIni().getName().isEmpty()) {
                 modName = modInfo.getModIni().getName();
               } else {
                 modName = modInfo.getTp2Name();
               }
-              final String content = String.format(R.get("ui.main.modOrder.message.content"), modName, modSequence);
-              final ButtonType type = Utils.showCustomDialog(getStage(), Alert.AlertType.CONFIRMATION, title, header,
-                  content, ButtonType.YES, ButtonType.NO);
+              final String header = String.format(R.get("ui.main.modOrder.message.header"), modName);
+
+              final String modSequence = String.join("\n", conflicts);
+              final String content = String.format("%s\n%s", R.get("ui.main.modOrder.message.content"), modSequence);
+
+              final ButtonType type = Utils.showConfirmationDialog(getStage(), title, header, content, true);
               retVal = (type == ButtonType.YES);
             }
           }
@@ -1852,6 +1854,7 @@ public class MainWindow extends Application {
               Logger.warn(e, "Output application message");
             }
             appendOutputText(msg, false);
+            setWeiduTerminated();
           }
         }
         default -> executeCustom();
