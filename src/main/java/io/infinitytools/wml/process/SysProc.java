@@ -505,6 +505,9 @@ public class SysProc {
         retVal = -1;
       }
 
+      // unblocks working directory on Windows
+      pb.directory(null);
+
       process = null;
 
       return retVal;
