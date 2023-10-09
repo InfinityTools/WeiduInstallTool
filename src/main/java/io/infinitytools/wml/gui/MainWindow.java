@@ -255,14 +255,22 @@ public class MainWindow extends Application {
     }
 
     /**
-     * Returns the {@link Image} object for the tray icon depending on the specified UI mode.
+     * Returns the {@link Image} object for the tray icon depending on the specified states.
      *
-     * @param darkMode Specify {@code true} to return the icon for the Dark Mode UI, {@code false} to return
-     *                 the icon for the Light Mode UI.
+     * @param darkMode       Specify {@code true} to return the icon for the Dark Mode UI, {@code false} to return
+     *                       the icon for the Light Mode UI.
+     * @param runningProcess Specify {@code true} to return the icon for a running process, {@code false} to return
+     *                       the icon for a completed process.
      * @return {@link Image} object.
      */
-    public static Image getIcon(boolean darkMode) {
-      final Icons ic = darkMode ? Icons.IconDark32 : Icons.Icon32;
+    public static Image getIcon(boolean darkMode, boolean runningProcess) {
+      final Icons ic;
+      if (darkMode) {
+        ic = runningProcess ? Icons.IconRunningDark32 : Icons.IconDark32;
+      } else {
+        ic = runningProcess ? Icons.IconRunning32 : Icons.Icon32;
+      }
+
       try (final InputStream is = Icons.class.getResourceAsStream(ic.getFileName())) {
         assert is != null;
         return javax.imageio.ImageIO.read(is);
@@ -284,7 +292,7 @@ public class MainWindow extends Application {
         return;
       }
 
-      final Image icon = getIcon(isDarkModeEnabled());
+      final Image icon = getIcon(isDarkModeEnabled(), isProcessRunning());
       if (icon == null) {
         // should never happen
         Logger.warn("Could not load system tray icon");
@@ -973,8 +981,12 @@ public class MainWindow extends Application {
     updateWindowTitle(true);
     getController().quitButton.setText(R.get("ui.main.terminate.button"));
     getController().inputButtons.forEach(button -> button.setDisable(false));
-    if (getTray().isAvailable()) {
+    if (getTray() != null && getTray().isAvailable()) {
       getTray().getQuitItem().setLabel(getTray().getQuitLabel());
+      // tray icon: update label and icon color
+      getTray().getTrayIcon().setToolTip(String.format("%s [%s]", Globals.APP_TITLE,
+          R.get("ui.main.windowTitle.state.running")));
+      getTray().getTrayIcon().setImage(Tray.getIcon(isDarkModeEnabled(), true));
     }
   }
 
@@ -986,8 +998,12 @@ public class MainWindow extends Application {
 
     final String labelKey = getTray().isAvailable() ? "ui.main.close.button" : "ui.main.quit.button";
     getController().quitButton.setText(R.get(labelKey));
-    if (getTray().isAvailable()) {
+    if (getTray() != null && getTray().isAvailable()) {
       getTray().getQuitItem().setLabel(getTray().getQuitLabel());
+      // tray icon: update label and icon color
+      getTray().getTrayIcon().setToolTip(String.format("%s [%s]", Globals.APP_TITLE,
+          R.get("ui.main.windowTitle.state.completed")));
+      getTray().getTrayIcon().setImage(Tray.getIcon(isDarkModeEnabled(), false));
     }
 
     getController().inputButtons.forEach(button -> button.setDisable(true));
@@ -1122,7 +1138,7 @@ public class MainWindow extends Application {
 
     // updating tray icon if available
     if (getTray() != null && getTray().getTrayIcon() != null) {
-      getTray().getTrayIcon().setImage(Tray.getIcon(enable));
+      getTray().getTrayIcon().setImage(Tray.getIcon(enable, isProcessRunning()));
     }
   }
 

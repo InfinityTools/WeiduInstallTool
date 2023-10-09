@@ -60,6 +60,36 @@ public enum Icons {
       Icon16.getFileName()),
 
   /**
+   * Application icon (running process)
+   */
+  IconRunning256("icon-running/256x256.png"),
+  /**
+   * Application icon (running process)
+   */
+  IconRunning128("icon-running/128x128.png"),
+  /**
+   * Application icon (running process)
+   */
+  IconRunning64("icon-running/64x64.png"),
+  /**
+   * Application icon (running process)
+   */
+  IconRunning32("icon-running/32x32.png"),
+  /**
+   * Application icon (running process)
+   */
+  IconRunning22("icon-running/22x22.png"),
+  /**
+   * Application icon (running process)
+   */
+  IconRunning16("icon-running/16x16.png"),
+  /**
+   * Collection of application icons in all available dimensions (running process).
+   */
+  IconRunning(IconRunning256.getFileName(), IconRunning128.getFileName(), IconRunning64.getFileName(),
+      IconRunning32.getFileName(), IconRunning22.getFileName(), IconRunning16.getFileName()),
+
+  /**
    * Application icon (Dark Mode UI version)
    */
   IconDark256("icon-dark/256x256.png"),
@@ -88,6 +118,36 @@ public enum Icons {
    */
   IconDark(IconDark256.getFileName(), IconDark128.getFileName(), IconDark64.getFileName(), IconDark32.getFileName(),
       IconDark22.getFileName(), IconDark16.getFileName()),
+
+  /**
+   * Application icon (Dark Mode UI version, running process)
+   */
+  IconRunningDark256("icon-running-dark/256x256.png"),
+  /**
+   * Application icon (Dark Mode UI version, running process)
+   */
+  IconRunningDark128("icon-running-dark/128x128.png"),
+  /**
+   * Application icon (Dark Mode UI version, running process)
+   */
+  IconRunningDark64("icon-running-dark/64x64.png"),
+  /**
+   * Application icon (Dark Mode UI version, running process)
+   */
+  IconRunningDark32("icon-running-dark/32x32.png"),
+  /**
+   * Application icon (Dark Mode UI version, running process)
+   */
+  IconRunningDark22("icon-running-dark/22x22.png"),
+  /**
+   * Application icon (Dark Mode UI version, running process)
+   */
+  IconRunningDark16("icon-running-dark/16x16.png"),
+  /**
+   * Collection of application icons in all available dimensions. (Dark Mode UI version, running process)
+   */
+  IconRunningDark(IconRunningDark256.getFileName(), IconRunningDark128.getFileName(), IconRunningDark64.getFileName(),
+      IconRunningDark32.getFileName(), IconRunningDark22.getFileName(), IconRunningDark16.getFileName()),
 
   /**
    * Transparent application logo
