@@ -30,11 +30,12 @@ The launcher provides detailed information about the currently installed mod, wh
 
 ### Customization
 
-Customization options of the WeiDU Mod Launcher include:
+Customization of the WeiDU Mod Launcher includes:
+- Displaying UI text and messages in the user language if available
 - Toggling between light and dark mode UI on-the-fly
 - Setting output text size and character encoding
 - Showing visual hints about the installation state
-- Warnings about mod conflicts
+- Warnings about potential mod conflicts
 - and more…
 
 ## Installation
