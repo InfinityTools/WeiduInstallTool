@@ -8,7 +8,7 @@
 
 WeiDU Mod Launcher is a graphical front end for the [WeiDU command line tool](https://github.com/WeiDUorg/weidu), which is used to install mods for Infinity Engine games, such as Baldur's Gate, Icewind Dale or Planescape Torment. The front end is written in Java and uses the JavaFX framework to provide a modern UI.
 
-The launcher provides all functionality of the WeiDU command line interpreter as well as many usability improvements to help with the mod installation task.
+The launcher offers all functionality of the WeiDU command line interpreter as well as many usability improvements and convenience features to help with the mod installation task.
 
 ![main window](preview/mainwindow-plus.png)
 
@@ -22,7 +22,7 @@ The installed version of WeiDU Mod Launcher is automatically associated<sup>*</s
 
 ### Drag and Drop Support
 
-The launcher also provides drag and drop support. Tp2 files or mod folders themselves can be dropped onto an open launcher instance to initiate the mod installation process if no other mod is currently being installed.
+The launcher also provides drag and drop support. Tp2 files or the mod folders themselves can be dropped onto an open launcher instance to initiate the mod installation process if no other mod is currently being installed.
 
 ### Detailed Mod Information
 
@@ -35,6 +35,7 @@ Customization options of the WeiDU Mod Launcher include:
 - Setting output text size and character encoding
 - Showing visual hints about the installation state
 - Warnings about mod conflicts
+- and more…
 
 ## Installation
 
@@ -51,32 +52,32 @@ Installation builds are available as installers and portable packages for Window
 The following commands will build the application and create packages in the format native to the current platform.
 
 **Windows (installer):**
-```
+```bat
 cd WeiduModLauncher
 gradlew.bat jpackage
 ```
 
 **Windows (portable zip):**
-```
+```bat
 cd WeiduModLauncher
 gradlew.bat portableZip
 ```
 
 **Linux and macOS (installer):**
-```
+```bash
 cd WeiduModLauncher
 chmod +x gradlew
 ./gradlew jpackage
 ```
 
 **Linux and macOS (portable tarball):**
-```
+```bash
 cd WeiduModLauncher
 chmod +x gradlew
 ./gradlew portableTar
 ```
 
-The resulting package(s) can be found in the `./build/distribution` folder.
+The resulting package(s) can be found in the `./build/distribution` folder. File type associations are only configured by the installer version of the application.
 
 The `jpackage` task requires the following software to be installed on the system:
 - Windows: [WiX 3.0](https://wixtoolset.org) or later is required.
