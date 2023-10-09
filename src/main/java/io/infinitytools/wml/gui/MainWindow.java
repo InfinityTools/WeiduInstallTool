@@ -937,8 +937,8 @@ public class MainWindow extends Application {
       }
       case Q -> {
         if (isShortcutOnly) {
-          // signal to quit the app
-          onCloseApplication(event);
+          // signal to terminate or close the app
+          onQuitClicked();
         }
       }
       default -> {
