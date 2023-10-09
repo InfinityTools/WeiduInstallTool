@@ -126,6 +126,14 @@
             </Tooltip>
           </tooltip>-->
         </CheckMenuItem>
+        <CheckMenuItem fx:id="trayIconFeedbackCheckItem"
+                       text="%ui.main.menu.item.trayIconFeedback">
+          <!--<tooltip>
+            <Tooltip fx:id="trayIconFeedbackTooltip"
+                     text="Enable to visualize the mod processing status in the system tray icon.">
+            </Tooltip>
+          </tooltip>-->
+        </CheckMenuItem>
         <CheckMenuItem fx:id="showLogCheckItem"
                        text="%ui.main.menu.item.logWindow">
           <accelerator>

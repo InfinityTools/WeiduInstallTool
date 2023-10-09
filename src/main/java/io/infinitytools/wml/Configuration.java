@@ -100,6 +100,10 @@ public class Configuration {
      */
     TRAY_HINT_SHOWN("Tray Hint Shown", Boolean.class, false),
     /**
+     * Indicates whether the tray icon should change depending on the running state of the WeiDU process.
+     */
+    TRAY_ICON_FEEDBACK("Tray Icon Feedback", Boolean.class, true),
+    /**
      * Specifies a custom path to the WeiDU binary.
      */
     WEIDU_PATH("Weidu Path", String.class, null),

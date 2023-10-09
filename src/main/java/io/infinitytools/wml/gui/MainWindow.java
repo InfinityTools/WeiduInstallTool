@@ -123,7 +123,7 @@ public class MainWindow extends Application {
     /**
      * Indicates whether tray icons are supported on the current machine.
      */
-    private static final boolean IS_SUPPORTED = SystemTray.isSupported() && SystemInfo.IS_WINDOWS;
+    public static final boolean IS_SUPPORTED = SystemTray.isSupported() && SystemInfo.IS_WINDOWS;
 
     private SystemTray tray;
     private TrayIcon trayIcon;
@@ -616,12 +616,32 @@ public class MainWindow extends Application {
   private void setSingleInstanceEnabled(boolean newValue, boolean feedback) {
     getController().singleInstanceCheckItem.setSelected(newValue);
 
+    // Tray icon feedback is only available in single instance mode
+    if (getController().trayIconFeedbackCheckItem.isVisible()) {
+      getController().trayIconFeedbackCheckItem.setDisable(!getController().singleInstanceCheckItem.isSelected());
+    }
+
     if (feedback) {
       boolean configValue = Configuration.getInstance().getOption(Configuration.Key.SINGLE_INSTANCE);
       if (newValue != configValue) {
         Utils.showMessageDialog(getStage(), R.INFORMATION(), R.get("ui.main.menu.item.singleInstance"),
             R.get("ui.main.menu.item.singleInstance.message.content"));
       }
+    }
+  }
+
+  /**
+   * Returns whether the system tray icon should reflect the WeiDU process state.
+   */
+  public boolean isTrayIconFeedbackEnabled() {
+    return getController().trayIconFeedbackCheckItem.isSelected();
+  }
+
+  private void setTrayIconFeedbackEnabled(boolean newValue) {
+    getController().trayIconFeedbackCheckItem.setSelected(newValue);
+
+    if (getTray() != null && getTray().isAvailable()) {
+      getTray().getTrayIcon().setImage(Tray.getIcon(isDarkModeEnabled(), newValue && isProcessRunning()));
     }
   }
 
@@ -986,7 +1006,7 @@ public class MainWindow extends Application {
       // tray icon: update label and icon color
       getTray().getTrayIcon().setToolTip(String.format("%s [%s]", Globals.APP_TITLE,
           R.get("ui.main.windowTitle.state.running")));
-      getTray().getTrayIcon().setImage(Tray.getIcon(isDarkModeEnabled(), true));
+      getTray().getTrayIcon().setImage(Tray.getIcon(isDarkModeEnabled(), isTrayIconFeedbackEnabled()));
     }
   }
 
@@ -1260,6 +1280,7 @@ public class MainWindow extends Application {
         .setOption(Configuration.Key.WARN_MOD_ORDER, isWarnModOrderEnabled()));
     getController().darkModeUiCheckItem.setOnAction(event -> applyDarkModeUi(isDarkModeEnabled()));
     getController().singleInstanceCheckItem.setOnAction(event -> setSingleInstanceEnabled(isSingleInstanceEnabled(), true));
+    getController().trayIconFeedbackCheckItem.setOnAction(event -> setTrayIconFeedbackEnabled(isTrayIconFeedbackEnabled()));
     getController().bufferSizeSlider.valueProperty().addListener((ob, ov, nv) -> setOutputBufferSizeLabel(nv.doubleValue()));
     getController().outputFontSizeValueFactory.valueProperty().addListener((ob, ov, nv) -> setOutputAreaFontSize(nv));
 
@@ -1331,12 +1352,13 @@ public class MainWindow extends Application {
       }
     }
 
-    setAutoQuitEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.QUIT_ON_ENTER));
-    setVisualizeResultsEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.VISUALIZE_RESULT));
-    setWarnModOrderEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.WARN_MOD_ORDER));
-    setDarkModeEnabled(Configuration.getInstance().<Boolean>getOption(Configuration.Key.DARK_UI_MODE));
+    setAutoQuitEnabled(Configuration.getInstance().getOption(Configuration.Key.QUIT_ON_ENTER));
+    setVisualizeResultsEnabled(Configuration.getInstance().getOption(Configuration.Key.VISUALIZE_RESULT));
+    setWarnModOrderEnabled(Configuration.getInstance().getOption(Configuration.Key.WARN_MOD_ORDER));
+    setDarkModeEnabled(Configuration.getInstance().getOption(Configuration.Key.DARK_UI_MODE));
     setSingleInstanceEnabled(Configuration.getInstance().getOption(Configuration.Key.SINGLE_INSTANCE), false);
-    setOutputBufferSize(Configuration.getInstance().<Integer>getOption(Configuration.Key.BUFFER_LIMIT));
+    setTrayIconFeedbackEnabled(Configuration.getInstance().getOption(Configuration.Key.TRAY_ICON_FEEDBACK));
+    setOutputBufferSize(Configuration.getInstance().getOption(Configuration.Key.BUFFER_LIMIT));
 
     applyOutputFontSize(Configuration.getInstance().getOption(Configuration.Key.OUTPUT_FONT_SIZE,
         getController().outputArea.getFont().getSize()), true);
@@ -1685,6 +1707,7 @@ public class MainWindow extends Application {
     if (getController().singleInstanceCheckItem.isVisible()) {
       cfg.setOption(Configuration.Key.SINGLE_INSTANCE, isSingleInstanceEnabled());
     }
+    cfg.setOption(Configuration.Key.TRAY_ICON_FEEDBACK, isTrayIconFeedbackEnabled());
     cfg.setOption(Configuration.Key.QUIT_ON_ENTER, isAutoQuitEnabled());
     cfg.setOption(Configuration.Key.VISUALIZE_RESULT, isVisualizeResultsEnabled());
     cfg.setOption(Configuration.Key.BUFFER_LIMIT, getOutputBufferSize());

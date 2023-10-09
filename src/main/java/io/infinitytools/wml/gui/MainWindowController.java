@@ -63,6 +63,7 @@ public class MainWindowController implements Initializable {
   public CheckMenuItem warnModOrderCheckItem;
   public CheckMenuItem darkModeUiCheckItem;
   public CheckMenuItem singleInstanceCheckItem;
+  public CheckMenuItem trayIconFeedbackCheckItem;
   public CheckMenuItem showLogCheckItem;
   public CustomMenuItem bufferSizeMenuItem;
   public CustomMenuItem outputFontSizeMenuItem;
@@ -86,10 +87,20 @@ public class MainWindowController implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     initContextMenu();
     initInputButtons();
+    initOptions();
+  }
 
+  /**
+   * Configures availability of application options.
+   */
+  private void initOptions() {
     // single instance mode is already the default behavior on macOS
     singleInstanceCheckItem.setDisable(SystemInfo.IS_MACOS);
     singleInstanceCheckItem.setVisible(!SystemInfo.IS_MACOS);
+
+    // system tray is only available on selected platforms
+    trayIconFeedbackCheckItem.setDisable(!MainWindow.Tray.IS_SUPPORTED);
+    trayIconFeedbackCheckItem.setVisible(MainWindow.Tray.IS_SUPPORTED);
   }
 
   /**
