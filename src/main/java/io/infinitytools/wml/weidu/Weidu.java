@@ -194,45 +194,40 @@ public class Weidu {
   public String getHelp() {
     String retVal = null;
 
-    if (!SystemInfo.IS_LINUX) {
-      // Originally a Windows-only procedure, but appears to be required for macOS, too.
-      // WeiDU expects the user to press ENTER repeatedly to advance output by one more page until the process
-      // terminates.
-      final SysProc sp = new SysProc(weidu.toString(), "--help", "--no-exit-pause");
-      try {
-        final Future<Integer> result = sp.execute();
-        long waitTime = 0;
-        long waitTimeTotal = 0;
-        while (sp.isRunning() && waitTimeTotal < 2000) {
-          sp.setInput(BufferConvert.encodeBytes(SystemInfo.NEWLINE));
-          Thread.sleep(waitTime);
-          waitTime = Math.min(waitTime + 1, 10L);
-          waitTimeTotal += waitTime;
-        }
+    // Originally a Windows-only workaround, but appears to be required for macOS and Linux, too, under certain
+    // circumstances.
+    // WeiDU expects the user to press ENTER (repeatedly) to advance output by one more page until the process
+    // terminates.
+    final SysProc sp = new SysProc(weidu.toString(), "--help", "--no-exit-pause");
+    try {
+      final Future<Integer> result = sp.execute();
+      long waitTime = 0;
+      long waitTimeTotal = 0;
+      while (sp.isRunning() && waitTimeTotal < 2000) {
+        sp.setInput(BufferConvert.encodeBytes(SystemInfo.NEWLINE));
+        Thread.sleep(waitTime);
+        waitTime = Math.min(waitTime + 1, 10L);
+        waitTimeTotal += waitTime;
+      }
 
-        result.get(1000, TimeUnit.MILLISECONDS);
-      } catch (ExecutionException | IOException | InterruptedException | TimeoutException e) {
-        Logger.error(e, "Error executing WeiDU process");
-      }
-      final byte[] data = sp.getOutput();
-      final String output = BufferConvert.decodeBytes(data).decoded();
-      if (output != null) {
-        // Removing useless extra lines
-        List<String> list = new ArrayList<>(Arrays.asList(output.split("\r?\n")));
-        for (int i = 0; i < list.size(); i++) {
-          final String line = list.get(i);
-          if (line.contains("Press Enter For More Options") || line.contains("Enter arguments:")) {
-            list.remove(i);
-            list.remove(i - 1); // previous line is always empty
-            i--;
-          }
+      result.get(2000, TimeUnit.MILLISECONDS);
+    } catch (ExecutionException | IOException | InterruptedException | TimeoutException e) {
+      Logger.error(e, "Error executing WeiDU process");
+    }
+    final byte[] data = sp.getOutput();
+    final String output = BufferConvert.decodeBytes(data).decoded();
+    if (output != null) {
+      // Removing useless extra lines
+      List<String> list = new ArrayList<>(Arrays.asList(output.split("\r?\n")));
+      for (int i = 0; i < list.size(); i++) {
+        final String line = list.get(i);
+        if (line.contains("Press Enter For More Options") || line.contains("Enter arguments:")) {
+          list.remove(i);
+          list.remove(i - 1); // previous line is always empty
+          i--;
         }
-        retVal = list.stream().collect(Collectors.joining("\n", "", "\n"));
       }
-    } else {
-      // Other systems are much less painful
-      final byte[] data = ProcessUtils.getProcessOutput(weidu.toString(), "--help", "--no-exit-pause");
-      retVal = BufferConvert.decodeBytes(data).decoded();
+      retVal = list.stream().collect(Collectors.joining("\n", "", "\n"));
     }
 
     if (retVal == null) {
