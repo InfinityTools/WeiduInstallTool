@@ -1115,18 +1115,14 @@ public class MainWindow extends Application {
   }
 
   /**
-   * Applies the specified font size to the font size spinner and optionally updates configuration option.
+   * Applies the specified font size to the font size spinner and updates the configuration option.
    *
-   * @param fontSize     Font size to apply to the output text area.
-   * @param updateConfig Whether to update the corresponding {@link Configuration} option.
+   * @param fontSize Font size to apply to the output text area.
    */
-  private void applyOutputFontSize(double fontSize, boolean updateConfig) {
+  private void applyOutputFontSize(double fontSize) {
     // ensure that output font size is rounded to a multiple of 0.5
     fontSize = Math.floor(fontSize * 2.0) / 2.0;
-
-    if (updateConfig) {
-      Configuration.getInstance().setOption(Configuration.Key.OUTPUT_FONT_SIZE, fontSize);
-    }
+    Configuration.getInstance().setOption(Configuration.Key.OUTPUT_FONT_SIZE, fontSize);
 
     // distinction is necessary to ensure that font size is set
     if (fontSize != getController().outputFontSizeValueFactory.getValue()) {
@@ -1380,7 +1376,7 @@ public class MainWindow extends Application {
     setOutputBufferSize(Configuration.getInstance().getOption(Configuration.Key.BUFFER_LIMIT));
 
     applyOutputFontSize(Configuration.getInstance().getOption(Configuration.Key.OUTPUT_FONT_SIZE,
-        getController().outputArea.getFont().getSize()), true);
+        getController().outputArea.getFont().getSize()));
 
     applyDarkModeUi(isDarkModeEnabled());
 
@@ -2184,9 +2180,8 @@ public class MainWindow extends Application {
    *
    * @param forced Specify {@code false} to request user confirmation before terminating a process. Specify {@code true}
    *               to terminate the process unconditionally.
-   * @return {@code true} if a process was running and has been terminated, {@code false} otherwise.
    */
-  private boolean terminate(boolean forced) {
+  private void terminate(boolean forced) {
     if (process != null && process.isRunning()) {
       ButtonType result = ButtonType.OK;
       if (!forced) {
@@ -2197,10 +2192,8 @@ public class MainWindow extends Application {
       if (result == ButtonType.OK) {
         process.killProcess();
         appendOutputText(String.format("\n*** %s ***", R.get("ui.main.terminate.output")), true);
-        return true;
       }
     }
-    return false;
   }
 
   /**
