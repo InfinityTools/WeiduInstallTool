@@ -222,6 +222,14 @@
           <MenuItem fx:id="outputSelectAllMenuItem"
                     text="%ui.textArea.contextMenu.selectAll"/>
           <SeparatorMenuItem/>
+          <MenuItem fx:id="outputSearchMenuItem"
+                    text="%ui.find.menu.text">
+            <accelerator>
+              <!-- KeyCodeCombination: JavaFX requires all attributes to be explicitly defined. -->
+              <KeyCodeCombination code="F" shortcut="DOWN" shift="UP" control="UP" alt="UP" meta="UP"/>
+            </accelerator>
+          </MenuItem>
+          <SeparatorMenuItem/>
           <MenuItem fx:id="outputScrollTopMenuItem"
                     text="%ui.main.outputArea.contextMenu.scrollTop"/>
           <MenuItem fx:id="outputScrollBottomMenuItem"

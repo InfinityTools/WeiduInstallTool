@@ -102,7 +102,7 @@ public class Configuration {
     /**
      * Indicates whether the tray icon should change depending on the running state of the WeiDU process.
      */
-    TRAY_ICON_FEEDBACK("Tray Icon Feedback", Boolean.class, true),
+    TRAY_ICON_FEEDBACK("Tray Icon Feedback", Boolean.class, false),
     /**
      * Specifies a custom path to the WeiDU binary.
      */

@@ -1,0 +1,7 @@
+.root {
+  -fx-padding: 12px;
+}
+
+.boldLabel {
+  -fx-font-weight: bold;
+}

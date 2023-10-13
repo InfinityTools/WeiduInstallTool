@@ -192,6 +192,34 @@ public class Utils {
   }
 
   /**
+   * Returns the given string within the specified bounds.
+   *
+   * @param text         The original string.
+   * @param maxLength    Maximum length of the returned string.
+   * @param withEllipsis Indicates whether a shortened string should append an ellipsis character.
+   * @return The given string, shortened if needed, to meet the specified requirements.
+   *         Returns an empty string if the specified string argument is {@code null}.
+   */
+  public static String getSafeString(String text, int maxLength, boolean withEllipsis) {
+    if (text != null) {
+      if (text.length() <= maxLength) {
+        return text;
+      }
+
+      if (maxLength > 0) {
+        final String retVal = text.substring(0, maxLength);
+        if (withEllipsis) {
+          return retVal + "…";
+        } else {
+          return retVal;
+        }
+      }
+    }
+
+    return "";
+  }
+
+  /**
    * Executes the specified operation and returns the result. Returns a default value if the operation throws an
    * exception.
    *
@@ -336,9 +364,9 @@ public class Utils {
   public static ButtonType showConfirmationDialog(Window owner, String title, String header, String content, boolean yesNo) {
     final ButtonType[] buttons;
     if (yesNo) {
-      buttons = new ButtonType[] { ButtonType.YES, ButtonType.NO };
+      buttons = new ButtonType[]{ButtonType.YES, ButtonType.NO};
     } else {
-      buttons = new ButtonType[] { ButtonType.OK, ButtonType.CANCEL };
+      buttons = new ButtonType[]{ButtonType.OK, ButtonType.CANCEL};
     }
     return showCustomDialog(owner, AlertType.CONFIRMATION, title, header, content, buttons);
   }

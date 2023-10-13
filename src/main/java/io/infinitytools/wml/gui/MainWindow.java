@@ -727,7 +727,7 @@ public class MainWindow extends Application {
       final String newText = ensureOutputTextLimit(curText, text.length());
       final int charsToDelete = curText.length() - newText.length();
       if (charsToDelete > 0) {
-        Logger.debug("Deleting output characters: {}", charsToDelete);
+        Logger.trace("Deleting output characters: {}", charsToDelete);
         clearOutputText();
         getController().outputArea.appendText(newText + text);
       } else {
@@ -992,6 +992,18 @@ public class MainWindow extends Application {
     final Dragboard db = event.getDragboard();
     final boolean success = handleDroppedFiles(db.getFiles().toArray(new File[0]));
     event.setDropCompleted(success);
+  }
+
+  /**
+   * Called when the "Find..." menu option is called for the output text area.
+   */
+  private void onShowFindDialog() {
+    try {
+      SearchDialog.getInstance(getController().outputArea).show();
+    } catch (Exception e) {
+      Logger.error(e, "Could not open search dialog: {}", e.getMessage());
+      Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.find.message.open.error"), null);
+    }
   }
 
   /**
@@ -1262,6 +1274,13 @@ public class MainWindow extends Application {
 
     // add invisible border; required to reserve border space for a consistent look when border is enabled
     setVisualizedResult(false, 0);
+
+    // initialize menu items in context menu for the output text area
+    getController().outputContextMenu.setOnShowing(event -> {
+      getController().outputCopyMenuItem.setDisable(getController().outputArea.getSelection().getLength() == 0);
+      getController().outputSearchMenuItem.setDisable(isProcessRunning());
+    });
+    getController().outputSearchMenuItem.setOnAction(event -> onShowFindDialog());
 
     // initialize charset switch options for the output text area
     setOutputCharset(StandardCharsets.UTF_8);

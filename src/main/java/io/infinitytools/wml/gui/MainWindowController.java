@@ -32,6 +32,7 @@ public class MainWindowController implements Initializable {
   public ContextMenu outputContextMenu;
   public MenuItem outputCopyMenuItem;
   public MenuItem outputSelectAllMenuItem;
+  public MenuItem outputSearchMenuItem;
   public MenuItem outputScrollTopMenuItem;
   public MenuItem outputScrollBottomMenuItem;
   public TextField inputField;
@@ -112,7 +113,6 @@ public class MainWindowController implements Initializable {
     outputSelectAllMenuItem.setOnAction(event -> outputArea.selectAll());
     outputScrollTopMenuItem.setOnAction(event -> outputArea.setScrollTop(0.0));
     outputScrollBottomMenuItem.setOnAction(event -> outputArea.setScrollTop(Double.MAX_VALUE));
-    outputContextMenu.setOnShowing(event -> outputCopyMenuItem.setDisable(outputArea.getSelection().getLength() == 0));
 
     // extending context menu by character encoding options
     // binding is initialized in the MainWindow class
