@@ -3,7 +3,7 @@ Version=1.0
 Type=Application
 
 Name=WeiDU Mod Launcher
-Comment=A graphical frontend for WeiDU Mods
+Comment=A graphical front end for WeiDU Mods
 Categories=Game;Java;
 
 Icon=io.github.infinitytools.WeiduModLauncher
