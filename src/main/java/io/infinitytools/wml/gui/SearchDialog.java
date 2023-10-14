@@ -274,7 +274,10 @@ public class SearchDialog extends Stage {
    */
   private void updateInputPattern() throws IllegalArgumentException {
     if (inputPattern == null) {
-      final int flags = isMatchCase() ? 0 : Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
+      int flags = Pattern.MULTILINE;
+      if (!isMatchCase()) {
+        flags |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
+      }
       final String text = getResolvedString(getInputText());
       final String regex = isRegularExpression() ? text : Pattern.quote(text);
       inputPattern = Pattern.compile(regex, flags);
