@@ -460,4 +460,17 @@ public class Configuration {
     setMode(mode);
     setTp2Path(tp2File);
   }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(this.getClass().getSimpleName()).append(" {\n");
+    for (final Key key : Key.values()) {
+      final String type = key.getType().getSimpleName();
+      final Object value = getOption(key);
+      sb.append(String.format("\t%s (%s): %s", key, type, value)).append('\n');
+    }
+    sb.append('}');
+    return sb.toString();
+  }
 }

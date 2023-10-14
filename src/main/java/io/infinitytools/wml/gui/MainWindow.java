@@ -458,6 +458,7 @@ public class MainWindow extends Application {
     } catch (Exception e) {
       Logger.error(e, "Loading configuration");
     }
+    Logger.debug("Settings loaded: {}", Configuration.getInstance());
 
     // Setting up single instance mode
     final boolean isSingleInstance = Configuration.getInstance().getOption(Configuration.Key.SINGLE_INSTANCE);
@@ -1628,14 +1629,36 @@ public class MainWindow extends Application {
     // not valid anymore
     Configuration.getInstance().setOption(Configuration.Key.WEIDU_HASH, null);
 
-    final Path binPath = Utils.chooseOpenFile(null, titleFileDialog, SystemInfo.getUserPath(),
-        filterWeidu, filterExe);
-    if (binPath != null) {
-      Configuration.getInstance().setOption(Configuration.Key.WEIDU_PATH, binPath.toString());
-      Weidu.reset();
-      return null;
-    } else {
-      throw new UnsupportedOperationException("WeiDU executable selection cancelled by the user.");
+    Path initialPath = SystemInfo.getUserPath();
+    Path binPath = null;
+    while (true) {
+      binPath = Utils.chooseOpenFile(null, titleFileDialog, initialPath, filterWeidu, filterExe);
+
+      // Checking binary prefix
+      if (binPath != null) {
+        final String binName = binPath.getFileName().toString().toLowerCase(Locale.ROOT);
+        // "setup-" is reserved for auto-installing mods.
+        if (binName.startsWith("setup-")) {
+          final ButtonType bt = Utils.showCustomDialog(getStage(), Alert.AlertType.WARNING, R.WARNING(),
+              R.get("ui.checkWeidu.message.forbiddenName.header"), null, ButtonType.YES, ButtonType.NO);
+          if (bt == ButtonType.YES) {
+            if (binPath.getParent() != null) {
+              initialPath = binPath.getParent();
+            }
+            continue;
+          } else {
+            binPath = null;
+          }
+        }
+      }
+
+      if (binPath != null) {
+        Configuration.getInstance().setOption(Configuration.Key.WEIDU_PATH, binPath.toString());
+        Weidu.reset();
+        return null;
+      } else {
+        throw new UnsupportedOperationException("WeiDU executable selection cancelled by the user.");
+      }
     }
   }
 
