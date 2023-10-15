@@ -175,6 +175,49 @@ public enum Icons {
   Logo(Logo256.getFileName(), Logo128.getFileName(), Logo64.getFileName(), Logo32.getFileName(), Logo16.getFileName()),
 
   /**
+   * Icon for "Open Mod: button
+   */
+  OpenMod256("icon-tp2/256x256.png"),
+  /**
+   * Icon for "Open Mod: button
+   */
+  OpenMod128("icon-tp2/128x128.png"),
+  /**
+   * Icon for "Open Mod: button
+   */
+  OpenMod64("icon-tp2/64x64.png"),
+  /**
+   * Icon for "Open Mod: button
+   */
+  OpenMod32("icon-tp2/32x32.png"),
+  /**
+   * Collection of "Open Mod" button icons in all available dimensions.
+   */
+  OpenMod(OpenMod256.getFileName(), OpenMod128.getFileName(), OpenMod64.getFileName(), OpenMod32.getFileName()),
+
+  /**
+   * Icon for "Open Mod: button (Dark Mode UI version)
+   */
+  OpenModDark256("icon-tp2-dark/256x256.png"),
+  /**
+   * Icon for "Open Mod: button (Dark Mode UI version)
+   */
+  OpenModDark128("icon-tp2-dark/128x128.png"),
+  /**
+   * Icon for "Open Mod: button (Dark Mode UI version)
+   */
+  OpenModDark64("icon-tp2-dark/64x64.png"),
+  /**
+   * Icon for "Open Mod: button (Dark Mode UI version)
+   */
+  OpenModDark32("icon-tp2-dark/32x32.png"),
+  /**
+   * Collection of "Open Mod" button icons in all available dimensions (Dark Mode UI version).
+   */
+  OpenModDark(OpenModDark256.getFileName(), OpenModDark128.getFileName(), OpenModDark64.getFileName(),
+      OpenModDark32.getFileName()),
+
+  /**
    * Icon for Options menu
    */
   Options256("options/256x256.png"),

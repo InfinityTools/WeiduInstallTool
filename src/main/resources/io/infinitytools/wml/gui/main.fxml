@@ -15,30 +15,13 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckMenuItem?>
-<?import javafx.scene.control.ContextMenu?>
-<?import javafx.scene.control.CustomMenuItem?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.Spinner?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.input.KeyCodeCombination?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-
+<?import javafx.scene.layout.*?>
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="io.infinitytools.wml.gui.MainWindowController"
@@ -70,6 +53,19 @@
               text="%ui.main.about.button">
       <tooltip>
         <Tooltip text="%ui.main.about.tooltip"/>
+      </tooltip>
+    </Button>
+    <Button fx:id="loadModButton"
+            text="%ui.main.loadMod.button">
+      <graphic>
+        <ImageView fitWidth="16"
+                   fitHeight="16"
+                   preserveRatio="true">
+          <Image url="@../icons/icon-tp2/32x32.png"/>
+        </ImageView>
+      </graphic>
+      <tooltip>
+        <Tooltip text="%ui.main.loadMod.tooltip"/>
       </tooltip>
     </Button>
     <MenuButton fx:id="optionsButton"

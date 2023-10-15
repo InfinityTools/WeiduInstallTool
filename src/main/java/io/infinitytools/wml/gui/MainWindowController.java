@@ -38,6 +38,7 @@ public class MainWindowController implements Initializable {
   public TextField inputField;
   public Button sendButton;
   public Button aboutButton;
+  public Button loadModButton;
   public Button inputDigit0Button;
   public Button inputDigit1Button;
   public Button inputDigit2Button;

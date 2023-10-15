@@ -65,6 +65,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.List;
@@ -1012,8 +1013,12 @@ public class MainWindow extends Application {
    */
   private void setWeiduRunning() {
     updateWindowTitle(true);
+
     getController().quitButton.setText(R.get("ui.main.terminate.button"));
+
+    getController().loadModButton.setDisable(true);
     getController().inputButtons.forEach(button -> button.setDisable(false));
+
     if (getTray() != null && getTray().isAvailable()) {
       getTray().getQuitItem().setLabel(getTray().getQuitLabel());
       // tray icon: update label and icon color
@@ -1039,6 +1044,7 @@ public class MainWindow extends Application {
       getTray().getTrayIcon().setImage(Tray.getIcon(isDarkModeEnabled(), false));
     }
 
+    getController().loadModButton.setDisable(false);
     getController().inputButtons.forEach(button -> button.setDisable(true));
 
     // Triggering tray notification if main window is not active
@@ -1159,7 +1165,12 @@ public class MainWindow extends Application {
     // updating window skins
     CustomScene.updateSceneCache();
 
-    // updating Options menu icon
+    // updating UI icons
+    if (getController().loadModButton.getGraphic() instanceof ImageView iv) {
+      final Icons icon = enable ? Icons.OpenModDark32 : Icons.OpenMod32;
+      iv.setImage(icon.getImage());
+    }
+
     if (getController().optionsButton.getGraphic() instanceof ImageView iv) {
       final Icons icon = enable ? Icons.OptionsDark32 : Icons.Options32;
       iv.setImage(icon.getImage());
@@ -1316,6 +1327,7 @@ public class MainWindow extends Application {
     getController().quitButton.setOnAction(event -> onQuitClicked());
     getController().detailsButton.selectedProperty().addListener((ob, ov, nv) -> onDetailsButtonSelected(nv));
     getController().detailsButton.setOnAction(event -> setInputFocus());
+    getController().loadModButton.setOnAction(event -> openModFile());
     getController().aboutButton.setOnAction(event -> showAboutDialog());
     getController().sendButton.setOnAction(event -> sendInput(getController().inputField.getText(), true));
 
@@ -2195,6 +2207,38 @@ public class MainWindow extends Application {
       Logger.error(e, "Error creating About dialog");
       // Fall-back option
       Utils.showMessageDialog(stage, "About", Globals.APP_TITLE, "Version " + Globals.APP_VERSION);
+    }
+  }
+
+  /**
+   * Let's the user choose a tp2 file for a new mod installation process.
+   */
+  private void openModFile() {
+    if (isProcessRunning()) {
+      Logger.debug("Process is still running.");
+      return;
+    }
+
+    Path initialPath = null;
+    String lastPath = Configuration.getInstance().getOption(Configuration.Key.LAST_MOD_PATH);
+    if (lastPath != null) {
+      try {
+        initialPath = Path.of(lastPath);
+      } catch (InvalidPathException e) {
+        Logger.debug("Invalid path: {}", lastPath);
+      }
+    }
+
+    Path tp2File = Utils.chooseOpenFile(getStage(), R.get("ui.configuration.fileDialog.tp2.title"), initialPath,
+        new FileChooser.ExtensionFilter(R.get("ui.configuration.fileDialog.tp2.filter.tp2"), "*.tp2"),
+        new FileChooser.ExtensionFilter(R.get("ui.fileDialog.filter.allFiles"), "*.*"));
+    if (tp2File != null) {
+      try {
+        restart(tp2File.toString());
+      } catch (Exception e) {
+        Logger.warn(e, "Open mod file: {}", tp2File);
+        Utils.showErrorDialog(getStage(), R.ERROR(), R.get("ui.main.loadMod.message.loadError.header"), null);
+      }
     }
   }
 
