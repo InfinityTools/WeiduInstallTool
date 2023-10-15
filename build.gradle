@@ -69,7 +69,7 @@ javafx {
 
 dependencies {
   // https://mvnrepository.com/artifact/org.json/json
-  implementation group: 'org.json', name: 'json', version: '20230618'
+  implementation group: 'org.json', name: 'json', version: '20231013'
   // https://tinylog.org/v2/download/
   implementation group: 'org.tinylog', name: 'tinylog-api', version: '2.6.2'
   implementation group: 'org.tinylog', name: 'tinylog-impl', version: '2.6.2'
