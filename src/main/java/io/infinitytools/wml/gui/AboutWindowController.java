@@ -20,6 +20,7 @@ import io.infinitytools.wml.utils.R;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.image.ImageView;
 import org.tinylog.Logger;
 
@@ -28,6 +29,7 @@ public class AboutWindowController {
   public Label titleLabel;
   public Label versionLabel;
   public Hyperlink projectLink;
+  public Hyperlink wikiLink;
   public Hyperlink weiduLink;
   public Label descLabel;
   public Label copyLabel;
@@ -43,18 +45,29 @@ public class AboutWindowController {
     try {
       titleLabel.setText(Globals.APP_TITLE);
       versionLabel.setText(String.format("%s %s", R.get("ui.about.version.label"), Globals.APP_VERSION));
-      if (Globals.PROJECT_URL != null) {
-        projectLink.setText(Globals.PROJECT_URL);
-      } else {
-        projectLink.setDisable(true);
-      }
-      if (Globals.WEIDU_URL != null) {
-        weiduLink.setText(Globals.WEIDU_URL);
-      } else {
-        weiduLink.setDisable(true);
-      }
+      updateLink(Globals.PROJECT_URL, projectLink);
+      updateLink(Globals.WIKI_URL, wikiLink);
+      updateLink(Globals.WEIDU_URL, weiduLink);
     } catch (NullPointerException e) {
       Logger.error(e);
+    }
+  }
+
+  /**
+   * Used internally to update URLs in UI controls.
+   *
+   * @param url     URL string.
+   * @param labeled The UI control to update.
+   */
+  private static void updateLink(String url, Labeled labeled) {
+    if (labeled == null) {
+      return;
+    }
+
+    if (url != null) {
+      labeled.setText(url);
+    } else {
+      labeled.setDisable(true);
     }
   }
 }

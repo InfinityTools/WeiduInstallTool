@@ -40,7 +40,7 @@ Customization of the WeiDU Mod Launcher includes:
 
 ## Installation
 
-Installation builds are available as installers and portable packages for Windows, Linux and macOS. They can be downloaded from the [Releases](https://github.com/InfinityTools/WeiduModLauncher/releases) section of the project.
+Installation builds are available as installers and portable packages for Windows, GNU/Linux and macOS. They can be downloaded from the [Releases](https://github.com/InfinityTools/WeiduModLauncher/releases) section of the project.
 
 ## Building from Source
 

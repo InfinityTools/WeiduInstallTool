@@ -101,6 +101,7 @@ public class AboutDialog extends Stage {
     controller.init();
 
     controller.projectLink.setOnAction(event -> onHyperlinkClick(controller.projectLink));
+    controller.wikiLink.setOnAction(event -> onHyperlinkClick(controller.wikiLink));
     controller.weiduLink.setOnAction(event -> onHyperlinkClick(controller.weiduLink));
     controller.okButton.setOnAction(event -> onOkButtonClick());
 

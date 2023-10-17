@@ -44,6 +44,11 @@ public class Globals {
   public static final String PROJECT_URL = Objects.requireNonNull(loadProperty("project"));
 
   /**
+   * URL to the project wiki pages. (Loaded from property file.)
+   */
+  public static final String WIKI_URL = Objects.requireNonNull(loadProperty("wiki"));
+
+  /**
    * URL to the WeiDU sources. (Loaded from property file.)
    */
   public static final String WEIDU_URL = Objects.requireNonNull(loadProperty("weidu"));
