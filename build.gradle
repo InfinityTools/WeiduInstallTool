@@ -28,8 +28,8 @@ ext {
   Properties _props = new Properties()
   _props.load(file("src/main/resources/globals.properties").newDataInputStream())
   project.version = _props.getProperty("version")
-  appName = _props.getProperty("name", "WeiduModLauncher")
-  projectUrl = _props.getProperty("project", "https://github.com/InfinityTools/WeiduModLauncher")
+  appName = _props.getProperty("name", "WeiduInstallTool")
+  projectUrl = _props.getProperty("project", "https://github.com/InfinityTools/WeiduInstallTool")
 }
 
 java {
@@ -58,8 +58,8 @@ tasks.withType(JavaExec).configureEach {
 }
 
 application {
-  mainModule = 'io.infinitytools.wml'
-  mainClass = 'io.infinitytools.wml.WeiduModLauncher'
+  mainModule = 'io.infinitytools.wit'
+  mainClass = 'io.infinitytools.wit.WeiduInstallTool'
 }
 
 javafx {
@@ -118,7 +118,7 @@ jlink {
 
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
       installerType = "exe"
-      icon = "${resourceDir}/WeiduModLauncher.ico"
+      icon = "${resourceDir}/WeiduInstallTool.ico"
 
       installerOptions.addAll([
               "--file-associations", "${resourceDir}/open_with.properties",
@@ -133,7 +133,7 @@ jlink {
       // macOS installer requires a version number >= 1.0.0
       appVersion = project.version.toString().startsWith("0.") ? "1.0.0" : project.version
       installerType = "pkg"
-      icon = "${resourceDir}/wml.icns"
+      icon = "${resourceDir}/wit.icns"
 
       installerOptions.addAll([
               "--mac-package-name", "${appName}",
@@ -141,7 +141,7 @@ jlink {
       ])
     } else if (Os.isFamily(Os.FAMILY_UNIX)) {
       // Unix check must be performed AFTER macOS check since it includes macOS check as well
-      icon = "${projectDir}/src/main/resources/io/infinitytools/wml/icons/icon/256x256.png"
+      icon = "${projectDir}/src/main/resources/io/infinitytools/wit/icons/icon/256x256.png"
       // Build both deb and rpm packages
       // installerType = "rpm"
       installerOptions.addAll([

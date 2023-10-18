@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2023 Argent77
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.*?>
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="io.infinitytools.wit.gui.MainWindowController"
+          stylesheets="@mainStyles.css"
+          alignment="center"
+          hgap="8"
+          vgap="8">
+  <padding>
+    <Insets top="10"
+            right="10"
+            bottom="10"
+            left="10"/>
+  </padding>
+  <columnConstraints>
+    <ColumnConstraints hgrow="ALWAYS"/>
+    <ColumnConstraints halignment="CENTER"/>
+  </columnConstraints>
+
+  <!-- Grid(0, 0): Output label -->
+  <HBox alignment="BOTTOM_LEFT"
+        spacing="8"
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="0"
+        GridPane.halignment="LEFT">
+    <Label text="%ui.main.output.label"
+           styleClass="boldLabel"/>
+    <Pane HBox.hgrow="ALWAYS"/>
+    <Button fx:id="aboutButton"
+              text="%ui.main.about.button">
+      <tooltip>
+        <Tooltip text="%ui.main.about.tooltip"/>
+      </tooltip>
+    </Button>
+    <Button fx:id="loadModButton"
+            text="%ui.main.loadMod.button">
+      <graphic>
+        <ImageView fitWidth="16"
+                   fitHeight="16"
+                   preserveRatio="true">
+          <Image url="@../icons/icon-tp2/32x32.png"/>
+        </ImageView>
+      </graphic>
+      <tooltip>
+        <Tooltip text="%ui.main.loadMod.tooltip"/>
+      </tooltip>
+    </Button>
+    <MenuButton fx:id="optionsButton"
+                text="%ui.main.menu"
+                HBox.hgrow="ALWAYS">
+      <graphic>
+        <ImageView fitWidth="16"
+                   fitHeight="16"
+                   preserveRatio="true">
+          <Image url="@../icons/options/32x32.png"/>
+        </ImageView>
+      </graphic>
+      <tooltip>
+        <Tooltip text="%ui.main.menu.tooltip"/>
+      </tooltip>
+      <items>
+        <CheckMenuItem fx:id="autoQuitCheckItem"
+                       text="%ui.main.menu.item.autoQuit">
+          <!--<tooltip>
+            <Tooltip fx:id="autoQuitTooltip"
+                     text="Select to quit the application when pressing Enter after the WeiDU process has terminated.">
+            </Tooltip>
+          </tooltip>-->
+        </CheckMenuItem>
+        <CheckMenuItem fx:id="visualizeResultCheckItem"
+                       text="%ui.main.menu.item.visualizeResult">
+          <!--<tooltip>
+            <Tooltip fx:id="visualizeResultTooltip"
+                     text="Select to provide a visual hint about the success state of the WeiDU operation.">
+            </Tooltip>
+          </tooltip>-->
+        </CheckMenuItem>
+        <CheckMenuItem fx:id="warnModOrderCheckItem"
+                       text="%ui.main.menu.item.warnModOrder">
+          <!--<tooltip>
+            <Tooltip fx:id="warnModOrderTooltip"
+                     text="Select to warn if the installation conflicts with the mod order provided by the associated ini file (if available).">
+            </Tooltip>
+          </tooltip>-->
+        </CheckMenuItem>
+        <CheckMenuItem fx:id="darkModeUiCheckItem"
+                       text="%ui.main.menu.item.darkModeUi">
+          <!--<tooltip>
+            <Tooltip fx:id="darkModeUiTooltip"
+                     text="Enable to apply a dark theme to the UI.">
+            </Tooltip>
+          </tooltip>-->
+        </CheckMenuItem>
+        <CheckMenuItem fx:id="singleInstanceCheckItem"
+                       text="%ui.main.menu.item.singleInstance">
+          <!--<tooltip>
+            <Tooltip fx:id="singleInstanceTooltip"
+                     text="Enable to allow only a single application instance running at the same time.">
+            </Tooltip>
+          </tooltip>-->
+        </CheckMenuItem>
+        <CheckMenuItem fx:id="trayIconFeedbackCheckItem"
+                       text="%ui.main.menu.item.trayIconFeedback">
+          <!--<tooltip>
+            <Tooltip fx:id="trayIconFeedbackTooltip"
+                     text="Enable to visualize the mod processing status in the system tray icon.">
+            </Tooltip>
+          </tooltip>-->
+        </CheckMenuItem>
+        <CheckMenuItem fx:id="showLogCheckItem"
+                       text="%ui.main.menu.item.logWindow">
+          <accelerator>
+            <!-- KeyCodeCombination: JavaFX requires all attributes to be explicitly defined. -->
+            <KeyCodeCombination code="D" shortcut="DOWN" shift="UP" control="UP" alt="UP" meta="UP"/>
+          </accelerator>
+          <!--<tooltip>
+            <Tooltip fx:id="showLogTooltip"
+                     text="Select to display the log window of the application.">
+            </Tooltip>
+          </tooltip>-->
+        </CheckMenuItem>
+
+        <SeparatorMenuItem />
+
+        <CustomMenuItem fx:id="outputFontSizeMenuItem">
+          <content>
+            <HBox alignment="CENTER_LEFT"
+                  spacing="8">
+              <padding>
+                <Insets top="2"
+                        right="4"
+                        bottom="2"/>
+              </padding>
+              <Label text="%ui.main.menu.item.outputFontSize.prompt.label"/>
+              <Spinner fx:id="outputFontSizeSpinner"
+                       HBox.hgrow="SOMETIMES">
+                <valueFactory>
+                  <!-- Fully qualified class path required to work around fxml build errors -->
+                  <javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory fx:id="outputFontSizeValueFactory"
+                                                                                      min="4.0"
+                                                                                      max="80.0"
+                                                                                      initialValue="12.0"
+                                                                                      amountToStepBy="0.5">
+                  </javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory>
+                </valueFactory>
+              </Spinner>
+              <Label text="%ui.main.menu.item.outputFontSize.pt.label"/>
+            </HBox>
+          </content>
+        </CustomMenuItem>
+
+        <SeparatorMenuItem />
+
+        <!-- Output Buffer Size uses a custom menu item with a complex UI layout -->
+        <CustomMenuItem fx:id="bufferSizeMenuItem">
+          <content>
+            <VBox spacing="4">
+              <Label text="%ui.main.menu.item.bufferSize.label"/>
+              <HBox alignment="CENTER_LEFT"
+                    spacing="8">
+                <Slider fx:id="bufferSizeSlider"
+                        max="5000000"
+                        blockIncrement="500000"
+                        majorTickUnit="500000"
+                        minorTickCount="5"
+                        showTickMarks="true"
+                        snapToTicks="true"
+                        HBox.hgrow="ALWAYS">
+                </Slider>
+                <Label fx:id="bufferSizeValueLabel"
+                       text="0"/>
+              </HBox>
+            </VBox>
+          </content>
+        </CustomMenuItem>
+      </items>
+    </MenuButton>
+  </HBox>
+
+  <!-- Grid(0, 1): Output text area -->
+  <TextArea fx:id="outputArea"
+            prefColumnCount="80"
+            wrapText="true"
+            editable="false"
+            GridPane.columnIndex="0"
+            GridPane.rowIndex="1"
+            GridPane.hgrow="ALWAYS"
+            GridPane.vgrow="ALWAYS">
+    <contextMenu>
+      <ContextMenu fx:id="outputContextMenu">
+        <items>
+          <MenuItem fx:id="outputCopyMenuItem"
+                    text="%ui.textArea.contextMenu.copy"/>
+          <SeparatorMenuItem/>
+          <MenuItem fx:id="outputSelectAllMenuItem"
+                    text="%ui.textArea.contextMenu.selectAll"/>
+          <SeparatorMenuItem/>
+          <MenuItem fx:id="outputSearchMenuItem"
+                    text="%ui.find.menu.text">
+            <accelerator>
+              <!-- KeyCodeCombination: JavaFX requires all attributes to be explicitly defined. -->
+              <KeyCodeCombination code="F" shortcut="DOWN" shift="UP" control="UP" alt="UP" meta="UP"/>
+            </accelerator>
+          </MenuItem>
+          <SeparatorMenuItem/>
+          <MenuItem fx:id="outputScrollTopMenuItem"
+                    text="%ui.main.outputArea.contextMenu.scrollTop"/>
+          <MenuItem fx:id="outputScrollBottomMenuItem"
+                    text="%ui.main.outputArea.contextMenu.scrollBottom"/>
+        </items>
+      </ContextMenu>
+    </contextMenu>
+  </TextArea>
+
+  <!-- Grid(0, 2): User input (label, input field, button) -->
+  <HBox alignment="CENTER_LEFT"
+        spacing="8"
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="2"
+        GridPane.halignment="LEFT">
+    <Label text="%ui.main.input.label"
+           styleClass="boldLabel"/>
+    <TextField fx:id="inputField"
+               HBox.hgrow="ALWAYS"/>
+    <Button fx:id="sendButton"
+            text="%ui.main.send.button">
+      <tooltip>
+        <Tooltip text="%ui.main.send.button.tooltip"
+                 showDuration="10s"
+                 maxWidth="400"
+                 wrapText="true">
+        </Tooltip>
+      </tooltip>
+    </Button>
+  </HBox>
+
+  <!-- Grid(1, 0): Details window toggle button -->
+  <ToggleButton fx:id="detailsButton"
+                text="%ui.main.details.button"
+                maxWidth="Infinity"
+                maxHeight="Infinity"
+                GridPane.columnIndex="1"
+                GridPane.rowIndex="0">
+    <tooltip>
+      <Tooltip text="%ui.main.details.button.tooltip"/>
+    </tooltip>
+  </ToggleButton>
+
+  <!-- Grid(1, 1): Toolbar -->
+  <VBox alignment="BOTTOM_CENTER"
+        spacing="8"
+        GridPane.columnIndex="1"
+        GridPane.rowIndex="1"
+        GridPane.halignment="CENTER">
+    <Label text="%ui.main.quickInput.label"
+           alignment="CENTER"
+           styleClass="boldLabel"/>
+    <GridPane hgap="4"
+              vgap="4" alignment="CENTER">
+      <Button fx:id="inputDigit7Button"
+              text="7"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="0"/>
+      <Button fx:id="inputDigit8Button"
+              text="8"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="1"
+              GridPane.rowIndex="0"/>
+      <Button fx:id="inputDigit9Button"
+              text="9"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="2"
+              GridPane.rowIndex="0"/>
+      <Button fx:id="inputDigit4Button"
+              text="4"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="1"/>
+      <Button fx:id="inputDigit5Button"
+              text="5"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="1"
+              GridPane.rowIndex="1"/>
+      <Button fx:id="inputDigit6Button"
+              text="6"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="2"
+              GridPane.rowIndex="1"/>
+      <Button fx:id="inputDigit1Button"
+              text="1"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="2"/>
+      <Button fx:id="inputDigit2Button"
+              text="2"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="1"
+              GridPane.rowIndex="2"/>
+      <Button fx:id="inputDigit3Button"
+              text="3"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnIndex="2"
+              GridPane.rowIndex="2"/>
+      <Button fx:id="inputDigit0Button"
+              text="0"
+              maxWidth="Infinity"
+              GridPane.hgrow="ALWAYS"
+              GridPane.columnSpan="3"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="3"/>
+    </GridPane>
+    <Button fx:id="inputQuitButton"
+            text="%ui.main.inputQuit.button"
+            maxWidth="Infinity">
+      <tooltip>
+        <Tooltip text="%ui.main.inputQuit.button.tooltip"/>
+      </tooltip>
+    </Button>
+    <Button fx:id="inputAskButton"
+            text="%ui.main.inputAsk.button"
+            maxWidth="Infinity">
+      <tooltip>
+        <Tooltip text="%ui.main.inputAsk.button.tooltip"/>
+      </tooltip>
+    </Button>
+    <Button fx:id="inputSkipButton"
+            text="%ui.main.inputSkip.button"
+            maxWidth="Infinity">
+      <tooltip>
+        <Tooltip text="%ui.main.inputSkip.button.tooltip"/>
+      </tooltip>
+    </Button>
+    <Button fx:id="inputReinstallButton"
+            text="%ui.main.inputReinstall.button"
+            maxWidth="Infinity">
+      <tooltip>
+        <Tooltip text="%ui.main.inputReinstall.button.tooltip"/>
+      </tooltip>
+    </Button>
+    <Button fx:id="inputUninstallButton"
+            text="%ui.main.inputUninstall.button"
+            maxWidth="Infinity">
+      <tooltip>
+        <Tooltip text="%ui.main.inputUninstall.button.tooltip"/>
+      </tooltip>
+    </Button>
+    <Button fx:id="inputInstallButton"
+            text="%ui.main.inputInstall.button"
+            maxWidth="Infinity">
+      <tooltip>
+        <Tooltip text="%ui.main.inputInstall.button.tooltip"/>
+      </tooltip>
+    </Button>
+    <Button fx:id="inputNoButton"
+            text="%ui.main.inputNo.button"
+            maxWidth="Infinity">
+      <tooltip>
+        <Tooltip text="%ui.main.inputNo.button.tooltip"/>
+      </tooltip>
+    </Button>
+    <Button fx:id="inputYesButton"
+            text="%ui.main.inputYes.button"
+            maxWidth="Infinity">
+      <tooltip>
+        <Tooltip text="%ui.main.inputYes.button.tooltip"/>
+      </tooltip>
+    </Button>
+  </VBox>
+
+  <!-- Grid(1, 2): Quit/Terminate button -->
+  <Pane GridPane.columnIndex="1"
+        GridPane.rowIndex="2"/>
+
+  <!-- Grid(0-1, 3): Quit/Terminate button -->
+  <HBox alignment="CENTER"
+        GridPane.columnIndex="0"
+        GridPane.rowIndex="3"
+        GridPane.columnSpan="2">
+    <Button fx:id="quitButton"
+            text="%ui.main.quit.button"
+            maxHeight="Infinity">
+    </Button>
+  </HBox>
+</GridPane>

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module io.infinitytools.wml {
+module io.infinitytools.wit {
   requires jdk.charsets;
   requires java.desktop;
   requires transitive javafx.controls;
@@ -24,10 +24,10 @@ module io.infinitytools.wml {
   requires org.tinylog.impl;
   requires org.tinylog.api;
 
-  opens io.infinitytools.wml.gui to javafx.fxml;
-  exports io.infinitytools.wml.gui;
-  exports io.infinitytools.wml.mod;
-  exports io.infinitytools.wml.mod.info;
-  exports io.infinitytools.wml.mod.ini;
-  exports io.infinitytools.wml.utils;
+  opens io.infinitytools.wit.gui to javafx.fxml;
+  exports io.infinitytools.wit.gui;
+  exports io.infinitytools.wit.mod;
+  exports io.infinitytools.wit.mod.info;
+  exports io.infinitytools.wit.mod.ini;
+  exports io.infinitytools.wit.utils;
 }

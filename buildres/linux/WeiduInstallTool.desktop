@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=WeiDU Install Tool
+Comment=A graphical front end for WeiDU Mods
+Categories=Game;Java;
+
+Icon=/opt/weiduinstalltool/lib/WeiduInstallTool.png
+Exec=/opt/weiduinstalltool/bin/WeiduInstallTool %f
+MimeType=application/x-tp2
+Terminal=false
