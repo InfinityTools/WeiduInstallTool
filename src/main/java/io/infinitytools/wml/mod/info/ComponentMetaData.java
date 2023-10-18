@@ -15,17 +15,73 @@
  */
 package io.infinitytools.wml.mod.info;
 
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Represents a single instance of metadata that is associated with a mod component.
  */
 public class ComponentMetaData extends ComponentBase {
+  /**
+   * Indicates where this component is position in the relative mod order.
+   */
+  public enum OrderType {
+    /**
+     * Mod component can be positioned anywhere in the stack of installed mods.
+     */
+    ANY,
+    /**
+     * Mod component should be installed <strong>before</strong> the specified list of mods.
+     */
+    BEFORE,
+    /**
+     * Mod component should be installed <strong>after</strong> the specified list of mods.
+     */
+    AFTER
+  }
+
+  /**
+   * Defines a hint about the relative position of this mod component within the list of installed mods.
+   *
+   * @param type Specifies the relative position of this mod component.
+   * @param mods List of mods that are relevant for the relative position of this mod component.
+   */
+  public record OrderHint(OrderType type, List<String> mods) {
+    @Override
+    public String toString() {
+      return type + ": " + mods;
+    }
+
+    /**
+     * Returns a {@link OrderType} enum based on the specified metadata content.
+     *
+     * @param data Unparsed metadata as string.
+     * @return An initialized {@link OrderType} enum value.
+     */
+    public static OrderHint create(String data) {
+      if (data != null) {
+        final String line = data.strip().toLowerCase(Locale.ROOT);
+        if (line.matches("^before\\s*=.+")) {
+          int pos = line.indexOf('=');
+          final String[] seq = line.substring(pos + 1).strip().split("\\s*,\\s*");
+          return new OrderHint(OrderType.BEFORE, Arrays.asList(seq));
+        } else if (line.matches("^after[ \t]*=.+")) {
+          int pos = line.indexOf('=');
+          final String[] seq = line.substring(pos + 1).strip().split("\\s*,\\s*");
+          return new OrderHint(OrderType.AFTER, Arrays.asList(seq));
+        }
+      }
+
+      return new OrderHint(OrderType.ANY, Collections.emptyList());
+    }
+  }
+
   private final String data;
+  private final OrderHint orderHint;
 
   public ComponentMetaData(ComponentBase parent, String data) {
     super(parent);
     this.data = data;
+    this.orderHint = OrderHint.create(this.data);
   }
 
   /**
@@ -33,6 +89,15 @@ public class ComponentMetaData extends ComponentBase {
    */
   public String getData() {
     return data;
+  }
+
+  /**
+   * Returns the metadata content parsed as {@link OrderHint} object.
+   *
+   * @return {@link OrderHint} representation of the metadata.
+   */
+  public OrderHint getOrderHint() {
+    return orderHint;
   }
 
   @Override

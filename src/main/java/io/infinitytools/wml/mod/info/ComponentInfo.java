@@ -126,6 +126,50 @@ public class ComponentInfo extends ComponentBase {
     return metaList;
   }
 
+  /**
+   * Returns whether the component provides a custom mod order hint of type "before".
+   *
+   * @return {@code true} if a mod order hint of type "before" is defined, {@code false} otherwise.
+   */
+  public boolean hasModOrderBefore() {
+    return metaList.stream().anyMatch(cm -> cm.getOrderHint().type() == ComponentMetaData.OrderType.BEFORE);
+  }
+
+  /**
+   * Returns a list of mods that are recommended to be installed <strong>before</strong> this mod component.
+   *
+   * @return Mods as a {@link List} of strings.
+   */
+  public List<String> getModOrderBefore() {
+    return metaList
+        .stream()
+        .filter(cm -> cm.getOrderHint().type() == ComponentMetaData.OrderType.BEFORE)
+        .flatMap(cm -> cm.getOrderHint().mods().stream())
+        .toList();
+  }
+
+  /**
+   * Returns whether the component provides a custom mod order hint of type "after".
+   *
+   * @return {@code true} if a mod order hint of type "after" is defined, {@code false} otherwise.
+   */
+  public boolean hasModOrderAfter() {
+    return metaList.stream().anyMatch(cm -> cm.getOrderHint().type() == ComponentMetaData.OrderType.AFTER);
+  }
+
+  /**
+   * Returns a list of mods that are recommended to be installed <strong>after</strong> this mod component.
+   *
+   * @return Mods as a {@link List} of strings.
+   */
+  public List<String> getModOrderAfter() {
+    return metaList
+        .stream()
+        .filter(cm -> cm.getOrderHint().type() == ComponentMetaData.OrderType.AFTER)
+        .flatMap(cm -> cm.getOrderHint().mods().stream())
+        .toList();
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(id);
