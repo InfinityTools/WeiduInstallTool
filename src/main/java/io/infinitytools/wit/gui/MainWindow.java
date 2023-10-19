@@ -19,8 +19,13 @@ import io.infinitytools.wit.Configuration;
 import io.infinitytools.wit.Globals;
 import io.infinitytools.wit.icons.Icons;
 import io.infinitytools.wit.mod.ModInfo;
+import io.infinitytools.wit.mod.info.ComponentBase;
+import io.infinitytools.wit.mod.info.ComponentInfo;
+import io.infinitytools.wit.mod.info.ComponentRoot;
+import io.infinitytools.wit.mod.info.ComponentSubGroup;
 import io.infinitytools.wit.mod.ini.ModIni;
 import io.infinitytools.wit.mod.log.WeiduLog;
+import io.infinitytools.wit.mod.log.WeiduLogEntry;
 import io.infinitytools.wit.net.AppServer;
 import io.infinitytools.wit.process.BufferConvert;
 import io.infinitytools.wit.process.SysProc;
@@ -1862,6 +1867,71 @@ public class MainWindow extends Application {
   }
 
   /**
+   * Scans the specified mod components tree for mod order hints.
+   *
+   * @param root Mod components tree root.
+   * @return List containing potentially conflicting mods.
+   */
+  private List<String> findConflictingModComponents(ComponentRoot root) {
+    // collecting conflicts
+    final HashMap<ComponentInfo, List<String>> conflicts = new HashMap<>();
+    if (root != null) {
+      for (final ComponentBase cb : root.getChildren()) {
+        if (cb instanceof ComponentInfo ci) {
+          if (ci.hasModOrderBefore()) {
+            conflicts.put(ci, ci.getModOrderBefore());
+          }
+        } else if (cb instanceof ComponentSubGroup cs) {
+          for (final ComponentBase cb2 : cs.getChildren()) {
+            if (cb2 instanceof ComponentInfo ci) {
+              if (ci.hasModOrderBefore()) {
+                conflicts.put(ci, ci.getModOrderBefore());
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Removing conflicts for already installed components
+    if (!conflicts.isEmpty()) {
+      WeiduLog log = null;
+      final Path gamePath = getModInfo().getGamePath();
+      if (gamePath != null) {
+        try {
+          log = WeiduLog.load(gamePath.resolve(WeiduLog.WEIDU_FILENAME));
+        } catch (Exception e) {
+          Logger.debug(e, "Checking mod component conflicts (ignored)");
+        }
+      }
+
+      if (log != null) {
+        final Collection<WeiduLogEntry> entries = log.getEntries(getModInfo().getTp2Name());
+        if (!entries.isEmpty()) {
+          for (final Iterator<ComponentInfo> iter = conflicts.keySet().iterator(); iter.hasNext();) {
+            final ComponentInfo ci = iter.next();
+            final int componentId = ci.getId();
+            for (final WeiduLogEntry logEntry : entries) {
+              if (logEntry.getComponent() == componentId) {
+                iter.remove();
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // preparing return value
+    final List<String> retVal = new ArrayList<>();
+    for (final List<String> list : conflicts.values()) {
+      retVal.addAll(list);
+    }
+
+    return retVal;
+  }
+
+  /**
    * Checks if there are potential mod order conflicts.
    *
    * @param interactive Whether to allow the user to confirm or override the suggested action.
@@ -1873,7 +1943,19 @@ public class MainWindow extends Application {
     if (getModInfo() != null && getModInfo().getModIni() != null) {
       // getting mods that should be installed after this mod
       final ModIni ini = getModInfo().getModIni();
-      List<String> modList = ini.getBeforeList();
+      List<String> modList = new ArrayList<>(ini.getBeforeList());
+
+      // processing component-specific order hints
+      modList.addAll(findConflictingModComponents(getModInfo().getComponentInfo(0)));
+
+      // eliminating duplicates
+      if (modList.size() > 1) {
+        final HashSet<String> unique = new HashSet<>(modList);
+        modList.clear();
+        modList.addAll(unique);
+      }
+      modList.sort(String::compareTo);
+
       if (!modList.isEmpty()) {
         final Path gamePath = getModInfo().getGamePath();
         Set<String> mods = null;
