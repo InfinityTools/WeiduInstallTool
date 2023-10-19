@@ -3,7 +3,7 @@
    <mime-type type="application/x-tp2">
      <comment xml:lang="en">WeiDU TP2 Script</comment>
      <glob pattern="*.tp2"/>
-     <icon name="io.github.infinitytools.WeiduModLauncher-tp2"/>
-     <generic-icon name="io.github.infinitytools.WeiduModLauncher-tp2"/>
+     <icon name="io.github.infinitytools.WeiduInstallTool-tp2"/>
+     <generic-icon name="io.github.infinitytools.WeiduInstallTool-tp2"/>
    </mime-type>
 </mime-info>

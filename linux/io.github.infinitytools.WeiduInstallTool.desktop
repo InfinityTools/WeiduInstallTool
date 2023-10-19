@@ -2,11 +2,11 @@
 Version=1.0
 Type=Application
 
-Name=WeiDU Mod Launcher
+Name=WeiDU Install Tool
 Comment=A graphical front end for WeiDU Mods
 Categories=Game;Java;
 
-Icon=io.github.infinitytools.WeiduModLauncher
-Exec=WeiduModLauncher %f
+Icon=io.github.infinitytools.WeiduInstallTool
+Exec=WeiduInstallTool %f
 Terminal=false
 MimeType=application/x-tp2
