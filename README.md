@@ -1,14 +1,12 @@
-<!--
-[![GitHub release (latest)](https://img.shields.io/github/v/release/InfinityTools/WeiduInstallTool?color=darkred&label=latest%20release)](https://github.com/InfinityTools/WeiduInstallTool/releases/latest)
+<!--[![GitHub release (latest)](https://img.shields.io/github/v/release/InfinityTools/WeiduInstallTool?color=darkred&label=latest%20release)](https://github.com/InfinityTools/WeiduInstallTool/releases/latest)
 [![GitHub release date (latest)](https://img.shields.io/github/release-date/InfinityTools/WeiduInstallTool?color=gold)](https://github.com/InfinityTools/WeiduInstallTool/releases/latest)
-[![Github downloads](https://img.shields.io/github/downloads/InfinityTools/WeiduInstallTool/total.svg?color=blueviolet)](https://github.com/InfinityTools/WeiduInstallTool/releases)
--->
+[![Github downloads](https://img.shields.io/github/downloads/InfinityTools/WeiduInstallTool/total.svg?color=blueviolet)](https://github.com/InfinityTools/WeiduInstallTool/releases)-->
 # WeiDU Install Tool
 *A graphical front end for WeiDU Mods.*
 
-WeiDU Install Tool is a graphical front end for the [WeiDU command line tool](https://github.com/WeiDUorg/weidu) which is used to install mods for Infinity Engine games, such as Baldur's Gate, Icewind Dale or Planescape Torment. The front end is written in Java and uses the JavaFX framework to provide a modern UI.
+WeiDU Install Tool is a graphical front end for the [WeiDU command line tool](https://github.com/WeiDUorg/weidu) to install modifications for Infinity Engine games, such as Baldur's Gate, Icewind Dale or Planescape Torment. The front end is written in Java and uses the JavaFX framework to provide a modern UI.
 
-The application offers all functionality of the WeiDU command line interpreter as well as many usability improvements and convenience features to help with the mod installation task.
+The tool offers all the functionality of the WeiDU command line interpreter as well as many usability improvements and convenience features to help with the mod installation task. *It is not intended to be a full-fledged mod manager like Project Infinity.*
 
 ![main window](preview/mainwindow-plus.png)
 
@@ -16,25 +14,25 @@ The application offers all functionality of the WeiDU command line interpreter a
 
 ### Tp2 Mod File Association
 
-The installed version of WeiDU Install Tool is automatically associated<sup>*</sup> with tp2 mod files which allows you to quickly and conveniently install mods from the file manager without having to deal with setup executables.
+The installed version of WeiDU Install Tool is automatically associated<sup>*</sup> with tp2 mod files which allows you to quickly and conveniently install mods from the file manager without having to deal with setup executables or the command line.
 
 <small><em><sup>*</sup> Not available on macOS.</em></small>
 
 ### Drag and Drop Support
 
-The application also provides drag and drop support. Tp2 files or the mod folders themselves can be dropped onto an open application instance to initiate the mod installation process if no other mod is currently being installed.
+This feature allows you to drop tp2 files or the mod folders themselves onto an open WeiDU Install Tool instance to initiate the mod installation process if no other mod is currently being installed.
 
 ### Detailed Mod Information
 
-The application provides detailed information about the currently installed mod, which includes a tree view of available components with filters for mod language and component groups. Moreover, general information about the mod will be shown if available, which includes the mod name and author, a short summary of the mod content, as well as links to the mod's homepage, readme and download location, and optional dependencies.
+The application provides information about the currently installed mod to get a detailed overview about the purpose of the mod and available installation options. Available mod components are presented in a tree-like structure. They can be shown in any of the available mod languages and optionally filtered by component groups. A separate section provides more general information about the mod which includes the mod name and author, a short summary of the mod content, as well as links to the mod's homepage, readme and download location, and optional dependencies.
 
 ### Customization
 
 Customization of the WeiDU Install Tool includes:
-- Displaying UI text and messages in the user language if available
-- Toggling between light and dark mode UI on-the-fly
-- Setting output text size and character encoding
-- Showing visual hints about the installation state
+- Displaying UI text and messages in the language native to the user if available
+- Toggling between a light and dark user interface on-the-fly
+- Specifying output text size and character encoding
+- Displaying visual hints about the installation state
 - Warnings about potential mod conflicts
 - and more…
 
@@ -46,7 +44,7 @@ Installation builds are available as installers and portable packages for Window
 
 **Required tools:**
 - [Gradle Build Tool](https://gradle.org/)
-- [Oracle's JDK 21 or later](https://www.oracle.com/de/java/technologies/downloads/), or [OpenJDK 21 or later](https://adoptium.net/temurin/releases/?version=21)
+- [OpenJDK 21 or later](https://adoptium.net/temurin/releases/?version=21) or [Oracle's JDK 21 or later](https://www.oracle.com/de/java/technologies/downloads/)
 
 *Note: JDK 21 is automatically provided if an older Java installation is found on the system.*
 
@@ -78,7 +76,7 @@ chmod +x gradlew
 ./gradlew portableTar
 ```
 
-The resulting package(s) can be found in the `./build/distribution` folder. File type associations are only configured by the installer version of the tool.
+The resulting package(s) can be found in the `./build/distribution` folder. Start menu entries and file type associations are only set up by the installer version of the tool.
 
 The `jpackage` task requires the following software to be installed on the system:
 - Windows: [WiX 3.0](https://wixtoolset.org) or later is required.
