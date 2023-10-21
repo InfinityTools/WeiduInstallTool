@@ -22,7 +22,7 @@ String projectUrl
 boolean debugBuild = true
 
 ext {
-  junitVersion = '5.9.2'
+  junitVersion = '5.10.0'
 
   // App version is stored in a global properties file
   Properties _props = new Properties()
