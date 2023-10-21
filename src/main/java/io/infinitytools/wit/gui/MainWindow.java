@@ -1908,7 +1908,7 @@ public class MainWindow extends Application {
       if (log != null) {
         final Collection<WeiduLogEntry> entries = log.getEntries(getModInfo().getTp2Name());
         if (!entries.isEmpty()) {
-          for (final Iterator<ComponentInfo> iter = conflicts.keySet().iterator(); iter.hasNext();) {
+          for (final Iterator<ComponentInfo> iter = conflicts.keySet().iterator(); iter.hasNext(); ) {
             final ComponentInfo ci = iter.next();
             final int componentId = ci.getId();
             for (final WeiduLogEntry logEntry : entries) {
@@ -2094,6 +2094,16 @@ public class MainWindow extends Application {
     final Path workingDir = getModInfo().getGamePath();
     if (workingDir != null && tp2File.startsWith(workingDir)) {
       tp2File = workingDir.relativize(tp2File);
+    } else {
+      // warning about out-of-game-path mod location
+      Logger.info("Mod folder should not lie outside of the game directory (game: {}, mod: {}).",
+          workingDir, tp2File);
+      final ButtonType result = Utils.showCustomDialog(getStage(), Alert.AlertType.WARNING,
+          R.get("ui.main.modLocation.message.title"), R.get("ui.main.modLocation.message.header"),
+          R.get("ui.main.modLocation.message.content"), ButtonType.YES, ButtonType.NO);
+      if (result != ButtonType.YES) {
+        throw new IllegalArgumentException("Operation cancelled by the user.");
+      }
     }
 
     final String[] command = getWeiduCommand(gameLang, tp2File);
