@@ -4,6 +4,8 @@
 # WeiDU Install Tool
 *A graphical front end for WeiDU Mods.*
 
+[![G3 Forums](https://img.shields.io/static/v1?label=Discussion&message=G3%20Forums&color=3b45a3&labelColor=eee&style=for-the-badge)](https://www.gibberlings3.net/forums/forum/235-weidu-install-tool/ "The Gibberlings Three Forums")
+
 WeiDU Install Tool is a graphical front end for the [WeiDU command line tool](https://github.com/WeiDUorg/weidu) to install modifications for Infinity Engine games, such as Baldur's Gate, Icewind Dale or Planescape Torment. The front end is written in Java and uses the JavaFX framework to provide a modern UI.
 
 The tool offers all the functionality of the WeiDU command line interpreter as well as many usability improvements and convenience features to help with the mod installation task. *It is not intended to be a full-fledged mod manager like Project Infinity.*
@@ -39,6 +41,8 @@ Customization of the WeiDU Install Tool includes:
 ## Installation
 
 Installation builds are available as installers and portable packages for Windows, GNU/Linux and macOS. They can be downloaded from the [Releases](https://github.com/InfinityTools/WeiduInstallTool/releases) section of the project.
+
+*Note: It is possible that some antivirus or security tools are overly sensitive and block download or installation of the file because of problematic executables. These are false positives if you downloaded the file from the official GitHub Releases page. Most antivirus tools provide options to whitelist the problematic files or mark them as safe and allow you to continue with the process.*
 
 ## Building from Source
 
