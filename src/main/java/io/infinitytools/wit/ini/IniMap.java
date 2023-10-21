@@ -85,6 +85,18 @@ public class IniMap implements Iterable<IniMapSection> {
     }
   }
 
+  public enum Options {
+    /**
+     * This option enables a hack that allows "Description" key definitions to continue over multiple lines.
+     */
+    MultiLineDescription,
+    /**
+     * Specifying this option disables comment detection in the same line as key/value definitions.
+     * This hack is primarily intended to allow special characters in metadata definitions.
+     */
+    StrictLineComments,
+  }
+
   private final List<IniMapSection> sections = new ArrayList<>();
 
   private Style style;
@@ -97,8 +109,8 @@ public class IniMap implements Iterable<IniMapSection> {
    * @return A fully initialized {@link IniMap} instance from the given INI data.
    * @throws Exception If the INI content cannot be parsed.
    */
-  public static IniMap parse(Path ini, Style style) throws Exception {
-    return parse(ini, StandardCharsets.UTF_8, style);
+  public static IniMap parse(Path ini, Style style, Options... options) throws Exception {
+    return parse(ini, StandardCharsets.UTF_8, style, options);
   }
 
   /**
@@ -109,16 +121,16 @@ public class IniMap implements Iterable<IniMapSection> {
    * @return A fully initialized {@link IniMap} instance from the given INI data.
    * @throws Exception If the INI content cannot be parsed.
    */
-  public static IniMap parse(Path ini, Charset encoding, Style style) throws Exception {
+  public static IniMap parse(Path ini, Charset encoding, Style style, Options... options) throws Exception {
     IniMap retVal = null;
     if (ini != null) {
-      retVal = parse(Files.readString(ini, encoding), style);
+      retVal = parse(Files.readString(ini, encoding), style, options);
     }
     return retVal;
   }
 
-  public static IniMap parse(URL ini, Style style) throws Exception {
-    return parse(ini, StandardCharsets.UTF_8, style);
+  public static IniMap parse(URL ini, Style style, Options... options) throws Exception {
+    return parse(ini, StandardCharsets.UTF_8, style, options);
   }
 
   /**
@@ -129,7 +141,7 @@ public class IniMap implements Iterable<IniMapSection> {
    * @return A fully initialized {@link IniMap} instance from the given INI data.
    * @throws Exception If the INI content cannot be parsed.
    */
-  public static IniMap parse(URL ini, Charset encoding, Style style) throws Exception {
+  public static IniMap parse(URL ini, Charset encoding, Style style, Options... options) throws Exception {
     IniMap retVal = null;
     if (ini != null) {
       if (encoding == null) {
@@ -140,7 +152,7 @@ public class IniMap implements Iterable<IniMapSection> {
         final byte[] buf = is.readAllBytes();
         s = new String(buf, encoding);
       }
-      retVal = parse(s, style);
+      retVal = parse(s, style, options);
     }
     return retVal;
   }
@@ -152,7 +164,7 @@ public class IniMap implements Iterable<IniMapSection> {
    * @return A fully initialized {@link IniMap} instance from the given INI data.
    * @throws Exception If the INI content cannot be parsed.
    */
-  public static IniMap parse(Reader ini, Style style) throws Exception {
+  public static IniMap parse(Reader ini, Style style, Options... options) throws Exception {
     IniMap retVal = null;
     if (ini != null) {
       final StringBuilder sb = new StringBuilder();
@@ -162,7 +174,7 @@ public class IniMap implements Iterable<IniMapSection> {
           sb.append(buf, 0, len);
         }
       }
-      retVal = parse(sb.toString(), style);
+      retVal = parse(sb.toString(), style, options);
     }
     return retVal;
   }
@@ -174,10 +186,10 @@ public class IniMap implements Iterable<IniMapSection> {
    * @return A fully initialized {@link IniMap} instance from the given INI data.
    * @throws Exception If the INI content cannot be parsed.
    */
-  public static IniMap parse(String ini, Style style) throws Exception {
+  public static IniMap parse(String ini, Style style, Options... options) throws Exception {
     IniMap retVal = null;
     if (ini != null) {
-      retVal = parse(Arrays.asList(ini.split("\r?\n")), style);
+      retVal = parse(Arrays.asList(ini.split("\r?\n")), style, options);
     }
     return retVal;
   }
@@ -189,7 +201,14 @@ public class IniMap implements Iterable<IniMapSection> {
    * @return A fully initialized {@link IniMap} instance from the given INI data.
    * @throws Exception If the INI content cannot be parsed.
    */
-  public static IniMap parse(List<String> lines, Style style) throws Exception {
+  public static IniMap parse(List<String> lines, Style style, Options... options) throws Exception {
+    final EnumSet<Options> optionSet;
+    if (options.length == 0) {
+      optionSet = EnumSet.noneOf(Options.class);
+    } else {
+      optionSet = EnumSet.copyOf(Arrays.asList(options));
+    }
+
     final String commentPrefix;
     if (style != null) {
       // Style.Any includes multiple comment styles
@@ -222,7 +241,7 @@ public class IniMap implements Iterable<IniMapSection> {
     for (int i = 0, count = lines.size(); i < count; i++) {
       final String line = lines.get(i);
       final int len = line.length();
-      final CharBuffer cb = CharBuffer.allocate(len);
+      CharBuffer cb = CharBuffer.allocate(len);
       State state = State.Null;
       int pos = 0;
       while (pos < len) {
@@ -300,13 +319,30 @@ public class IniMap implements Iterable<IniMapSection> {
               curEntry = curSection.addEntry(key, "");
               state = State.Value;
             } else if (!fnKey.test(ch) && !fnWhiteSpace.test(ch)) {
-              throw new Exception(String.format("Invalid character for entry key at line:%d, pos:%d", i + 1, pos + 1));
+              // Special exception: Handle "Description" entry more lenient and allow multiple lines
+              if (optionSet.contains(Options.MultiLineDescription) &&
+                  curEntry != null && curEntry.getKey().equalsIgnoreCase("Description")) {
+                cb.put(ch);
+                final int capacity = curEntry.getValue().length() + line.length() + 2;
+                String curValue = curEntry.getValue() + ' ' + cb.flip();
+                cb.clear();
+                if (cb.capacity() < capacity) {
+                  cb = CharBuffer.allocate(capacity);
+                }
+                cb.append(curValue);
+                state = State.Value;
+              } else {
+                throw new Exception(String.format("Invalid character for entry key at line:%d, pos:%d", i + 1, pos + 1));
+              }
             } else {
               cb.put(ch);
             }
             break;
-          case Value:
-            if (!escaped && fnComment.test(ch)) {
+          case Value: {
+            boolean isComment = !escaped && fnComment.test(ch);
+            boolean isValue = !isComment && (escaped || fnValue.test(ch));
+
+            if (isComment && !optionSet.contains(Options.StrictLineComments)) {
               if (fnCommentSlash.test(ch)) {
                 if (pos + 1 < len && fnCommentSlash.test(line.charAt(pos + 1))) {
                   state = State.Comment;
@@ -322,13 +358,14 @@ public class IniMap implements Iterable<IniMapSection> {
               } else {
                 cb.put(ch);
               }
-            } else if (!escaped && !fnValue.test(ch)) {
-              throw new Exception(
-                  String.format("Invalid character for entry value at line:%d, pos:%d", i + 1, pos + 1));
-            } else {
+            } else if (isValue || (optionSet.contains(Options.StrictLineComments) && isComment)) {
               cb.put(ch);
+            } else {
+              throw new Exception(String.format("Invalid character for entry value at line:%d, pos:%d", i + 1, pos + 1));
             }
+
             break;
+          }
           case Comment:
             cb.put(ch);
             break;

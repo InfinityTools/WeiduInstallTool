@@ -42,7 +42,8 @@ public class ModIni {
   public static ModIni load(Path tp2File) {
     try {
       return new ModIni(tp2File);
-    } catch (FileNotFoundException ignored) {
+    } catch (FileNotFoundException e) {
+      Logger.debug(e, "Parsing metadata file");
     }
     return null;
   }
@@ -68,6 +69,7 @@ public class ModIni {
     for (final Path curPath : iniPaths) {
       if (Files.exists(curPath)) {
         iniFile = curPath;
+        break;
       }
     }
 
@@ -76,7 +78,8 @@ public class ModIni {
     }
 
     try {
-      IniMap ini = IniMap.parse(iniFile, IniMap.Style.Unix);
+      IniMap ini = IniMap.parse(iniFile, IniMap.Style.Unix, IniMap.Options.MultiLineDescription,
+          IniMap.Options.StrictLineComments);
       IniMapSection section = ini.getSection("Metadata");
       if (section == null) {
         throw new Exception();
