@@ -678,22 +678,35 @@ public class Weidu {
     final URL url = URI.create(zipAsset.downloadUrl()).toURL();
     final int bufferSize = (int) ((zipAsset.size() > 0) ? zipAsset.size() : 4_000_000);
     final ByteArrayOutputStream baos = new ByteArrayOutputStream(bufferSize);
-    try (BufferedInputStream is = new BufferedInputStream(url.openStream())) {
-      int bytesRead;
-      while ((bytesRead = is.read(buf, 0, buf.length)) >= 0) {
-        baos.write(buf, 0, bytesRead);
-        curSize += bytesRead;
-        if (bytesRead > 0) {
-          double curProgress = ((double) curSize / (double) zipAsset.size()) * progressScale;
-          if (!feedbackFunc.test("Downloading archive",
-              progress + Math.min(progressScale, curProgress))) {
-            return;
+
+    // FIXME: Loop is workaround for a "SocketException: Connection reset" error; determine whether issue is client-side or server-side
+    IOException ex = null;
+    for (int i = 0; i < 3; i++) {
+      try (BufferedInputStream is = new BufferedInputStream(url.openStream())) {
+        int bytesRead;
+        while ((bytesRead = is.read(buf, 0, buf.length)) >= 0) {
+          baos.write(buf, 0, bytesRead);
+          curSize += bytesRead;
+          if (bytesRead > 0) {
+            double curProgress = ((double) curSize / (double) zipAsset.size()) * progressScale;
+            if (!feedbackFunc.test("Downloading archive",
+                progress + Math.min(progressScale, curProgress))) {
+              return;
+            }
           }
         }
+        ex = null;
+        break;
+      } catch (IOException e) {
+        Logger.debug(e, "Error downloading WeiDU archive (attempt {})", i + 1);
+        ex = e;
       }
-    } catch (IOException e) {
-      Logger.debug(e, "Error downloading WeiDU archive");
-      throw new IOException("Could not download WeiDU binary", e);
+    }
+
+    // trigger only if all download attempts have failed
+    if (ex != null) {
+      Logger.warn(ex, "Error downloading WeiDU archive");
+      throw new IOException("Could not download WeiDU binary", ex);
     }
 
     // 3. Extract WeiDU binary to destination
