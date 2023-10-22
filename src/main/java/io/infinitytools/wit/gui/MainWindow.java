@@ -1961,7 +1961,9 @@ public class MainWindow extends Application {
         Set<String> mods = null;
         try {
           WeiduLog log = WeiduLog.load(gamePath.resolve(WeiduLog.WEIDU_FILENAME));
-          mods = log.getEntries().stream().map(e -> e.getTp2Name().toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
+          if (log != null) {
+            mods = log.getEntries().stream().map(e -> e.getTp2Name().toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
+          }
         } catch (Exception e) {
           // WeiDU.log may not exist
           Logger.info(e, "WeiDU.log not available or could not be parsed");

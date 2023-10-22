@@ -18,11 +18,13 @@ package io.infinitytools.wit.mod.log;
 import io.infinitytools.wit.mod.ModInfo;
 import org.tinylog.Logger;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -57,6 +59,8 @@ public class WeiduLog implements Iterable<WeiduLogEntry> {
         try {
           content = Files.readString(log, cs);
           break;
+        } catch (NoSuchFileException e) {
+          Logger.debug("WeiDU.log not available");
         } catch (CharacterCodingException e) {
           Logger.debug(e, "Incompatible character encoding: {}", cs);
         }
@@ -81,6 +85,9 @@ public class WeiduLog implements Iterable<WeiduLogEntry> {
       byte[] buf;
       try (final InputStream is = log.openStream()) {
         buf = is.readAllBytes();
+      } catch (FileNotFoundException e) {
+        Logger.debug("WeiDU.log not available");
+        buf = null;
       }
 
       if (buf != null) {
