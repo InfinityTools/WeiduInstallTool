@@ -42,7 +42,7 @@ Customization of the WeiDU Install Tool includes:
 
 Installation builds are available as installers and portable packages for Windows, GNU/Linux and macOS. They can be downloaded from the [Releases](https://github.com/InfinityTools/WeiduInstallTool/releases) section of the project.
 
-*Note: It is possible that some antivirus or security tools are overly sensitive and block download or installation of the file because of problematic executables. These are false positives if you downloaded the file from the official GitHub Releases page. Most antivirus tools provide options to whitelist the problematic files or mark them as safe and allow you to continue with the process.*
+_**Note:** It is possible that some antivirus or security tools are overly sensitive and block download or installation of the file because of problematic executables. These are false positives if you downloaded the file from the official GitHub Releases page. Most antivirus tools provide options to whitelist the problematic files or mark them as safe and allow you to continue with the process._
 
 ## Building from Source
 
