@@ -78,7 +78,7 @@ public class ModIni {
     }
 
     try {
-      IniMap ini = IniMap.parse(iniFile, IniMap.Style.Unix, IniMap.Options.MultiLineDescription,
+      IniMap ini = IniMap.parse(iniFile, IniMap.Style.Any, IniMap.Options.MultiLineDescription,
           IniMap.Options.StrictLineComments);
       IniMapSection section = ini.getSection("Metadata");
       if (section == null) {
