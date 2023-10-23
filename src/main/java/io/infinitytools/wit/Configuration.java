@@ -120,6 +120,15 @@ public class Configuration {
      */
     LAST_MOD_PATH("Last Mod Path", String.class, null),
     /**
+     * Specifies whether the mod installation log should be saved in a separate folder.
+     */
+    DEBUG_FOLDER_ENABLED("Enable Debug Folder", Boolean.class, false),
+    /**
+     * Specifies the folder name where mod installation logs should be saved.
+     * Folder name is relative to the game directory.
+     */
+    DEBUG_FOLDER_NAME("Debug Folder Name", String.class, "debug"),
+    /**
      * Specifies the language in which all text of the application should be displayed.
      * System language is used if this option is not defined.
      * <p>

@@ -68,6 +68,10 @@ public class MainWindowController implements Initializable {
   public CheckMenuItem trayIconFeedbackCheckItem;
   public CheckMenuItem showLogCheckItem;
   public CustomMenuItem bufferSizeMenuItem;
+  public CustomMenuItem debugFolderMenuItem;
+  public CheckBox debugFolderCheckBox;
+  public TextField debugFolderTextField;
+  public Label debugFolderMessageLabel;
   public CustomMenuItem outputFontSizeMenuItem;
   public Spinner<Double> outputFontSizeSpinner;
   public SpinnerValueFactory.DoubleSpinnerValueFactory outputFontSizeValueFactory;

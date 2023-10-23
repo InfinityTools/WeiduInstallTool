@@ -653,6 +653,40 @@ public class MainWindow extends Application {
   }
 
   /**
+   * Returns whether debug files from guided mod installations should be stored in a separate folder.
+   */
+  public boolean isDebugFolderEnabled() {
+    return getController().debugFolderCheckBox.isSelected();
+  }
+
+  /**
+   * Defines whether debug files from guided mod installations should be stored in a separate folder.
+   */
+  public void setDebugFolderEnabled(boolean newValue) {
+    getController().debugFolderCheckBox.setSelected(newValue);
+  }
+
+  /**
+   * Returns the folder name for debug files from guided mod installations.
+   */
+  public String getDebugFolderName() {
+    return getController().debugFolderTextField.getText();
+  }
+
+  /**
+   * Specifies the folder name for debug files from guided mod installations.
+   *
+   * @param folderName Folder name, relative to the game directory.
+   */
+  public void setDebugFolderName(String folderName) {
+    String name = Utils.getValidatedFolderPath(folderName, true);
+    getController().debugFolderTextField.setText(name);
+    if (name.isEmpty()) {
+      getController().debugFolderCheckBox.setSelected(false);
+    }
+  }
+
+  /**
    * Returns whether the Details window is visible.
    */
   public boolean isDetailsWindowVisible() {
@@ -826,6 +860,69 @@ public class MainWindow extends Application {
     } else {
       setDetailsWindowVisible(newValue);
     }
+  }
+
+  /**
+   * Ensures that the debug folder input field does not contain invalid characters.
+   */
+  private void onDebugFolderTextChanged() {
+    final String text = getController().debugFolderTextField.getText();
+    if (text.isEmpty()) {
+      return;
+    }
+
+    int caret = getController().debugFolderTextField.getCaretPosition();
+    StringBuilder sb = new StringBuilder(text);
+
+    final String forbiddenChars = "<>:|?* \"\t\n\r\f";
+    int i = 0;
+    while (i < sb.length()) {
+      final char ch = sb.charAt(i);
+      if (forbiddenChars.indexOf(ch) >= 0) {
+        sb.delete(i, i + 1);
+        if (i < caret) {
+          caret--;
+        }
+      } else {
+        // Unix uses forward slashes for path separators
+        if (!SystemInfo.IS_WINDOWS && ch == '\\') {
+          sb.replace(i, i+1, "/");
+        }
+        i++;
+      }
+    }
+    caret = Math.min(caret, sb.length());
+
+    getController().debugFolderTextField.positionCaret(caret);
+    getController().debugFolderTextField.setText(sb.toString());
+
+    // updating info message
+    updateDebugFolderMessage();
+  }
+
+  /**
+   * Called whenever the selected state of the "Debug Folder" option is changed.
+   */
+  private void onDebugFolderSelectionChanged() {
+    final boolean selected = getController().debugFolderCheckBox.isSelected();
+    getController().debugFolderTextField.setDisable(!selected);
+
+    // updating info message
+    updateDebugFolderMessage();
+  }
+
+  /**
+   * Shows or hides an info text associated with the "Debug Folder" option depending on the current option state.
+   */
+  private void updateDebugFolderMessage() {
+    final boolean defEnabled = Configuration.getInstance().getOption(Configuration.Key.DEBUG_FOLDER_ENABLED);
+    final boolean curEnabled = getController().debugFolderCheckBox.isSelected();
+    final String defText = Configuration.getInstance().getOption(Configuration.Key.DEBUG_FOLDER_NAME);
+    final String curText = getController().debugFolderTextField.getText();
+    final boolean msgEnabled = defEnabled != curEnabled || !defText.contentEquals(curText);
+
+    getController().debugFolderMessageLabel.setVisible(msgEnabled);
+    getController().debugFolderMessageLabel.setManaged(msgEnabled);
   }
 
   /**
@@ -1316,6 +1413,12 @@ public class MainWindow extends Application {
     getController().bufferSizeSlider.valueProperty().addListener((ob, ov, nv) -> setOutputBufferSizeLabel(nv.doubleValue()));
     getController().outputFontSizeValueFactory.valueProperty().addListener((ob, ov, nv) -> setOutputAreaFontSize(nv));
 
+    getController().debugFolderCheckBox.selectedProperty().addListener((ob, ov, nv) -> onDebugFolderSelectionChanged());
+    getController().debugFolderTextField.textProperty().addListener((ob, ov, nv) -> onDebugFolderTextChanged());
+    getController().debugFolderTextField.focusedProperty().addListener((ob, ov, nv) ->
+        getController().debugFolderTextField
+            .setText(Utils.getValidatedFolderPath(getController().debugFolderTextField.getText(), true)));
+
     getController().showLogCheckItem.setOnAction(event -> {
       final boolean selected = getController().showLogCheckItem.isSelected();
       try {
@@ -1392,6 +1495,10 @@ public class MainWindow extends Application {
     setSingleInstanceEnabled(Configuration.getInstance().getOption(Configuration.Key.SINGLE_INSTANCE), false);
     setTrayIconFeedbackEnabled(Configuration.getInstance().getOption(Configuration.Key.TRAY_ICON_FEEDBACK));
     setOutputBufferSize(Configuration.getInstance().getOption(Configuration.Key.BUFFER_LIMIT));
+
+    setDebugFolderEnabled(Configuration.getInstance().getOption(Configuration.Key.DEBUG_FOLDER_ENABLED));
+    setDebugFolderName(Configuration.getInstance().getOption(Configuration.Key.DEBUG_FOLDER_NAME));
+    onDebugFolderSelectionChanged();
 
     applyOutputFontSize(Configuration.getInstance().getOption(Configuration.Key.OUTPUT_FONT_SIZE,
         getController().outputArea.getFont().getSize()));
@@ -1765,6 +1872,8 @@ public class MainWindow extends Application {
     cfg.setOption(Configuration.Key.TRAY_ICON_FEEDBACK, isTrayIconFeedbackEnabled());
     cfg.setOption(Configuration.Key.QUIT_ON_ENTER, isAutoQuitEnabled());
     cfg.setOption(Configuration.Key.VISUALIZE_RESULT, isVisualizeResultsEnabled());
+    cfg.setOption(Configuration.Key.DEBUG_FOLDER_ENABLED, isDebugFolderEnabled());
+    cfg.setOption(Configuration.Key.DEBUG_FOLDER_NAME, getDebugFolderName());
     cfg.setOption(Configuration.Key.BUFFER_LIMIT, getOutputBufferSize());
     cfg.setOption(Configuration.Key.OUTPUT_FONT_SIZE, getOutputAreaFontSize());
     if (modInfo != null) {
@@ -2121,7 +2230,7 @@ public class MainWindow extends Application {
     final List<String> command = new ArrayList<>(Configuration.getInstance().getWeiduArgs());
 
     if (!command.contains("--log")) {
-      final Path logFile = getModInfo().getLogFile();
+      final Path logFile = getEffectiveLogFilePath(true);
       command.add(0, logFile.toString());
       command.add(0, "--log");
     }
@@ -2146,6 +2255,47 @@ public class MainWindow extends Application {
 
     Logger.debug("Guided mode, WeiDU command: {}", command);
     return command.toArray(new String[0]);
+  }
+
+  /**
+   * Returns the effective path of the .debug file created by the mod installation process, which also considers
+   * the option to redirect debug files to custom folders.
+   *
+   * @param autoCreateFolders Specify {@code true} to ensure that the folder for the log file exists.
+   * @return Effective log file path.
+   */
+  public Path getEffectiveLogFilePath(boolean autoCreateFolders) {
+    Path logFile = getModInfo().getLogFile();
+
+    // relocate log path if needed
+    if (isDebugFolderEnabled()) {
+      try {
+        final Path subPath = Path.of(getDebugFolderName());
+        if (subPath.getNameCount() > 0) {
+          Path path;
+          if (logFile.getParent() == null) {
+            path = subPath;
+          } else {
+            path = logFile.getParent().resolve(subPath);
+          }
+          path = path.resolve(logFile.getFileName());
+          logFile = path;
+        }
+      } catch (Exception ignored) {
+      }
+    }
+
+    if (autoCreateFolders && logFile.getParent() != null && !Files.isDirectory(logFile.getParent())) {
+      try {
+        Files.createDirectories(logFile.getParent());
+      } catch (IOException e) {
+        // falling back to original path on error
+        Logger.warn(e, "Could not create folder for debug file");
+        logFile = getModInfo().getLogFile();
+      }
+    }
+
+    return logFile;
   }
 
   /**

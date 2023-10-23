@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -292,6 +293,56 @@ public class Utils {
     }
 
     return retVal;
+  }
+
+  /**
+   * Ensures that the specified folder name conforms to the file name specification.
+   *
+   * @param pathName Folder path as string.
+   * @param relative Indicates whether only relative folder paths are allowed.
+   * @return A valid path name conforming to the specified parameters.
+   */
+  public static String getValidatedFolderPath(String pathName, boolean relative) {
+    if (pathName == null) {
+      pathName = "";
+    }
+
+    try {
+      Path path = Path.of(pathName);
+      if (relative && path.getNameCount() > 0 && path.isAbsolute()) {
+        path = path.subpath(1, path.getNameCount());
+      }
+
+      // removing or fixing invalid path names
+      List<String> pathNames = new ArrayList<>();
+      for (Path value : path) {
+        String item = value.toString().strip();
+
+        boolean check = !item.isEmpty() && !item.equals("..") && !item.equals(".");
+        if (check) {
+          while (item.endsWith(".")) {
+            item = item.substring(0, item.length() - 1);
+          }
+        }
+
+        if (!item.isEmpty() && !item.equals("..") && !item.equals(".")) {
+          pathNames.add(item);
+        }
+      }
+
+      // assembling final path
+      if (pathNames.isEmpty()) {
+        pathName = "";
+      } else {
+        final String firstName = pathNames.removeFirst();
+        pathName = Path.of(firstName, pathNames.toArray(new String[0])).toString();
+      }
+    } catch (InvalidPathException e) {
+      Logger.debug("Invalid folder path: {}", pathName);
+      pathName = "";
+    }
+
+    return pathName;
   }
 
   /**

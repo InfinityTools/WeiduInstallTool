@@ -145,6 +145,31 @@
 
         <SeparatorMenuItem />
 
+        <CustomMenuItem fx:id="debugFolderMenuItem">
+          <content>
+            <VBox alignment="CENTER_LEFT"
+                  spacing="8">
+              <padding>
+                <Insets top="2"
+                        right="4"
+                        bottom="2"/>
+              </padding>
+              <CheckBox fx:id="debugFolderCheckBox"
+                        text="%ui.main.menu.item.useDebugFolder"/>
+              <TextField fx:id="debugFolderTextField"
+                         text="debug" />
+              <!-- managed=false signals the layout manager to not reserve space for the invisible node -->
+              <Label fx:id="debugFolderMessageLabel"
+                     styleClass="warningLabel"
+                     text="%ui.main.menu.item.useDebugFolder.label"
+                     visible="false"
+                     managed="false"/>
+            </VBox>
+          </content>
+        </CustomMenuItem>
+
+        <SeparatorMenuItem />
+
         <CustomMenuItem fx:id="outputFontSizeMenuItem">
           <content>
             <HBox alignment="CENTER_LEFT"

@@ -19,3 +19,7 @@
 .boldLabel {
   -fx-font-weight: bold;
 }
+
+.warningLabel {
+  -fx-text-fill: red;
+}
