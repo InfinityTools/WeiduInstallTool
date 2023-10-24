@@ -82,6 +82,92 @@
         <Tooltip text="%ui.main.menu.tooltip"/>
       </tooltip>
       <items>
+        <Menu fx:id="weiduOptionsMenu"
+              text="%ui.main.menu.item.weidu.options">
+          <CheckMenuItem fx:id="weiduQuickLogCheckItem"
+                         text="%ui.main.menu.item.weidu.quickLog">
+            <!--<tooltip>
+              <Tooltip fx:id="weiduQuickLogTooltip"
+                       text="When enabled then mod component names are not printed in the WeiDU.log.\nThis option can speed up mod installations considerably.">
+              </Tooltip>
+            </tooltip>-->
+          </CheckMenuItem>
+          <CheckMenuItem fx:id="weiduSafeExitCheckItem"
+                         text="%ui.main.menu.item.weidu.safeExit">
+            <!--<tooltip>
+              <Tooltip fx:id="weiduQuickLogTooltip"
+                       text="When enabled then WeiDU prints the WeiDU.log after starting the installation of every component.">
+              </Tooltip>
+            </tooltip>-->
+          </CheckMenuItem>
+
+          <SeparatorMenuItem/>
+
+          <CheckMenuItem fx:id="weiduStackTraceCheckItem"
+                         text="%ui.main.menu.item.weidu.stackTrace">
+            <!--<tooltip>
+              <Tooltip fx:id="WeiduLogTooltip"
+                       text="When enabled prints OCaml stack trace when reporting an exception.">
+              </Tooltip>
+            </tooltip>-->
+          </CheckMenuItem>
+          <CheckMenuItem fx:id="weiduDebugOcamlCheckItem"
+                         text="%ui.main.menu.item.weidu.debugOcaml">
+            <!--<tooltip>
+              <Tooltip fx:id="WeiduLogTooltip"
+                       text="When enabled prints random debugging information for the Ocaml source.">
+              </Tooltip>
+            </tooltip>-->
+          </CheckMenuItem>
+          <CheckMenuItem fx:id="weiduDebugBoiicCheckItem"
+                         text="%ui.main.menu.item.weidu.debugBoiic">
+            <!--<tooltip>
+              <Tooltip fx:id="WeiduLogTooltip"
+                       text="When enabled prints out which files have been changed by BUT_ONLY_IF_IT_CHANGES.">
+              </Tooltip>
+            </tooltip>-->
+          </CheckMenuItem>
+          <CheckMenuItem fx:id="weiduDebugChangeCheckItem"
+                         text="%ui.main.menu.item.weidu.debugChange">
+            <!--<tooltip>
+              <Tooltip fx:id="WeiduLogTooltip"
+                       text="When enabled prints a warning if a file is being COPY_EXISTED without receiving a change.">
+              </Tooltip>
+            </tooltip>-->
+          </CheckMenuItem>
+
+          <SeparatorMenuItem/>
+
+          <CustomMenuItem fx:id="weiduCustomOptionsMenuItem">
+            <content>
+              <VBox alignment="CENTER_LEFT"
+                    spacing="8">
+                <padding>
+                  <Insets top="2"
+                          right="4"
+                          bottom="2"/>
+                </padding>
+                <!-- Workaround for JavaFX bug: textFill attribute fixes invisible text -->
+                <CheckBox fx:id="weiduCustomOptionsCheckBox"
+                          text="%ui.main.menu.item.weidu.customOptions"
+                          textFill="black">
+                  <tooltip>
+                    <Tooltip text="%ui.main.menu.item.weidu.customOptions.tooltip"/>
+                  </tooltip>
+                </CheckBox>
+                <TextField fx:id="weiduCustomOptionsTextField"
+                           prefColumnCount="25"/>
+                <!-- managed=false signals the layout manager to not reserve space for the invisible node -->
+                <Label fx:id="weiduCustomOptionsMessageLabel"
+                       styleClass="warningLabel"
+                       text="%ui.main.menu.item.restartApp.label"
+                       visible="false"
+                       managed="false"/>
+              </VBox>
+            </content>
+          </CustomMenuItem>
+        </Menu>
+
         <CheckMenuItem fx:id="autoQuitCheckItem"
                        text="%ui.main.menu.item.autoQuit">
           <!--<tooltip>
@@ -155,13 +241,17 @@
                         bottom="2"/>
               </padding>
               <CheckBox fx:id="debugFolderCheckBox"
-                        text="%ui.main.menu.item.useDebugFolder"/>
+                        text="%ui.main.menu.item.useDebugFolder">
+                <tooltip>
+                  <Tooltip text="%ui.main.menu.item.useDebugFolder.label"/>
+                </tooltip>
+              </CheckBox>
               <TextField fx:id="debugFolderTextField"
                          text="debug" />
               <!-- managed=false signals the layout manager to not reserve space for the invisible node -->
               <Label fx:id="debugFolderMessageLabel"
                      styleClass="warningLabel"
-                     text="%ui.main.menu.item.useDebugFolder.label"
+                     text="%ui.main.menu.item.restartApp.label"
                      visible="false"
                      managed="false"/>
             </VBox>

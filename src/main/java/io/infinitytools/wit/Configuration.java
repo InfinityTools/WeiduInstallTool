@@ -73,6 +73,38 @@ public class Configuration {
      */
     WARN_MOD_ORDER("Warn Mod Order", Boolean.class, true),
     /**
+     * Applies WeiDU option "--quick-log" to guided operations if enabled.
+     */
+    WEIDU_QUICK_LOG("Weidu Quick Log", Boolean.class, false),
+    /**
+     * Applies WeiDU option "--safe-exit" to guided operations if enabled.
+     */
+    WEIDU_SAFE_EXIT("Weidu Safe Exit", Boolean.class, false),
+    /**
+     * Applies WeiDU option "--print-backtrace" to guided operations if enabled.
+     */
+    WEIDU_STACK_TRACE("Weidu Stack Trace", Boolean.class, false),
+    /**
+     * Applies WeiDU option "--debug-ocaml" to guided operations if enabled.
+     */
+    WEIDU_DEBUG_OCAML("Weidu Debug Ocaml", Boolean.class, false),
+    /**
+     * Applies WeiDU option "--debug-boiic" to guided operations if enabled.
+     */
+    WEIDU_DEBUG_BOIIC("Weidu Debug Boiic", Boolean.class, false),
+    /**
+     * Applies WeiDU option "--debug-change" to guided operations if enabled.
+     */
+    WEIDU_DEBUG_CHANGE("Weidu Debug Change", Boolean.class, false),
+    /**
+     * Specifies whether custom WeiDU options should be added when installing mods in guided mode.
+     */
+    WEIDU_CUSTOM_OPTIONS_ENABLED("Enable Custom Weidu Options", Boolean.class, false),
+    /**
+     * Specifies custom WeiDU options to be added when installing mods in guided mode.
+     */
+    WEIDU_CUSTOM_OPTIONS("Custom Weidu Options", String.class, null),
+    /**
      * Indicates whether pressing the Enter key closes the application when the WeiDU process is completed.
      * <p>
      * Enabled by default, except on Linux because of incomplete single app instance functionality.

@@ -40,10 +40,12 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -594,6 +596,158 @@ public class MainWindow extends Application {
   }
 
   /**
+   * Returns whether the WeiDU "--quick-log" option should be used when installing mods.
+   */
+  public boolean isWeiduQuickLogEnabled() {
+    return getController().weiduQuickLogCheckItem.isSelected();
+  }
+
+  /**
+   * Sets whether the WeiDU "--quick-log" option should be used when installing mods.
+   *
+   * @param newValue Enabled state of the option.
+   * @param feedback Whether to show a message dialog for the user when the state changes.
+   */
+  public void setWeiduQuickLogEnabled(boolean newValue, boolean feedback) {
+    setWeiduOptionEnabled(getController().weiduQuickLogCheckItem, newValue, feedback, Configuration.Key.WEIDU_QUICK_LOG);
+  }
+
+  /**
+   * Returns whether the WeiDU "--safe-exit" option should be used when installing mods.
+   */
+  public boolean isWeiduSafeExitEnabled() {
+    return getController().weiduSafeExitCheckItem.isSelected();
+  }
+
+  /**
+   * Sets whether the WeiDU "--safe-exit" option should be used when installing mods.
+   *
+   * @param newValue Enabled state of the option.
+   * @param feedback Whether to show a message dialog for the user when the state changes.
+   */
+  public void setWeiduSafeExitEnabled(boolean newValue, boolean feedback) {
+    setWeiduOptionEnabled(getController().weiduSafeExitCheckItem, newValue, feedback, Configuration.Key.WEIDU_SAFE_EXIT);
+  }
+
+  /**
+   * Returns whether the WeiDU "--safe-exit" option should be used when installing mods.
+   */
+  public boolean isWeiduStackTraceEnabled() {
+    return getController().weiduStackTraceCheckItem.isSelected();
+  }
+
+  /**
+   * Sets whether the WeiDU "--safe-exit" option should be used when installing mods.
+   *
+   * @param newValue Enabled state of the option.
+   * @param feedback Whether to show a message dialog for the user when the state changes.
+   */
+  public void setWeiduStackTraceEnabled(boolean newValue, boolean feedback) {
+    setWeiduOptionEnabled(getController().weiduStackTraceCheckItem, newValue, feedback, Configuration.Key.WEIDU_STACK_TRACE);
+  }
+
+  /**
+   * Returns whether the WeiDU "--debug-ocaml" option should be used when installing mods.
+   */
+  public boolean isWeiduDebugOcamlEnabled() {
+    return getController().weiduDebugOcamlCheckItem.isSelected();
+  }
+
+  /**
+   * Sets whether the WeiDU "--debug-ocaml" option should be used when installing mods.
+   *
+   * @param newValue Enabled state of the option.
+   * @param feedback Whether to show a message dialog for the user when the state changes.
+   */
+  public void setWeiduDebugOcamlEnabled(boolean newValue, boolean feedback) {
+    setWeiduOptionEnabled(getController().weiduDebugOcamlCheckItem, newValue, feedback, Configuration.Key.WEIDU_DEBUG_OCAML);
+  }
+
+  /**
+   * Returns whether the WeiDU "--debug-boiic" option should be used when installing mods.
+   */
+  public boolean isWeiduDebugBoiicEnabled() {
+    return getController().weiduDebugBoiicCheckItem.isSelected();
+  }
+
+  /**
+   * Sets whether the WeiDU "--debug-boiic" option should be used when installing mods.
+   *
+   * @param newValue Enabled state of the option.
+   * @param feedback Whether to show a message dialog for the user when the state changes.
+   */
+  public void setWeiduDebugBoiicEnabled(boolean newValue, boolean feedback) {
+    setWeiduOptionEnabled(getController().weiduDebugBoiicCheckItem, newValue, feedback, Configuration.Key.WEIDU_DEBUG_BOIIC);
+  }
+
+  /**
+   * Returns whether the WeiDU "--debug-change" option should be used when installing mods.
+   */
+  public boolean isWeiduDebugChangeEnabled() {
+    return getController().weiduDebugChangeCheckItem.isSelected();
+  }
+
+  /**
+   * Sets whether the WeiDU "--debug-change" option should be used when installing mods.
+   *
+   * @param newValue Enabled state of the option.
+   * @param feedback Whether to show a message dialog for the user when the state changes.
+   */
+  public void setWeiduDebugChangeEnabled(boolean newValue, boolean feedback) {
+    setWeiduOptionEnabled(getController().weiduDebugChangeCheckItem, newValue, feedback, Configuration.Key.WEIDU_DEBUG_CHANGE);
+  }
+
+  /**
+   * Sets the selection state of the specified menu item and optionally provides feedback whether to restart
+   * the application.
+   */
+  private void setWeiduOptionEnabled(CheckMenuItem item, boolean newValue, boolean feedBack, Configuration.Key key) {
+    if (item != null) {
+      item.setSelected(newValue);
+
+      if (feedBack && key != null && isProcessRunning()) {
+        boolean configValue = Configuration.getInstance().getOption(key);
+        if (newValue != configValue) {
+          Utils.showMessageDialog(getStage(), R.INFORMATION(), item.getText(),
+              R.get("ui.main.menu.item.restartApp.message.content"));
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns whether custom WeiDU options are used by guided mod installations.
+   */
+  public boolean isCustomWeiduOptionsEnabled() {
+    return getController().weiduCustomOptionsCheckBox.isSelected();
+  }
+
+  /**
+   * Defines whether custom WeiDU options are used by guided mod installations.
+   */
+  public void setCustomWeiduOptionsEnabled(boolean newValue) {
+    getController().weiduCustomOptionsCheckBox.setSelected(newValue);
+  }
+
+  /**
+   * Returns the content of the "Custom WeiDU Options" text field.
+   * The content is returned regardless of enabled state.
+   */
+  public String getCustomWeiduOptions() {
+    return getController().weiduCustomOptionsTextField.getText().strip();
+  }
+
+  /**
+   * Specifies the content of the "Custom WeiDU Options" text field.
+   */
+  public void setCustomWeiduOptions(String options) {
+    if (options == null) {
+      options = "";
+    }
+    getController().weiduCustomOptionsTextField.setText(options);
+  }
+
+  /**
    * Returns whether Dark Mode UI is enabled.
    */
   public boolean isDarkModeEnabled() {
@@ -632,7 +786,7 @@ public class MainWindow extends Application {
       boolean configValue = Configuration.getInstance().getOption(Configuration.Key.SINGLE_INSTANCE);
       if (newValue != configValue) {
         Utils.showMessageDialog(getStage(), R.INFORMATION(), R.get("ui.main.menu.item.singleInstance"),
-            R.get("ui.main.menu.item.singleInstance.message.content"));
+            R.get("ui.main.menu.item.restartApp.message.content"));
       }
     }
   }
@@ -886,7 +1040,7 @@ public class MainWindow extends Application {
       } else {
         // Unix uses forward slashes for path separators
         if (!SystemInfo.IS_WINDOWS && ch == '\\') {
-          sb.replace(i, i+1, "/");
+          sb.replace(i, i + 1, "/");
         }
         i++;
       }
@@ -915,14 +1069,50 @@ public class MainWindow extends Application {
    * Shows or hides an info text associated with the "Debug Folder" option depending on the current option state.
    */
   private void updateDebugFolderMessage() {
-    final boolean defEnabled = Configuration.getInstance().getOption(Configuration.Key.DEBUG_FOLDER_ENABLED);
-    final boolean curEnabled = getController().debugFolderCheckBox.isSelected();
-    final String defText = Configuration.getInstance().getOption(Configuration.Key.DEBUG_FOLDER_NAME);
-    final String curText = getController().debugFolderTextField.getText();
-    final boolean msgEnabled = defEnabled != curEnabled || !defText.contentEquals(curText);
+    updateOptionsMessage(Configuration.Key.DEBUG_FOLDER_ENABLED, Configuration.Key.DEBUG_FOLDER_NAME,
+        getController().debugFolderCheckBox.isSelected(), getController().debugFolderTextField.getText(),
+        getController().debugFolderMessageLabel);
+  }
 
-    getController().debugFolderMessageLabel.setVisible(msgEnabled);
-    getController().debugFolderMessageLabel.setManaged(msgEnabled);
+  /**
+   * Called whenever the selected state of the "Custom WeiDU Options" option is changed.
+   */
+  private void onWeiduCustomOptionsSelectionChanged() {
+    final boolean selected = getController().weiduCustomOptionsCheckBox.isSelected();
+    getController().weiduCustomOptionsTextField.setDisable(!selected);
+
+    // updating info message
+    updateWeiduCustomOptionsMessage();
+  }
+
+  /**
+   * Shows or hides an info text associated with the "Custom WeiDU Options" option depending on the current option state.
+   */
+  private void updateWeiduCustomOptionsMessage() {
+    updateOptionsMessage(Configuration.Key.WEIDU_CUSTOM_OPTIONS_ENABLED, Configuration.Key.WEIDU_CUSTOM_OPTIONS,
+        getController().weiduCustomOptionsCheckBox.isSelected(), getController().weiduCustomOptionsTextField.getText(),
+        getController().weiduCustomOptionsMessageLabel);
+  }
+
+  /**
+   * Generalized method for showing or hiding a (message) node based on the condition of specific child nodes.
+   *
+   * @param enabledKey  Key of the "enabled" checkbox.
+   * @param textKey     Key of the associated "content" text field.
+   * @param isSelected  Selection state of the checkbox.
+   * @param text        Text of the text field.
+   * @param messageNode {@link Node} to show or hide.
+   */
+  private void updateOptionsMessage(Configuration.Key enabledKey, Configuration.Key textKey,
+                                    boolean isSelected, String text, Node messageNode) {
+    if (isProcessRunning()) {
+      final boolean defEnabled = Configuration.getInstance().getOption(enabledKey);
+      final String defText = Configuration.getInstance().getOption(textKey);
+      final boolean msgEnabled = defEnabled != isSelected || !defText.contentEquals(text);
+
+      messageNode.setVisible(msgEnabled);
+      messageNode.setManaged(msgEnabled);
+    }
   }
 
   /**
@@ -1401,6 +1591,15 @@ public class MainWindow extends Application {
       }
     });
 
+    getController().weiduQuickLogCheckItem.setOnAction(event -> setWeiduQuickLogEnabled(isWeiduQuickLogEnabled(), true));
+    getController().weiduSafeExitCheckItem.setOnAction(event -> setWeiduSafeExitEnabled(isWeiduSafeExitEnabled(), true));
+    getController().weiduStackTraceCheckItem.setOnAction(event -> setWeiduStackTraceEnabled(isWeiduStackTraceEnabled(), true));
+    getController().weiduDebugOcamlCheckItem.setOnAction(event -> setWeiduDebugOcamlEnabled(isWeiduDebugOcamlEnabled(), true));
+    getController().weiduDebugBoiicCheckItem.setOnAction(event -> setWeiduDebugBoiicEnabled(isWeiduDebugBoiicEnabled(), true));
+    getController().weiduDebugChangeCheckItem.setOnAction(event -> setWeiduDebugChangeEnabled(isWeiduDebugChangeEnabled(), true));
+    getController().weiduCustomOptionsCheckBox.selectedProperty().addListener((ob, ov, nv) -> onWeiduCustomOptionsSelectionChanged());
+    getController().weiduCustomOptionsTextField.textProperty().addListener((ob, ov, nv) -> updateWeiduCustomOptionsMessage());
+
     getController().autoQuitCheckItem.setOnAction(event -> Configuration.getInstance()
         .setOption(Configuration.Key.QUIT_ON_ENTER, isAutoQuitEnabled()));
     getController().visualizeResultCheckItem.setOnAction(event -> Configuration.getInstance()
@@ -1487,6 +1686,15 @@ public class MainWindow extends Application {
         stage.setHeight(h);
       }
     }
+
+    setWeiduQuickLogEnabled(Configuration.getInstance().getOption(Configuration.Key.WEIDU_QUICK_LOG), false);
+    setWeiduSafeExitEnabled(Configuration.getInstance().getOption(Configuration.Key.WEIDU_SAFE_EXIT), false);
+    setWeiduStackTraceEnabled(Configuration.getInstance().getOption(Configuration.Key.WEIDU_STACK_TRACE), false);
+    setWeiduDebugOcamlEnabled(Configuration.getInstance().getOption(Configuration.Key.WEIDU_DEBUG_OCAML), false);
+    setWeiduDebugBoiicEnabled(Configuration.getInstance().getOption(Configuration.Key.WEIDU_DEBUG_BOIIC), false);
+    setWeiduDebugChangeEnabled(Configuration.getInstance().getOption(Configuration.Key.WEIDU_DEBUG_CHANGE), false);
+    setCustomWeiduOptionsEnabled(Configuration.getInstance().getOption(Configuration.Key.WEIDU_CUSTOM_OPTIONS_ENABLED));
+    setCustomWeiduOptions(Configuration.getInstance().getOption(Configuration.Key.WEIDU_CUSTOM_OPTIONS, ""));
 
     setAutoQuitEnabled(Configuration.getInstance().getOption(Configuration.Key.QUIT_ON_ENTER));
     setVisualizeResultsEnabled(Configuration.getInstance().getOption(Configuration.Key.VISUALIZE_RESULT));
@@ -1866,9 +2074,26 @@ public class MainWindow extends Application {
     cfg.setOption(Configuration.Key.WINDOW_MAXIMIZED, getStage().isMaximized());
     cfg.setOption(Configuration.Key.SHOW_DETAILS, isDetailsWindowVisible());
     cfg.setOption(Configuration.Key.WARN_MOD_ORDER, isWarnModOrderEnabled());
+
+    cfg.setOption(Configuration.Key.WEIDU_QUICK_LOG, isWeiduQuickLogEnabled());
+    cfg.setOption(Configuration.Key.WEIDU_SAFE_EXIT, isWeiduSafeExitEnabled());
+    cfg.setOption(Configuration.Key.WEIDU_STACK_TRACE, isWeiduStackTraceEnabled());
+    cfg.setOption(Configuration.Key.WEIDU_DEBUG_OCAML, isWeiduDebugOcamlEnabled());
+    cfg.setOption(Configuration.Key.WEIDU_DEBUG_BOIIC, isWeiduDebugBoiicEnabled());
+    cfg.setOption(Configuration.Key.WEIDU_DEBUG_CHANGE, isWeiduDebugChangeEnabled());
+
+    if (getCustomWeiduOptions().isEmpty()) {
+      cfg.setOption(Configuration.Key.WEIDU_CUSTOM_OPTIONS_ENABLED, false);
+      cfg.setOption(Configuration.Key.WEIDU_CUSTOM_OPTIONS, null);
+    } else {
+      cfg.setOption(Configuration.Key.WEIDU_CUSTOM_OPTIONS_ENABLED, isCustomWeiduOptionsEnabled());
+      cfg.setOption(Configuration.Key.WEIDU_CUSTOM_OPTIONS, getCustomWeiduOptions());
+    }
+
     if (getController().singleInstanceCheckItem.isVisible()) {
       cfg.setOption(Configuration.Key.SINGLE_INSTANCE, isSingleInstanceEnabled());
     }
+
     cfg.setOption(Configuration.Key.TRAY_ICON_FEEDBACK, isTrayIconFeedbackEnabled());
     cfg.setOption(Configuration.Key.QUIT_ON_ENTER, isAutoQuitEnabled());
     cfg.setOption(Configuration.Key.VISUALIZE_RESULT, isVisualizeResultsEnabled());
@@ -1876,6 +2101,7 @@ public class MainWindow extends Application {
     cfg.setOption(Configuration.Key.DEBUG_FOLDER_NAME, getDebugFolderName());
     cfg.setOption(Configuration.Key.BUFFER_LIMIT, getOutputBufferSize());
     cfg.setOption(Configuration.Key.OUTPUT_FONT_SIZE, getOutputAreaFontSize());
+
     if (modInfo != null) {
       cfg.setOption(Configuration.Key.LAST_GAME_PATH, modInfo.getGamePath().toString());
       if (modInfo.getTp2File() != null) {
@@ -2229,6 +2455,41 @@ public class MainWindow extends Application {
   private String[] getWeiduCommand(String gameLang, Path tp2File) {
     final List<String> command = new ArrayList<>(Configuration.getInstance().getWeiduArgs());
 
+    // custom WeiDU options
+    if (isCustomWeiduOptionsEnabled()) {
+      final String options = getCustomWeiduOptions();
+      if (!options.isEmpty()) {
+        final List<String> items = getCustomWeiduOptionsList(options, command);
+        command.addAll(items);
+      }
+    }
+
+    // diagnostic and performance options
+    if (isWeiduDebugChangeEnabled() && !command.contains("--debug-change")) {
+      command.add(0, "--debug-change");
+    }
+
+    if (isWeiduDebugOcamlEnabled() && !command.contains("--debug-boiic")) {
+      command.add(0, "--debug-boiic");
+    }
+
+    if (isWeiduDebugOcamlEnabled() && !command.contains("--debug-ocaml")) {
+      command.add(0, "--debug-ocaml");
+    }
+
+    if (isWeiduStackTraceEnabled() && !command.contains("--print-backtrace")) {
+      command.add(0, "--print-backtrace");
+    }
+
+    if (isWeiduSafeExitEnabled() && !command.contains("--safe-exit")) {
+      command.add(0, "--safe-exit");
+    }
+
+    if (isWeiduQuickLogEnabled() && !command.contains("--quick-log")) {
+      command.add(0, "--quick-log");
+    }
+
+    // standard options
     if (!command.contains("--log")) {
       final Path logFile = getEffectiveLogFilePath(true);
       command.add(0, logFile.toString());
@@ -2255,6 +2516,30 @@ public class MainWindow extends Application {
 
     Logger.debug("Guided mode, WeiDU command: {}", command);
     return command.toArray(new String[0]);
+  }
+
+  /**
+   * Returns a list of sanitized custom WeiDU options
+   *
+   * @param options WeiDU options to convert into a sanitized list.
+   * @param command Global list of WeiDU command parameters.
+   * @return Sanitized list of custom WeiDU options.
+   */
+  private static List<String> getCustomWeiduOptionsList(String options, List<String> command) {
+    final List<String> items = new ArrayList<>(Arrays.asList(options.split("\\s+")));
+    for (int i = 0; i < items.size(); ) {
+      final String item = items.get(i);
+      if (item.startsWith("--") && command.contains(item)) {
+        // remove WeiDU option and optional associated arguments
+        items.remove(i);
+        while (i < items.size() && !items.get(i).startsWith("--")) {
+          items.remove(i);
+        }
+      } else {
+        i++;
+      }
+    }
+    return items;
   }
 
   /**
