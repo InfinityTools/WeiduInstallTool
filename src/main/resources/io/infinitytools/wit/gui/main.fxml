@@ -50,7 +50,8 @@
            styleClass="boldLabel"/>
     <Pane HBox.hgrow="ALWAYS"/>
     <Button fx:id="aboutButton"
-              text="%ui.main.about.button">
+            minWidth="40"
+            text="%ui.main.about.button">
       <tooltip>
         <Tooltip text="%ui.main.about.tooltip"/>
       </tooltip>
@@ -525,8 +526,8 @@
         GridPane.rowIndex="3"
         GridPane.columnSpan="2">
     <Button fx:id="quitButton"
-            text="%ui.main.quit.button"
-            maxHeight="Infinity">
-    </Button>
+            minWidth="80"
+            maxHeight="Infinity"
+            text="%ui.main.quit.button"/>
   </HBox>
 </GridPane>
