@@ -287,8 +287,11 @@ public class Weidu {
       throw new FileNotFoundException("File does not exist: " + tp2File);
     }
 
-    final byte[] data = ProcessUtils.getProcessOutput(getWorkingDir(tp2File), weidu.toString(), "--nogame",
-        "--list-languages", tp2File.toString());
+    final Path workingDir = getWorkingDir(tp2File);
+    // creating relative tp2 file path (recommended on Linux to work around issues with upper case paths)
+    final Path tp2FileRelative = workingDir.relativize(tp2File);
+    final byte[] data = ProcessUtils.getProcessOutput(workingDir, weidu.toString(), "--nogame",
+        "--list-languages", tp2FileRelative.toString());
     final String output = BufferConvert.decodeBytes(data).decoded();
 
     return parseLanguages(output);
@@ -316,8 +319,11 @@ public class Weidu {
     }
 
     // Getting mod info data as raw byte data and determine best character encoding based on selected language
-    final byte[] outputData = ProcessUtils.getProcessOutput(getWorkingDir(tp2File), weidu.toString(), "--nogame",
-        "--list-components-json", tp2File.toString(), Integer.toString(language));
+    final Path workingDir = getWorkingDir(tp2File);
+    // creating relative tp2 file path (recommended on Linux to work around issues with upper case paths)
+    final Path tp2FileRelative = workingDir.relativize(tp2File);
+    final byte[] outputData = ProcessUtils.getProcessOutput(workingDir, weidu.toString(), "--nogame",
+        "--list-components-json", tp2FileRelative.toString(), Integer.toString(language));
     Logger.debug("Parsing mod component JSON data (buffer={} bytes)", outputData.length);
 
     // preparing list of potential character sets

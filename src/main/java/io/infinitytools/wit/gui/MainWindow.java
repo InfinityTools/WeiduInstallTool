@@ -2443,7 +2443,7 @@ public class MainWindow extends Application {
       }
     }
 
-    final String[] command = getWeiduCommand(gameLang, tp2File);
+    final String[] command = getWeiduCommand(gameLang, tp2File, workingDir);
 
     final SysProc sp = new SysProc(workingDir, true, command);
     runProcess(sp);
@@ -2451,8 +2451,12 @@ public class MainWindow extends Application {
 
   /**
    * Assembles the WeiDU command line for a guided mod installation.
+   *
+   * @param gameLang   Mod language index.
+   * @param tp2File    Full path of the tp2 file.
+   * @param workingDir Working directory for the WeiDU call.
    */
-  private String[] getWeiduCommand(String gameLang, Path tp2File) {
+  private String[] getWeiduCommand(String gameLang, Path tp2File, Path workingDir) {
     final List<String> command = new ArrayList<>(Configuration.getInstance().getWeiduArgs());
 
     // custom WeiDU options
@@ -2491,7 +2495,11 @@ public class MainWindow extends Application {
 
     // standard options
     if (!command.contains("--log")) {
-      final Path logFile = getEffectiveLogFilePath(true);
+      Path logFile = getEffectiveLogFilePath(true);
+      // creating relative log file path (recommended on Linux to work around issues with upper case paths)
+      if (workingDir != null) {
+        logFile = workingDir.relativize(logFile);
+      }
       command.add(0, logFile.toString());
       command.add(0, "--log");
     }
