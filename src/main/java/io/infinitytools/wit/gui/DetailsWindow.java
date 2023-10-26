@@ -75,6 +75,10 @@ public class DetailsWindow extends Stage {
       controller.groupComboBox.getSelectionModel().select(curGroupIndex);
     } catch (IndexOutOfBoundsException e) {
       Logger.error(e, "Language item selected at index {}", newLanguageIndex);
+    } catch (Exception e) {
+      Logger.error(e, "Mod components information unavailable");
+      setComponentsTreeDisabled();
+      return;
     }
 
     onComponentsTreeChanged(newLanguageIndex, controller.groupComboBox.getSelectionModel().getSelectedItem());
@@ -337,6 +341,21 @@ public class DetailsWindow extends Stage {
     if (node != null) {
       MainWindow.getInstance().getHostServices().showDocument(node.getText());
     }
+  }
+
+  /**
+   * Disables the controls associated with the mod components tree.
+   */
+  private void setComponentsTreeDisabled() {
+    controller.languageComboBox.setDisable(true);
+    controller.groupComboBox.setDisable(true);
+    final String msg = String.format("*** %s ***", R.get("ui.details.modInfo.message.unavailable"));
+    final ComponentInfo ci = new ComponentInfo(null, -1, -1, msg, false);
+    final TreeItem<ComponentBase> root = new TreeItem<>(ci);
+    controller.componentsTree.setRoot(root);
+
+    controller.componentsTree.setShowRoot(true);
+    controller.componentsTree.setFocusTraversable(false);
   }
 
   /**
