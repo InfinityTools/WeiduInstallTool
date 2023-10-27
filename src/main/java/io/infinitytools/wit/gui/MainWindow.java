@@ -1695,6 +1695,7 @@ public class MainWindow extends Application {
     setWeiduDebugChangeEnabled(Configuration.getInstance().getOption(Configuration.Key.WEIDU_DEBUG_CHANGE), false);
     setCustomWeiduOptionsEnabled(Configuration.getInstance().getOption(Configuration.Key.WEIDU_CUSTOM_OPTIONS_ENABLED));
     setCustomWeiduOptions(Configuration.getInstance().getOption(Configuration.Key.WEIDU_CUSTOM_OPTIONS, ""));
+    onWeiduCustomOptionsSelectionChanged();
 
     setAutoQuitEnabled(Configuration.getInstance().getOption(Configuration.Key.QUIT_ON_ENTER));
     setVisualizeResultsEnabled(Configuration.getInstance().getOption(Configuration.Key.VISUALIZE_RESULT));
