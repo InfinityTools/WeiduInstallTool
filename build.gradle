@@ -5,7 +5,7 @@ plugins {
   id 'application'
   id 'org.javamodularity.moduleplugin' version '1.8.12'
   id 'org.openjfx.javafxplugin' version '0.1.0'
-  id 'org.beryx.jlink' version '3.0.0'
+  id 'org.beryx.jlink' version '3.0.1'
 }
 
 group 'io.infinitytools'
@@ -74,7 +74,7 @@ dependencies {
   implementation group: 'org.tinylog', name: 'tinylog-api', version: '2.6.2'
   implementation group: 'org.tinylog', name: 'tinylog-impl', version: '2.6.2'
   // https://mvnrepository.com/artifact/org.apache.commons/commons-text
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.11.0'
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
