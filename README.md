@@ -91,6 +91,20 @@ The `jpackage` task requires the following software to be installed on the syste
 
 More details can be found in Oracle's [Packaging Tool User's Guide](https://docs.oracle.com/en/java/javase/21/jpackage/packaging-overview.html).
 
+## Credits
+
+Weidu Install Tool © 2023 by Argent77.
+
+### Translations
+
+**English:** Argent77
+
+**German:** Argent77 (Proofreading: Shai Hulud)
+
+**French:** JohnBob
+
+**Brazilian Portuguese:** Felipe
+
 ## License
 
 WeiDU Install Tool is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
