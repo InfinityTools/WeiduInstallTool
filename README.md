@@ -1,5 +1,5 @@
-<!--[![GitHub release (latest)](https://img.shields.io/github/v/release/InfinityTools/WeiduInstallTool?color=darkred&label=latest%20release)](https://github.com/InfinityTools/WeiduInstallTool/releases/latest)
-[![GitHub release date (latest)](https://img.shields.io/github/release-date/InfinityTools/WeiduInstallTool?color=gold)](https://github.com/InfinityTools/WeiduInstallTool/releases/latest)-->
+[![GitHub release (latest)](https://img.shields.io/github/v/release/InfinityTools/WeiduInstallTool?color=darkred&label=latest%20release)](https://github.com/InfinityTools/WeiduInstallTool/releases/latest)
+[![GitHub release date (latest)](https://img.shields.io/github/release-date/InfinityTools/WeiduInstallTool?color=gold)](https://github.com/InfinityTools/WeiduInstallTool/releases/latest)
 [![Github downloads](https://img.shields.io/github/downloads/InfinityTools/WeiduInstallTool/total.svg?color=blueviolet)](https://github.com/InfinityTools/WeiduInstallTool/releases)
 [![Language](https://img.shields.io/static/v1?label=language&message=English%20%7C%20French%20%7C%20German%20%7C%20Brazilian%20Portuguese%20%7C%20Russian&color=limegreen)](https://github.com/InfinityTools/WeiduInstallTool)
 

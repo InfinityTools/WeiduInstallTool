@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0] - 2023-11-04
+
+- *First stable release*
+- Added Russian translation (by abalabokhin)
+- Fixed typos and cosmetic issues
+
 ## [0.10.3] - 2023-10-27
 
 - Added option to create debug files of mod installations in a user-defined folder instead of the game directory.
@@ -26,4 +32,6 @@
 
 ## [0.10.1] - 2023-10-19
 
-- First public release candidate
+- *First public release candidate*
+- Added French translation (by JohnBob)
+- Added German translation (by Argent77, proofreading by Shai Hulud)
